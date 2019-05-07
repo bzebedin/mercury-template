@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="EclipseModuleManager">
+    <conelement value="org.eclipse.buildship.core.gradleclasspathcontainer" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/alkacon.mercury.template/test" expected_position="0" />
+      <src_folder value="file://$MODULE_DIR$/alkacon.mercury.template/src" expected_position="1" />
+      <src_folder value="file://$MODULE_DIR$/alkacon.mercury.webform/src" expected_position="2" />
+      <src_folder value="file://$MODULE_DIR$/alkacon.mercury.xtensions/src" expected_position="3" />
+      <src_folder value="file://$MODULE_DIR$/test/src" expected_position="4" />
+    </src_description>
+  </component>
+</module>
