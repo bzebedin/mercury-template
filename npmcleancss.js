@@ -50,17 +50,32 @@ function cleanCss(inputFiles, outputDir) {
     console.log('cleancss: from ' + inputFiles + ' to ' + outputDir);
     // set the rebase path, this is required otherwise the source map file is not found
     cleanCssOptions.rebaseTo = path.normalize(outputDir + '/');
+    console.log(cleanCssOptions);
     ensureDir(cleanCssOptions.rebaseTo);
-    glob(inputFiles, function(err, files) {
+    console.log('dirtest');
+    glob('build\\npm\\02_postcssed\\*.css', function(err, files) {
+        console.log(err);
+        console.log(files);
         for (var i = 0; i < files.length; i++) {
             var f = files[i];
             var o = path.normalize(outputDir + '/' + path.basename(f, '.css') + '.min.css');
             cleanCssMinify(cleanCssOptions, [ f ], o);
         }
     });
+    // console.log('normal');
+    // glob(inputFiles, function(err, files) {
+    //     console.log(err);
+    //     console.log(files);
+    //     for (var i = 0; i < files.length; i++) {
+    //         var f = files[i];
+    //         var o = path.normalize(outputDir + '/' + path.basename(f, '.css') + '.min.css');
+    //         cleanCssMinify(cleanCssOptions, [ f ], o);
+    //     }
+    // });
 }
 
 function cleanCssMinify(options, inputFile, outputFile) {
+    console.log('cleanCssMinify:',options,inputFile,outputFile);
     (new CleanCSS(options)).minify(inputFile, function(errors, minified) {
         if (minified.inlinedStylesheets.length > 0) {
             console.error('Minified: ' + minified.inlinedStylesheets[0]);

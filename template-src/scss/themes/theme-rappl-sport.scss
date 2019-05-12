@@ -1,0 +1,58 @@
+/**
+ * This program is part of the OpenCms Mercury Template.
+ *
+ * Copyright (c) Alkacon Software GmbH & Co. KG (http://www.alkacon.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**********
+ * Theme file: theme-blue.scss
+ */
+
+$intersport-darkblue: #153da0;
+$intersport-overlay-blue: #0B2682;
+
+$text-white:                    #ffffff;
+
+// Main theme colors
+$main-theme:                    #144382; // dark blue
+$main-theme-hover:              #2197db; // light blue
+$main-theme-complementary:      #b31b34; // dark red
+
+$nav-head-bg:                   $intersport-darkblue;
+$nav-header-margin-bottom:      0;
+$nav-header-menu-bg:            $intersport-darkblue;
+$nav-header-menu-bg-hover:      $intersport-overlay-blue;
+$nav-header-text:               $text-white;
+$nav-header-text-hover:         $text-white;
+$nav-header-text-active:        $text-white;
+$nav-header-set-bg-color:       true;
+$headings-color:                $text-white;
+
+$foot-top-bg-color:             $intersport-darkblue;
+$foot-top-text-color:           $text-white;
+
+$foot-sub-bg-color:             $intersport-overlay-blue;
+$foot-sub-text-color:           $text-white;
+
+$blue:                          $intersport-darkblue;
+$blue-light:                    #2197db !default;
+$blue-lighter:                  lighten($blue-light, 42%) !default;
+$blue-dark:                     darken($blue, 10%) !default;
+$blue-darker:                   darken($blue, 15%) !default;
+
+// Import the other files
+@import '../demo-defaults';
+@import '../imports';
