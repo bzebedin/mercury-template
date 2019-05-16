@@ -21,25 +21,29 @@
  * Theme file: theme-blue.scss
  */
 
-$intersport-darkblue: #153da0;
+$intersport-darkblue: #0e4094;
 $intersport-overlay-blue: #0B2682;
+$intersport-red: #e3000f;
+$intersport-darkred: #b30012;
+
+$intersport-gray: #E6E2E1;
 
 $text-white:                    #ffffff;
 
 // Main theme colors
-$main-theme:                    #144382; // dark blue
+$main-theme:                    $intersport-darkblue; // dark blue
 $main-theme-hover:              #2197db; // light blue
-$main-theme-complementary:      #b31b34; // dark red
+$main-theme-complementary:      $intersport-darkred; // dark red
 
-$nav-head-bg:                   $intersport-darkblue;
+$nav-head-bg:                   $text-white;
 $nav-header-margin-bottom:      0;
-$nav-header-menu-bg:            $intersport-darkblue;
+$nav-header-menu-bg:            $text-white;
 $nav-header-menu-bg-hover:      $intersport-overlay-blue;
-$nav-header-text:               $text-white;
+$nav-header-text:               $intersport-darkblue;
 $nav-header-text-hover:         $text-white;
-$nav-header-text-active:        $text-white;
+$nav-header-text-active:        $intersport-overlay-blue;
 $nav-header-set-bg-color:       true;
-$headings-color:                $text-white;
+$headings-color:                $intersport-darkblue;
 
 $foot-top-bg-color:             $intersport-darkblue;
 $foot-top-text-color:           $text-white;
@@ -48,10 +52,16 @@ $foot-sub-bg-color:             $intersport-overlay-blue;
 $foot-sub-text-color:           $text-white;
 
 $blue:                          $intersport-darkblue;
-$blue-light:                    #2197db !default;
-$blue-lighter:                  lighten($blue-light, 42%) !default;
+$blue-light:                    #2197DB !default;
+$blue-lighter:                  lighten($blue-light, 12%) !default;
 $blue-dark:                     darken($blue, 10%) !default;
 $blue-darker:                   darken($blue, 15%) !default;
+
+$red:                          $intersport-darkred;
+$red-light:                    #2197DB !default;
+$red-lighter:                  lighten($blue-light, 12%) !default;
+$red-dark:                     darken($intersport-darkred, 10%) !default;
+$red-darker:                   darken($intersport-darkred, 15%) !default;
 
 // Import the other files
 @import '../demo-defaults';
