@@ -808,7 +808,7 @@ var Mercury = function(jQ) {
         }
 
         // support for revolution slider is disabled by default
-        if (false) {
+        if (true) {
             if (requiresModule(".type-complex-slider")) {
                 try {
                     import(
