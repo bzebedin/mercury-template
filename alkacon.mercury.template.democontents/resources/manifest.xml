@@ -16,7 +16,7 @@ writeProperty '/' 'NavText' 'Overview'
 writeProperty '/' 'template' '/system/modules/alkacon.mercury.template/templates/mercury.jsp'
 writeProperty '/' 'template.theme' '/system/modules/alkacon.mercury.theme/css/theme-red.min.css'
 writeProperty '/' 'template.title.prefix' 'OpenCms |'
-writeProperty '/' 'template.privacy.policy' '/.content/privacy-policy.xml'
+writeProperty '/' 'mercury.privacy.policy' '/.content/privacy-policy.xml'
 
 createUser 'Author' 'password' 'Sample author user'
 addUserToGroup 'Author' 'Users'
@@ -42,7 +42,7 @@ addUserToRole 'Templator' 'DEVELOPER']]></import-script>
 		<export-mode name="reduced"/>
 		<description><![CDATA[The OpenCms Mercury template demo contents.
 This module also creates a set of demo users during the import.]]></description>
-		<version>11.0.0.1</version>
+		<version>11.0.0.7</version>
 		<autoincrement>true</autoincrement>
 		<authorname><![CDATA[Alkacon Software GmbH & Co. KG]]></authorname>
 		<authoremail/>
@@ -6730,7 +6730,7 @@ This module also creates a set of demo users during the import.]]></description>
 			<properties>
 				<property>
 					<name>Title</name>
-					<value><![CDATA[Series:  Christmas Tree Convention (25.12.19 - 25.12.21)]]></value>
+					<value><![CDATA[ Series:  Christmas Tree Convention (25.12.19 - 25.12.21)]]></value>
 				</property>
 			</properties>
 			<relations>
@@ -6817,7 +6817,7 @@ This module also creates a set of demo users during the import.]]></description>
 			<properties>
 				<property>
 					<name>Title</name>
-					<value><![CDATA[Series:  Gathering of Repetitive Users (19.10.18 - 19.04.21), User conference]]></value>
+					<value><![CDATA[ Series:  Gathering of Repetitive Users (19.10.18 - 19.04.21), User conference]]></value>
 				</property>
 			</properties>
 			<relations/>
@@ -6834,7 +6834,7 @@ This module also creates a set of demo users during the import.]]></description>
 			<properties>
 				<property>
 					<name>Title</name>
-					<value><![CDATA[Extracted:  Modified gathering of Repetitive Users (19.04.20), User conference]]></value>
+					<value><![CDATA[ Extracted:  Modified gathering of Repetitive Users (19.04.20), User conference]]></value>
 				</property>
 			</properties>
 			<relations/>
@@ -13236,6 +13236,10 @@ This module also creates a set of demo users during the import.]]></description>
 				<property>
 					<name>Title</name>
 					<value><![CDATA[Location Map / POI]]></value>
+				</property>
+				<property>
+					<name>search.subsite</name>
+					<value><![CDATA[English Mercury Demo]]></value>
 				</property>
 			</properties>
 			<relations/>

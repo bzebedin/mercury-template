@@ -11,6 +11,7 @@
 <%@ taglib prefix="cms" uri="http://www.opencms.org/taglib/cms"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="mercury" tagdir="/WEB-INF/tags/mercury" %>
 
 <c:set var="property" value="${cms.vfs.readPropertiesSearch[cms.requestContext.uri]}" />
 
@@ -25,10 +26,6 @@
 
 <%-- OSM API key --%>
 <c:set var="osmApiKey" value="${property['osm.apikey']}" />
-
-<c:if test="${not empty osmApiKey}">
-     <% request.setAttribute("osmSprite",CmsWorkplace.getStaticResourceUri("/osm/sprite")); %>
-</c:if>
 
 <%-- OSM style URL --%>
 <c:set var="osmStyleUrl" value="${property['osm.styleurl']}" />
@@ -49,22 +46,26 @@
 <%-- OpenCms project --%>
 <c:set var ="project" value="${cms.isOnlineProject ? 'online' : 'offline'}" />
 
+<mercury:nl/>
 <div id="template-info" data-info='{<%--
     --%><c:if test="${not empty googleApiKey}">"googleApiKey":"${googleApiKey}",</c:if><%--
     --%><c:if test="${not empty googleAnalyticsId}">"googleAnalyticsId":"${googleAnalyticsId}",</c:if><%--
     --%><c:if test="${not empty osmApiKey}">"osmApiKey":"${osmApiKey}",</c:if><%--
-    --%><c:if test="${not empty osmApiKey}">"osmSpriteUrl":"${osmSprite}",</c:if><%--
-    --%><c:if test="${not empty osmStyleUrl}">"osmStyleUrl":"${osmStyleUrl}",</c:if><%--
+    --%><c:if test="${not empty osmApiKey}">"osmSpriteUrl":"<%= CmsWorkplace.getStaticResourceUri("/osm/sprite") %>",</c:if><%--
+    --%><c:if test="${not empty osmApiKey and not empty osmStyleUrl}">"osmStyleUrl":"${osmStyleUrl}",</c:if><%--
     --%><c:if test="${not empty googleApiKeyWorkplace}">"googleApiKeyWorkplace":"${googleApiKeyWorkplace}",</c:if><%--
     --%>"editMode":"${cms.isEditMode}",<%--
     --%>"project":"${project}",<%--
     --%>"locale":"${cms.locale}"<%--
---%>}'${' '}${piwikData}><%--
+--%>}'${' '}${piwikData}><%----%>
+<mercury:nl/>
 
---%><div id="template-grid-info" class="template-grid-info"></div><%--
---%><div id="template-sass-version"></div><%--
---%><div id="template-plugins-version"></div><%--
+<div id="template-grid-info" class="template-grid-info"></div>
+<div id="template-sass-version"></div>
+<div id="template-plugins-version"></div><%----%>
 
---%></div>
+</div>
+<mercury:nl/>
+
 <div id="topcontrol"></div>
 

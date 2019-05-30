@@ -15,6 +15,7 @@
 <jsp:attribute name="top">
 
 <c:set var="cmsstatus">${cms.isEditMode ? 'opencms-page-editor ' : ''}${cms.isEditMode and cms.modelGroupPage ? 'opencms-group-editor ' : ''}</c:set>
+
 <!DOCTYPE html>
 <html lang="${cms.locale}" class="noscript ${cmsstatus}">
 <head>
@@ -50,20 +51,34 @@ __scriptPath="<cms:link>%(link.weak:/system/modules/alkacon.mercury.theme/js/mer
 <c:set var="replaceCss"><cms:property name="mercury.template.replaceCss" file="search" default="none" /></c:set>
 <c:choose>
     <c:when test="${not empty replaceCss and replaceCss ne 'none'}">
-        <%-- This way an "extraHead" JSP can override the default CSS theme. --%>
+        <%-- This way an "replaceCss" JSP can override the default CSS theme. --%>
         <cms:include file="${replaceCss}" />
     </c:when>
     <c:otherwise>
+        <%-- Common CSS and theme CSS --%>
         <c:set var="cssTheme"><cms:property name="template.theme" file="search" default="/system/modules/alkacon.mercury.theme/css/theme-red.min.css" /></c:set>
         <c:set var="cssCommonRes" value="${cms.vfs.readResource['%(link.weak:/system/modules/alkacon.mercury.theme/css/base.min.css:bf8f6ace-feab-11e8-aee0-0242ac11002b)']}" />
-        <c:set var="cssThemeRes" value="${cms.vfs.readResource[cssTheme]}" />
         <link rel="stylesheet" href="<cms:link>${cssCommonRes.sitePath}?ver=${cssCommonRes.dateLastModified}</cms:link>">
+        <c:set var="cssThemeRes" value="${cms.vfs.readResource[cssTheme]}" />
         <link rel="stylesheet" href="<cms:link>${cssThemeRes.sitePath}?ver=${cssThemeRes.dateLastModified}</cms:link>">
     </c:otherwise>
 </c:choose>
 
+<%-- Additional extra CSS --%>
+<c:set var="extraCSS"><cms:property name="mercury.template.css" file="search" default="/" /></c:set>
+<c:if test="${not empty extraCSS and (extraCSS ne 'none')}">
+    <c:set var="extraCSS" value="${extraCSS}custom.css" />
+    <c:if test="${cms.vfs.exists[extraCSS]}">
+        <c:set var="cssExtraCSS" value="${cms.vfs.readResource[extraCSS]}" />
+        <link rel="stylesheet" href="<cms:link>${cssExtraCSS.sitePath}?ver=${cssExtraCSS.dateLastModified}</cms:link>">
+    </c:if>
+</c:if>
+
+<%-- Additional extra head include, can e.g. be used to add inline CSS --%>
 <c:set var="extraHead"><cms:property name="mercury.template.extraHead" file="search" default="none" /></c:set>
-<c:if test="${not empty extraHead and extraHead ne 'none'}"><cms:include file="${extraHead}" /></c:if>
+<c:if test="${not empty extraHead and (extraHead ne 'none') and cms.vfs.exists[extraHead]}">
+    <cms:include file="${extraHead}" />
+</c:if>
 
 </head>
 <body>
@@ -90,6 +105,7 @@ __scriptPath="<cms:link>%(link.weak:/system/modules/alkacon.mercury.theme/js/mer
         role="ROLE.DEVELOPER"
     />
 </cms:container>
+<mercury:nl/>
 </jsp:attribute>
 
 
@@ -99,6 +115,15 @@ __scriptPath="<cms:link>%(link.weak:/system/modules/alkacon.mercury.theme/js/mer
 
 <%-- JavaScript blocking files placed at the end of the document so the pages load faster --%>
 <cms:headincludes type="javascript" />
+
+<c:set var="extraJS"><cms:property name="mercury.template.js" file="search" default="/" /></c:set>
+<c:if test="${not empty extraJS and (extraJS ne 'none')}">
+    <c:set var="extraJS" value="${extraJS}custom.js" />
+    <c:if test="${cms.vfs.exists[extraCSS]}">
+        <c:set var="jsExtraJS" value="${cms.vfs.readResource[extraJS]}" />
+        <script src="<cms:link>${jsExtraJS.sitePath}?ver=${jsExtraJS.dateLastModified}</cms:link>"></script>
+    </c:if>
+</c:if>
 
 <c:set var="extraFoot"><cms:property name="mercury.template.extraFoot" file="search" default="none" /></c:set>
 <c:if test="${not empty extraFoot and extraFoot ne 'none'}"><cms:include file="${extraFoot}" /></c:if>
