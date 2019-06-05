@@ -665,6 +665,9 @@ $border-styles:                     () !default;
 
 $images-sizes:                      () !default;
 
+// Min-heights
+$min-heights:                       (25vh,50vh,75vh,100vh) !default;
+
 // Spaces used for margins and paddings
 $margins:                           (0, 5, 10, 20, 30, 40) !default;
 $margins-paddings:                  $margins !default;

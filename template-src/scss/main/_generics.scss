@@ -192,6 +192,15 @@
     }
 }
 
+// Min-Heights
+@each $minheight in $min-heights {
+
+    .minh-#{$minheight} {
+        min-height: $minheight !important;
+    }
+
+}
+
 // Margins and paddings
 
 @each $space in $margins-paddings {
