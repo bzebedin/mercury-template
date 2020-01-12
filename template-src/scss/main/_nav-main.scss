@@ -49,11 +49,11 @@
                 line-height: $nav-mobile-line-height;
                 padding: $nav-mobile-line-padding #{$grid-gutter-width / 2};
                 border-bottom: $nav-mobile-border;
-                font-weight: normal;
-                font-size: $nav-mobile-font-size;
                 @if ($nav-mobile-font-family != $font-family-base) {
                     font-family: $nav-mobile-font-family;
                 }
+                font-size: $nav-mobile-font-size;
+                font-weight: $nav-mobile-font-weight;
 
                 &:hover {
                     text-decoration: none;
@@ -109,6 +109,7 @@
                         display: block;
                         border: none;
                         padding: 0;
+                        margin: 0;
                     }
                 }
 
@@ -128,7 +129,7 @@
             &[aria-expanded="true"] > a {
                 color: $nav-text-hover-mobile;
                 background-color: $nav-bg-hover-mobile;
-                border-color: $nav-border; // override theme color
+                border-color: $nav-mobile-border-color;
             }
 
             // this adds the downslide transition effect
@@ -317,7 +318,7 @@
     .nav-main-container {
         pointer-events: none;
         position: fixed;
-        #{$nav-mobile-position}: -1 * 90vw;
+        #{$nav-mobile-position}: -1 * $nav-mobile-width-xs;
         transition: $nav-mobile-position 0.5s, opacity 0.25s;
         top: 0;
         height: 100vh;
@@ -338,7 +339,7 @@
             // make space above the nav entries for the toggle button
             padding-top: $grid-gutter-width + $nav-toggle-size;
             min-width: $nav-mobile-side-size;
-            width: 90vw;
+            width: $nav-mobile-width-xs;
 
             &.has-sidelogo {
                 padding-top: 0;
@@ -352,22 +353,22 @@
 
         // adjust size of mobile side navigation
         @include media-breakpoint-up(sm) {
-            #{$nav-mobile-position}: -1 * 70vw;
+            #{$nav-mobile-position}: -1 * $nav-mobile-width-sm;
             .nav-main-group  {
-                width: 70vw;
+                width: $nav-mobile-width-sm;
             }
         }
         @include media-breakpoint-up(md) {
-            #{$nav-mobile-position}: -1 * 50vw;
+            #{$nav-mobile-position}: -1 * $nav-mobile-width-md;
             .nav-main-group  {
-                width: 50vw;
+                width: $nav-mobile-width-md;
             }
         }
         @if (($nav-breakpoint-mobile == lg) or ($nav-breakpoint-mobile == xl)) {
             @include media-breakpoint-up(lg) {
-                #{$nav-mobile-position}: -1 * round(breakpoint-min(lg) / 2);
+                #{$nav-mobile-position}: -1 * $nav-mobile-width-lg;
                 .nav-main-group  {
-                    width: round(breakpoint-min(lg) / 2);
+                    width: $nav-mobile-width-lg;
                 }
             }
         }
@@ -392,11 +393,23 @@
         top: $nav-mobile-toggle-top;
 
         @if ($nav-mobile-position == right) {
-            right: $grid-gutter-width;
+            right: $nav-mobile-toggle-side;
         }
 
         @if ($nav-mobile-position == left) {
-            left: $grid-gutter-width;
+            left: $nav-mobile-toggle-side;
+        }
+
+        @if ($nav-mobile-toggle-side-xs != $nav-mobile-toggle-side) {
+            @include media-breakpoint-down(xs) {
+                @if ($nav-mobile-position == right) {
+                    right: $nav-mobile-toggle-side-xs;
+                }
+
+                @if ($nav-mobile-position == left) {
+                    left: $nav-mobile-toggle-side-xs;
+                }
+            }
         }
     }
 
@@ -547,6 +560,13 @@
             }
         }
 
+        &.cap-none > li > a {
+            text-transform: none;
+        }
+        &.cap-upper > li > a {
+            text-transform: uppercase;
+        }
+
         > li {
             // all top level navbar items
             display: flex;
@@ -561,9 +581,6 @@
                 font-family: $nav-header-font-family;
                 position: relative;
                 padding: $nav-header-padding;
-                @if ($nav-header-set-bg-color == true) {
-                    background-color: $nav-header-menu-bg;
-                }
 
                 &::after {
                     position: absolute;
@@ -582,24 +599,12 @@
             &[aria-expanded="true"] > a:hover {
                 text-decoration: none;
                 color: $nav-header-text-hover;
-                @if ($nav-header-set-bg-color == true) {
-                    background-color: $nav-header-menu-bg-hover;
-                }
                 margin-bottom: 0;
             }
 
             &.active > a {
                 // the page highlighted by the OpenCms navigation (from the URL)
                 color: $nav-header-text-active;
-                @if ($nav-header-set-bg-color == true) {
-                    background-color: $nav-header-menu-bg; // top level nav
-                }
-            }
-
-            > a:focus {
-                @if ($nav-header-set-bg-color == true) {
-                    background-color: $nav-header-menu-bg; // top level nav
-                }
             }
 
             &[aria-expanded="true"] > a.nav-label + a[aria-controls] {
@@ -610,14 +615,19 @@
             &[aria-expanded] {
                 > a {
                     // if NOT li[aria-expanded], then this is a single head link that can be clicked
-                    cursor: default; // change pointer since dropdown menu shows on hover (not click) on desktop
+                    // cursor: default; // mercury header links can always be clicked on desktop
 
                     @if ($nav-header-show-arrows == true) {
-                        // always show arrows
+                        // show arrows in top menu
                         &::after {
+                            color: $nav-header-text;
                             line-height: $nav-header-line-height;
                             content: "\f107"; // arrow pointing down
-                            right: 2px;
+                            right: $nav-header-arrows-right;
+                        }
+
+                        &:hover::after {
+                            color: $nav-header-text-hover;
                         }
                     }
 
@@ -653,8 +663,8 @@
             }
 
             &.open-left > .nav-menu {
-                right: 0;
-                left: auto;
+                right: 0 !important;
+                left: auto !important;
             }
 
             > .nav-menu {
@@ -756,10 +766,10 @@
                     position: absolute;
                     display: inline-block;
                     font-family: FontAwesome;
-                    right: 9px;
+                    right: round(($nav-menu-hor-padding - 2px) / 2);
                     font-size: $nav-font-size;
                     content: "\f105"; // right arrow for default large screens
-                    font-weight: 400;
+                    font-weight: normal;
                 }
 
                 &.nav-label + a[aria-controls] {
@@ -842,7 +852,7 @@
     #nav-main-search {
 
         .nav-menu {
-            padding: $nav-hor-padding;
+            padding: $nav-header-hor-padding;
             background-color: $nav-bg;
             width: 400px;
         }
@@ -852,8 +862,9 @@
             margin: 0;
             border: none;
             color: $nav-text;
-            font-size: $nav-font-size;
+            font-family: $nav-menu-font-family;
             font-weight: $nav-menu-font-weight;
+            font-size: $nav-font-size;
             position: relative;
             width: 100%;
         }

@@ -22,32 +22,59 @@
 // Icon box formatter
 
 .type-iconbox {
+    $color: check-text-color($main-theme);
+    $color-link: check-text-color($main-theme, $link-color);
+    $color-hover: check-text-color($main-theme, $link-hover-color);
+
     background-color: $main-theme;
+    color: $color;
+
     padding: $default-margin $default-margin-small;
     text-align: center;
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+
     @include round-corners($iconbox-border-radius, true);
 
-    *:not(a) {
-        color: get-text-color($main-theme);
+    &:only-child {
+        flex-grow: 1;
+        flex-shrink: 1;
     }
 
+    @include colored-a($color-link, $color-hover);
+
     .icon-title {
+        color: inherit;
+        flex-grow: 1;
         margin-bottom: $default-margin;
         font-size: $h4-font-size;
         line-height: $line-height-headings;
+        @include use-hyphens-headings(true);
     }
 
     .icon-text {
         margin-top: $default-margin;
+        margin-bottom: 0;
+        > p {
+            word-wrap: break-word; // dont use hyphens: auto
+            overflow: hidden; // just break up words that are too long
+            text-overflow: ellipsis;
+            &:last-of-type {
+                margin-bottom: 0;
+            }
+        }
     }
 
     .icon-image {
         // no rem based font size here, we want the icon to be same size over all devices
+        flex-grow: 2;
         font-size: 32px;
     }
 
     .icon-link {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
         text-decoration: none;
         &:hover {
             text-decoration: none;

@@ -12,7 +12,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
 //
-// You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**********
@@ -35,12 +34,17 @@
         margin-bottom: 0;
         padding: 0;
         list-style-type: none;
+    }
 
-        // .list-entry:last-of-type {
-        //    > .teaser {
-        //        margin-bottom: 0;
-        //    }
-        // }
+    &.type-static-list {
+        ul.list-entries {
+            // this does not work for dynamic lists
+            > .list-entry:last-of-type {
+                > .teaser {
+                    margin-bottom: 0;
+                }
+            }
+        }
     }
 
     .list-spinner {
@@ -53,21 +57,18 @@
 }
 
 .teaser {
-    margin-bottom: round($list-teaser-margin-base * 15) / 10;
+    margin-bottom: $default-margin;
+    @include clearfix;
 
     &.teaser-compact {
         // compact teaser elements have a reduced bottom margin
-        margin-bottom: round($list-teaser-margin-base * 7.5) / 10;
-        .teaser-date {
-            margin-bottom: $default-margin-verysmall;
-        }
         .teaser-btn {
             padding: $teaser-btn-compact-padding;
         }
     }
 
     .intro-headline {
-        font-size: $teaser-title-size;
+        @include font-size-responsive($teaser-title-size-mobile, $teaser-title-size);
         line-height: $teaser-title-height;
         margin-bottom: $default-margin-small;
     }
@@ -85,15 +86,38 @@
         line-height: 1.2;
         font-size: 80%;
         color: $teaser-info-color;
+        margin-bottom: $default-margin-verysmall;
     }
 
     .heading {
-        a {
+        > a {
             &,
             &:focus,
             &:hover {
                 text-decoration: none;
             }
+        }
+    }
+
+    .text {
+        > a {
+            &,
+            &:focus,
+            &:hover {
+                color: $body-color;
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+.list-content {
+    .teaser {
+        margin-bottom: $list-teaser-margin;
+
+        &.teaser-compact {
+            // compact teaser elements have a reduced bottom margin
+            margin-bottom: $list-teaser-margin-compact;
         }
     }
 }
@@ -108,13 +132,15 @@
         @include text-tile;
 
         > .body {
-            .headline {
-                line-height: $teaser-title-height;
+            > .heading {
+                .headline {
+                    line-height: $teaser-title-height;
+                }
             }
         }
 
         @if ($list-tile-header-lines > 1) {
-            @include media-breakpoint-up(md) {
+            @include media-breakpoint-up(lg) {
                 &.teaser-text-tile {
                     > .body {
                         // make sure that this does not apply to "lists with groups"
@@ -130,6 +156,9 @@
     }
 }
 
+.masonry-list .teaser-tile .teaser.piece > .body {
+    flex-grow: 0; // no growing in masonry lists
+}
 
 @if ($teaser-btn-color != $btn-default) {
     .teaser-btn {
@@ -164,12 +193,22 @@
 
 // Download lists
 
+
+@mixin dl-btn {
+    margin-top: $default-margin-verysmall;
+    min-width: 200px;
+
+    .fa {
+        padding-right: $default-margin-small;
+    }
+}
+
 .download-list {
 
     a:hover {
         text-decoration: none;
         .dl-content {
-            h3 {
+            .dl-title {
                 text-decoration: underline;
             }
             .dl-desc {
@@ -187,6 +226,13 @@
 
     .dl-desc p {
         margin-bottom: 0;
+    }
+
+    .dl-cat {
+        .dl-cat-label {
+            @include list-category-label(false, false);
+            margin-right: $default-margin-small;
+        }
     }
 
     &.dl-list-elaborate {
@@ -208,7 +254,7 @@
         }
 
         .dl-content {
-            h3 {
+            .dl-title {
                 margin-top: 0;
                 margin-bottom: $default-margin-verysmall;
             }
@@ -216,27 +262,13 @@
                 margin-bottom: $default-margin-verysmall;
             }
             .dl-desc {
-                margin-bottom: $default-margin-small;
-            }
-            .dl-btn {
-                font-size: $btn-xs-font-size;
-                padding: $btn-xs-padding;
-                min-width: 0;
-
-                .fa {
-                    padding-right: $default-margin-small;
-                }
-            }
-        }
-
-        .dl-info {
-            margin-top: $default-margin-small;
-            text-align: center;
-            .fa {
-                font-size: 4.0rem;
                 margin-bottom: $default-margin-verysmall;
             }
+            .dl-btn {
+                @include dl-btn;
+            }
         }
+
 
         .dl-stats {
             .dl-type::after {
@@ -244,22 +276,66 @@
             }
         }
 
-        @include media-breakpoint-down(sm) {
-            .dl-stats {
-                .dl-type {
-                    display: none;
-                    &::after {
-                        display: none;
-                    }
+        @include media-breakpoint-up(md) {
+            .dl-date-cat {
+                @include clearfix;
+                > .dl-date {
+                    float: left;
                 }
+                > .dl-cat {
+                    padding-left: $default-margin;
+                    float: right;
+                }
+            }
+
+            .dl-info {
+                margin-top: $default-margin-small;
+                text-align: center;
+                .fa {
+                    font-size: 4.0rem;
+                    margin-bottom: $default-margin-verysmall;
+                }
+                .dl-info-text {
+                    display: none;
+                }
+            }
+        }
+
+        @include media-breakpoint-down(sm) {
+            .dl-info {
+                text-align: left;
+                margin-top: $default-margin-verysmall;
+
+                .btn-info {
+                    @include button-base;
+                    @include dl-btn;
+                    text-align: left;
+                }
+                .fa {
+                    min-width: 2*$default-margin;
+                }
+            }
+            .dl-btn {
+                text-align: left;
+                .fa {
+                    min-width: 2*$default-margin;
+                }
+            }
+            .dl-stats {
+                display: none;
             }
         }
     }
 
     &.dl-list-compact {
 
+        .list-entries {
+            border-bottom: 1px solid $dl-list-highlight-color;
+            margin-bottom: $default-margin-small;
+        }
+
         li:nth-child(odd) .dl-link {
-            background-color: $grey-lighter;
+            background-color: $dl-list-highlight-color;
         }
 
         .dl-link {
@@ -267,19 +343,22 @@
             padding-bottom: $default-margin-small;
         }
         a.dl-link:hover {
-            h3 {
+            .dl-title {
                 color: $main-theme-hover;
             }
         }
-        .dl-link {
-            display: table;
+
+        .dl-teaser-compact {
+            display: flex;
             width: 100%;
+        }
 
-            > span {
-                vertical-align: top;
-                display: table-cell;
+        .dl-link {
+            display: flex;
+            &.dl-link-disp {
+               flex-grow: 10;
+               width: 100%;
             }
-
             .fa {
                 font-size: 2.0rem;
             }
@@ -291,11 +370,16 @@
             padding-right: $default-margin-small;
         }
         .dl-content {
-            width: 100%;
-            h3 {
+            flex-grow: 10;
+            .dl-title {
                 @extend .default-font;
                 font-weight: $font-weight-bold;
                 margin: 0;
+            }
+            .dl-title,
+            .dl-file,
+            .dl-desc {
+                margin-right: 1.0rem;
             }
         }
         .dl-date,
@@ -321,28 +405,30 @@
             .dl-size {
                 display: block;
                 float: left;
+                min-width: 0;
             }
         }
         @include media-breakpoint-down(sm) {
-            .dl-link > span.dl-dl {
-                display: none;
+            .dl-teaser-compact {
+                flex-direction: column;
             }
-            .dl-show-file .dl-link > span.dl-dl {
-                display: block;
-            }
-        }
-        @include media-breakpoint-down(xs) {
-            .dl-date,
-            .dl-size {
-                display: block;
-                float: left;
-            }
-            .dl-show-file {
-                .dl-link .fa {
-                    font-size: 2.0rem;
+            .dl-link {
+                &.dl-link-down {
+                    justify-content: flex-end;
+                    padding-top: 0;
+                    .fa {
+                        padding-top: 0;
+                        font-size: 1.8rem;
+                    }
+                    .dl-date,
+                    .dl-size {
+                        min-width: 7.0rem;
+                    }
                 }
-                .dl-link > span.dl-dl {
-                    display: none;
+            }
+            .dl-show-file .dl-link {
+                > span.dl-dl {
+                    display: block;
                 }
             }
         }
@@ -357,6 +443,10 @@
         padding: $btn-sm-padding;
         display: block;
         width: 100%;
+    }
+
+    &:empty {
+        display: none;
     }
 }
 
@@ -467,7 +557,10 @@ aside .list-content,
 
         .intro-headline {
             // make headers smaller
-            font-size: round($teaser-title-size * 9) / 10;
+            @include font-size-responsive(
+                round($teaser-title-size-mobile * 9) / 10,
+                round($teaser-title-size * 9) / 10
+            );
             // also make intro lines normal color
             > .intro {
                 color: $headings-color;
@@ -546,24 +639,25 @@ aside .list-content,
                 position: absolute;
                 display: inline-block;
                 font-family: FontAwesome;
-                font-weight: normal;
+                right: 0;
+                width: $nav-handle-right-padding;
                 content: "\f078";
-                right: $btn-padding;
-                left: unset;
-                width: auto;
-                transform: rotate(-180deg) translate(0,0);
-                transition: transform .33s;
-                text-align: unset;
+                font-weight: normal;
+                text-align: center;
+                transform: rotate(-180deg);
+                transition: transform $nav-animation-time;
             }
             &.collapsed::after {
-                transform: rotate(0) translate(0,0);
-                transition: transform 0.33s;
+                transform: rotate(0);
+            }
+        }
+        .nav-side li > a + a {
+            &::after {
+                content: "\f107";
             }
         }
 
-
         &.categories,
-        &.folders,
         &.archive {
             @include list-filter-box;
         }
@@ -594,28 +688,7 @@ aside .list-content,
                     }
 
                     .li-entry {
-                        white-space: nowrap;
-                        display: inline-block;
-                        line-height: 1;
-                        font-size: 12px;
-                        padding: 4px 7px;
-                        border-radius: 4px;
-                        color: $text-dark;
-                        background-color: $grey-lighter;
-                        @if ($btn-font-family != $font-family-base) {
-                            font-family: $btn-font-family;
-                        }
-
-                        &:hover {
-                            background-color: $grey-light;
-                            transition: background-color 0.33s;
-                        }
-
-                        &:before {
-                            font-family: FontAwesome;
-                            content: "\f02b";
-                            padding-right: 4px;
-                        }
+                        @include list-category-label(true, true);
                     }
 
                     .li-count {
@@ -645,15 +718,11 @@ aside .list-content,
                 margin-right: 0;
 
                 li > a {
-                    padding-left: $default-margin;
-                    padding-right: $default-margin;
+                    // padding-left: $default-margin;
+                    padding-right: $nav-handle-right-padding;
                     + a {
-                        width: 3.2rem;
                         padding-left: 0;
                         padding-right: 0;
-                        &::after {
-                            right: calc(#{$btn-padding} - 1px);
-                        }
                     }
                 }
             }
@@ -668,7 +737,7 @@ aside .list-content,
             button.year {
                 color: $text-dark;
                 background-color: $grey-lighter;
-                padding-left: calc( #{$default-margin} - 1px);
+                padding-left: calc(#{$nav-side-left-padding-step} - 1px);
 
                 &:hover {
                     background-color: $grey-light;
@@ -678,7 +747,8 @@ aside .list-content,
                     content: "\f133";
                 }
                 &::after {
-                    right: calc(#{$btn-padding} - 1px); // this has a 1px border
+                    width: calc(#{$nav-handle-right-padding} - 2px);
+                    // right: calc(#{$btn-padding} - 1px); // this has a 1px border
                 }
             }
 
@@ -860,8 +930,7 @@ aside .list-content,
 .type-list-filter,
 .type-list-sortoptions {
     button {
-        border: none;
-        padding-left: $default-margin;
+        padding-left: $nav-side-left-padding-step;
         padding-right: $default-margin;
 
         .fa {

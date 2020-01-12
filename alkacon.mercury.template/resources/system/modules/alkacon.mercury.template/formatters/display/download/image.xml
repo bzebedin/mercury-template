@@ -14,6 +14,7 @@
     <Match>
       <Types>
         <ContainerType><![CDATA[list]]></ContainerType>
+        <ContainerType><![CDATA[mercury-list]]></ContainerType>
       </Types>
     </Match>
     <Display><![CDATA[download]]></Display>
@@ -30,11 +31,23 @@
       <IncludeName><![CDATA[listCssWrapper.download]]></IncludeName>
     </Setting>
     <Setting>
+      <IncludeName><![CDATA[hsize.listTeaser]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[categoryOption.download]]></IncludeName>
+    </Setting>
+    <Setting>
       <IncludeName><![CDATA[showFile.true]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[showDescription.true]]></IncludeName>
       <Description><![CDATA[%(key.msg.setting.download.showDescription.help)]]></Description>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[listWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[listEntryWrapper.default]]></IncludeName>
     </Setting>
   </NewFormatter>
 </NewFormatters>

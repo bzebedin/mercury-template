@@ -94,12 +94,14 @@
 
 
 <c:set var="ade"                value="${empty ade ? true : ade}" />
-<c:set var="hsize"              value="${empty hsize ? 2 : hsize}" />
+<c:set var="linkHeading"        value="${empty linkOption or empty link ? false : (linkOption eq 'heading')}" />
+<c:set var="hsize"              value="${empty hsize ? 2 : (hsize < 1 ? (linkHeading ? 3 : hsize) : hsize)}" />
 <c:set var="showText"           value="${empty text and empty markupText ? false : (empty textOption ? true : (textOption ne 'none'))}" />
-<c:set var="showHeading"        value="${empty heading or (hsize < 1) ? false : (empty headingOption ? true : (headingOption ne 'none'))}" />
 <c:set var="showVisual"         value="${empty image and empty markupVisual ? false : (empty sizeDesktop ? true : sizeDesktop != 0)}" />
-<c:set var="showLinkOption"     value="${empty linkOption ? true : (linkOption ne 'none') and (linkOption ne 'false') }" />
-<c:set var="showLink"           value="${empty link ? false : showLinkOption}" />
+<c:set var="showHeading"        value="${empty heading or (hsize < 1) ? false : (empty headingOption ? true : (headingOption ne 'none'))}" />
+<c:set var="showLinkOption"     value="${empty linkOption or linkHeading ? true : (linkOption ne 'none') and (linkOption ne 'false') }" />
+<c:set var="showLink"           value="${empty link or linkHeading ? false : showLinkOption}" />
+<c:set var="defaultText"        value="${showText and empty markupText}" />
 
 <c:choose>
 <c:when test="${showHeading or showText or showVisual or showLink}">
@@ -111,12 +113,15 @@
         cssText="${showText and (textOption ne 'default') ? textOption: ''}"
         attrVisual="${ade ? image.rdfaAttr : null}"
         attrBody="${ade and showLinkOption and (empty link or (link.exists and not link.isSet)) ? link.rdfaAttr : null}"
+        cssBody="${defaultText ? 'default' :_null}"
         attrText="${ade ? text.rdfaAttr : null}"
         attrLink="${ade ? link.rdfaAttr : null}">
 
         <jsp:attribute name="heading">
             <c:if test="${showHeading}">
-                <mercury:heading text="${heading}" level="${hsize}" ade="${ade}" css="piece-headline" />
+                <mercury:link link="${link}" css="piece-heading-link" test="${linkHeading}">
+                    <mercury:heading text="${heading}" level="${hsize}" ade="${linkHeading ? false : ade}" css="piece-heading" />
+                </mercury:link>
             </c:if>
         </jsp:attribute>
 
@@ -153,7 +158,7 @@
 
         <jsp:attribute name="text">
             <c:choose>
-                <c:when test="${showText and empty markupText}">
+                <c:when test="${defaultText}">
                     <c:out value="${text}" escapeXml="false" />
                 </c:when>
                 <c:when test="${showText}">
@@ -169,7 +174,7 @@
                         <c:set var="linkCss" value="btn btn-block piece-btn" />
                     </c:when>
                     <c:when test="${linkOption eq 'text'}">
-                        <c:set var="linkCss" value="pice-text-link" />
+                        <c:set var="linkCss" value="piece-text-link" />
                     </c:when>
                     <c:otherwise>
                         <%-- default is 'button' --%>

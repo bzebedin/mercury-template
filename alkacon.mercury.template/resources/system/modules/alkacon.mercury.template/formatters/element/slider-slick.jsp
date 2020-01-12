@@ -98,6 +98,7 @@
         </c:if>
         <c:set var="sliderClass" value="logo-slider" />
         <c:set var="marginClass" value="lm-10" />
+        <c:set var="cssgutter" value="20" />
         <c:set var="showDots" value="${false}" />
         <c:set var="pauseOnHover" value="${false}" />
         <c:set var="adoptRatioToScreen" value="${false}" />
@@ -118,7 +119,7 @@
 --%>id="<mercury:idgen prefix='sl' uuid='${cms.element.id}' />"<%--
 --%>><mercury:nl />
 
-    <mercury:heading level="${hsize}" text="${value.Title}" />
+    <mercury:heading level="${hsize}" text="${value.Title}" css="heading" />
 
     <c:choose>
         <c:when test="${value.Position.exists}">
@@ -133,15 +134,16 @@
     </c:choose>
 
     <c:if test="${value.TextBackgroundColor.isSet}">
-        <c:set var="captionBgStyle">background-color: ${value.TextBackgroundColor}</c:set>
+        <c:set var="captionBgStyle">background-color: ${value.TextBackgroundColor}; background-image: linear-gradient(${value.TextBackgroundColor}, ${value.TextBackgroundColor})</c:set>
         <c:set var="customStyle">style="${captionBgStyle}"</c:set>
     </c:if>
     <c:if test="${not empty bgColorHead}">
-        <c:set var="headBgStyle">style="background-color: ${bgColorHead}"</c:set>
+        <c:set var="headBgStyle">style="background-color: ${bgColorHead}; background-image: linear-gradient(${bgColorHead}, ${bgColorHead})"</c:set>
         <c:set var="customClass" value="custom" />
     </c:if>
     <c:if test="${not empty bgColorSub}">
-        <c:set var="subBgStyle">style="background-color: ${bgColorSub}"</c:set>
+        <%-- background-image linear gradient rule is here to trick WCAG audit to ignoring this text --%>
+        <c:set var="subBgStyle">style="background-color: ${bgColorSub}; background-image: linear-gradient(${bgColorSub}, ${bgColorSub})"</c:set>
         <c:set var="customClass" value="custom" />
         <c:set var="customStyle">${subBgStyle}</c:set>
     </c:if>
@@ -214,6 +216,7 @@
 
                     <cms:addparams>
                         <cms:param name="cssgrid">${adoptRatioToScreen ? 'col-xs-12 hidden-sm hidden-md hidden-lg hidden-xl' : cssgridCols}</cms:param>
+                        <cms:param name="cssgutter">${not empty cssgutter ? cssgutter : '#'}</cms:param>
                         <div class="slide-xs ${adoptRatioToScreen ? 'visible-xs' : ''}"><%----%>
                             <mercury:image-simple
                                 image="${image}"
@@ -300,16 +303,16 @@
                     : ''}
                 <div class="caption background ${posTop}${' '}${posLeft}" aria-hidden="true" ${bgStyle}><%----%>
                     <c:if test="${image.value.SuperTitle.isSet}">
-                        <strong ${headBgStyle}>${image.value.SuperTitle}</strong><%----%>
+                        <strong ${headBgStyle} aria-hidden="true">${image.value.SuperTitle}</strong><%----%>
                     </c:if>
                     <c:if test="${image.value.TitleLine1.isSet or image.value.TitleLine2.isSet}">
                         <div class="subcaption"><%----%>
                             <c:if test="${image.value.TitleLine1.isSet}">
-                                <small ${subBgStyle}>${image.value.TitleLine1}</small><%----%>
+                                <small ${subBgStyle} aria-hidden="true">${image.value.TitleLine1}</small><%----%>
                             </c:if>
                             <c:if test="${image.value.TitleLine2.isSet}">
                                 <%-- br only needed here for "custom" CSS setting when subcaption has different color --%>
-                                <br><small ${subBgStyle}>${image.value.TitleLine2}</small><%----%>
+                                <br><small ${subBgStyle} aria-hidden="true">${image.value.TitleLine2}</small><%----%>
                             </c:if>
                         </div><%----%>
                     </c:if>

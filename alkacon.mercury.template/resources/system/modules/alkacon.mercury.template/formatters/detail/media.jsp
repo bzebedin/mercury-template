@@ -51,19 +51,19 @@
 <c:set var="keyPieceLayout"         value="${showOverlay ? 0 : keyPieceLayout}" />
 
 <mercury:nl />
-<div class="detail-page type-media ${cssWrapper}"><%----%>
+<div class="detail-page type-media layout-${setting.keyPieceLayout.toInteger}${' '}${cssWrapper}"><%----%>
 <mercury:nl />
 
 <mercury:piece
     cssWrapper="detail-visual"
     pieceLayout="${keyPieceLayout}"
-    sizeDesktop="${6}"
+    sizeDesktop="${keyPieceLayout > 1 ? 6 : 12}"
     sizeMobile="${12}">
 
     <jsp:attribute name="heading">
         <c:if test="${not showOverlay}">
             <mercury:intro-headline intro="${showIntro ? value.Intro : null}" headline="${title}" level="${hsize}" ade="${ade}"/>
-            <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showPreface and keyPieceLayout == 0}" />
+            <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showPreface and keyPieceLayout <= 1}" />
         </c:if>
     </jsp:attribute>
 
@@ -98,13 +98,15 @@
     </jsp:attribute>
 
     <jsp:attribute name="text">
-        <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showPreface and not showOverlay and (keyPieceLayout != 0)}" />
+        <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showPreface and not showOverlay and (keyPieceLayout > 1)}" />
+
         <c:if test="${showText and text.isSet}">
             <div class="detail-content" ${ade ? text.rdfaAttr : ''}><%----%>
                 ${text}
             </div><%----%>
             <mercury:nl />
         </c:if>
+
     </jsp:attribute>
 
 </mercury:piece>

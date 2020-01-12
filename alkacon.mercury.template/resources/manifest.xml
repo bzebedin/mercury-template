@@ -13,7 +13,7 @@
 		<import-site>/</import-site>
 		<export-mode name="reduced"/>
 		<description><![CDATA[The mercury template is a full featured, configurable template. It is also the default demonstration template for OpenCms 11.]]></description>
-		<version>11.0.0.9</version>
+		<version>11.0.1.0</version>
 		<autoincrement>true</autoincrement>
 		<authorname><![CDATA[Alkacon Software GmbH & Co. KG]]></authorname>
 		<authoremail/>
@@ -2654,6 +2654,35 @@
 			<accesscontrol/>
 		</file>
 		<file>
+			<source>system/modules/alkacon.mercury.template/formatters/element/linksequence-header.xml</source>
+			<destination>system/modules/alkacon.mercury.template/formatters/element/linksequence-header.xml</destination>
+			<type>formatter_config</type>
+			<uuidstructure>3a1d86f0-ce5b-11e9-a312-0242ac11002b</uuidstructure>
+			<uuidresource>3a1d86f1-ce5b-11e9-a312-0242ac11002b</uuidresource>
+			<datecreated>Tue, 03 Sep 2019 14:58:02 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Link sequence (for header)]]></value>
+				</property>
+				<property>
+					<name>locale</name>
+					<value><![CDATA[en]]></value>
+				</property>
+				<property>
+					<name>locale-available</name>
+					<value><![CDATA[en]]></value>
+				</property>
+				<property>
+					<name>search.exclude</name>
+					<value><![CDATA[all]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
 			<source>system/modules/alkacon.mercury.template/formatters/element/linksequence.jsp</source>
 			<destination>system/modules/alkacon.mercury.template/formatters/element/linksequence.jsp</destination>
 			<type>jsp</type>
@@ -4538,6 +4567,60 @@
 			<accesscontrol/>
 		</file>
 		<file>
+			<source>system/modules/alkacon.mercury.template/functions/header-config.jsp</source>
+			<destination>system/modules/alkacon.mercury.template/functions/header-config.jsp</destination>
+			<type>jsp</type>
+			<uuidstructure>b881b45a-c8e3-11e9-bfcb-0242ac11002b</uuidstructure>
+			<uuidresource>a4dc6c67-c646-11e9-9a13-0242ac11002b</uuidresource>
+			<datecreated>Sat, 24 Aug 2019 08:10:32 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>cache</name>
+					<value><![CDATA[container-element;locale;uri]]></value>
+				</property>
+				<property type="shared">
+					<name>export</name>
+					<value><![CDATA[false]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.template/functions/header-config.xml</source>
+			<destination>system/modules/alkacon.mercury.template/functions/header-config.xml</destination>
+			<type>function_config</type>
+			<uuidstructure>caf9cb05-c8e3-11e9-bfcb-0242ac11002b</uuidstructure>
+			<uuidresource>caf9cb06-c8e3-11e9-bfcb-0242ac11002b</uuidresource>
+			<datecreated>Tue, 27 Aug 2019 16:00:30 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>Description</name>
+					<value><![CDATA[??? function.login.help ???]]></value>
+				</property>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Flexible header configuration]]></value>
+				</property>
+				<property>
+					<name>locale</name>
+					<value><![CDATA[en]]></value>
+				</property>
+				<property>
+					<name>locale-available</name>
+					<value><![CDATA[en]]></value>
+				</property>
+				<property>
+					<name>search.exclude</name>
+					<value><![CDATA[true]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
 			<source>system/modules/alkacon.mercury.template/functions/login.jsp</source>
 			<destination>system/modules/alkacon.mercury.template/functions/login.jsp</destination>
 			<type>jsp</type>
@@ -5082,7 +5165,12 @@
 			<uuidstructure>a4eaf5cb-24ab-11e9-bcf4-0242ac11002b</uuidstructure>
 			<datecreated>Wed, 30 Jan 2019 16:25:23 GMT</datecreated>
 			<flags>0</flags>
-			<properties/>
+			<properties>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Mercury OpenStreetMap files]]></value>
+				</property>
+			</properties>
 			<relations/>
 			<accesscontrol/>
 		</file>
@@ -5112,8 +5200,8 @@
 			<destination>system/modules/alkacon.mercury.template/osmviewer/style.json</destination>
 			<type>plain</type>
 			<uuidstructure>62d16792-2861-11e9-9bbf-0242ac11002b</uuidstructure>
-			<uuidresource>62d16793-2861-11e9-9bbf-0242ac11002b</uuidresource>
-			<datecreated>Mon, 04 Feb 2019 09:43:54 GMT</datecreated>
+			<uuidresource>317f1828-8dc4-11e9-8ac1-0242ac11002b</uuidresource>
+			<datecreated>Thu, 13 Jun 2019 10:15:39 GMT</datecreated>
 			<flags>0</flags>
 			<properties>
 				<property>
@@ -6285,6 +6373,27 @@
 			<accesscontrol/>
 		</file>
 		<file>
+			<source>system/modules/alkacon.mercury.template/tags/content-properties.tag</source>
+			<destination>system/modules/alkacon.mercury.template/tags/content-properties.tag</destination>
+			<type>jsp</type>
+			<uuidstructure>8b4610cb-8112-11e9-9b3c-0242ac11002b</uuidstructure>
+			<uuidresource>8b4610cc-8112-11e9-9b3c-0242ac11002b</uuidresource>
+			<datecreated>Tue, 28 May 2019 06:33:45 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Reads the properties for the current page]]></value>
+				</property>
+				<property type="shared">
+					<name>export</name>
+					<value><![CDATA[false]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
 			<source>system/modules/alkacon.mercury.template/tags/data-article.tag</source>
 			<destination>system/modules/alkacon.mercury.template/tags/data-article.tag</destination>
 			<type>jsp</type>
@@ -6397,6 +6506,27 @@
 				<property>
 					<name>Title</name>
 					<value><![CDATA[Wrapper for cms:display with error handling]]></value>
+				</property>
+				<property type="shared">
+					<name>export</name>
+					<value><![CDATA[false]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.template/tags/div.tag</source>
+			<destination>system/modules/alkacon.mercury.template/tags/div.tag</destination>
+			<type>jsp</type>
+			<uuidstructure>15a3d7e1-ca34-11e9-8136-0242ac11002b</uuidstructure>
+			<uuidresource>15a3d7e2-ca34-11e9-8136-0242ac11002b</uuidresource>
+			<datecreated>Thu, 29 Aug 2019 08:07:46 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Adds an optional div wrapper around a body]]></value>
 				</property>
 				<property type="shared">
 					<name>export</name>
@@ -6536,6 +6666,27 @@
 				<property>
 					<name>Title</name>
 					<value><![CDATA[Displays a responsive image with optional animation effects]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.template/tags/image-direct.tag</source>
+			<destination>system/modules/alkacon.mercury.template/tags/image-direct.tag</destination>
+			<type>jsp</type>
+			<uuidstructure>b5b587ef-7c63-11e9-b3ee-0242ac11002b</uuidstructure>
+			<uuidresource>b5b587f0-7c63-11e9-b3ee-0242ac11002b</uuidresource>
+			<datecreated>Wed, 22 May 2019 07:32:10 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Displays a non-responsive image]]></value>
+				</property>
+				<property type="shared">
+					<name>export</name>
+					<value><![CDATA[false]]></value>
 				</property>
 			</properties>
 			<relations/>
@@ -7565,6 +7716,10 @@
 				<property>
 					<name>template</name>
 					<value><![CDATA[/system/modules/alkacon.mercury.theme/css/style-editor.css]]></value>
+				</property>
+				<property>
+					<name>template.display.types</name>
+					<value><![CDATA[mercury-list]]></value>
 				</property>
 			</properties>
 			<relations/>

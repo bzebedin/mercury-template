@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ContentSectionData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="opencms://system/modules/alkacon.mercury.template/schemas/section.xsd">
+  <ContentSection language="en">
+    <Title><![CDATA[The Article element]]></Title>
+    <Text name="Text0">
+      <links/>
+      <content><![CDATA[<p>The<em> Article</em> element can contain several paragraphs and images, as well as information about author, publishing date etc. It is well suited to write <em>News Messages</em> or <em>Blog entries.</em> Compared to the much simpler <em>Content Section</em>, an<em>&nbsp;Article</em>&nbsp;forms a semantic entity.&nbsp;&nbsp;</p>
+<p>The full content of a Article is usually displayed on a&nbsp;<em>Detail page&nbsp;</em>that is accessed&nbsp;through a<em><em> List</em></em>. On this page, teaser elements are directly placed using the<em>&nbsp;Article Teaser</em> formatters.</p>]]></content>
+    </Text>
+    <Image>
+      <Image>
+        <link type="WEAK">
+          <target><![CDATA[/sites/default/.galleries/cliparts/default.png]]></target>
+          <uuid>f0289470-3a95-11e9-bd84-0242ac11002b</uuid>
+        </link>
+      </Image>
+      <Title><![CDATA[Defaul placeholder image]]></Title>
+    </Image>
+  </ContentSection>
+</ContentSectionData>

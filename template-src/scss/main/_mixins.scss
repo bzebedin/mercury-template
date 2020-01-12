@@ -20,7 +20,7 @@
 @mixin intro-header() {
     line-height: 1.25;
     font-size: 65%;
-    font-weight: $font-weight-bold;
+    font-weight: $font-weight-intro-headings;
     color: $intro-headings-color;
     margin-bottom: $intro-headings-margin-bottom;
 }
@@ -168,7 +168,8 @@
 
 // Default Headings
 @mixin heading-base {
-    font-weight: $font-weight-headings; // this must be set because otherwise the default would be "bold"
+    font-weight: $font-weight-headings; // must be set because otherwise the default would be "bold"
+    color: $headings-color;  // must be set because otherwise linked headlines would have the link color
     @if ($font-family-headings != $font-family-base) {
         font-family: $font-family-headings;
     }
@@ -177,9 +178,6 @@
     }
     @if ($line-height-headings != $line-height-base) {
         line-height: $line-height-headings;
-    }
-    @if ($headings-color != $body-color) {
-        color: $headings-color;
     }
 }
 
@@ -253,14 +251,24 @@
 @mixin rem-base {
     @if ($font-rem-base-mobile-size != $font-rem-base-desktop-size) {
         @include media-breakpoint-down(md) {
-            font-size: $font-rem-base-mobile-size;  // base font size for rem units
+            font-size: $font-rem-base-mobile-size;  // font size for rem units in mobile
         }
         @include media-breakpoint-up(lg) {
-            // adjust fonts for smaller screens
-            font-size: $font-rem-base-desktop-size;
+            font-size: $font-rem-base-desktop-size;  // font size for rem units in desktop
         }
     } @else {
-        font-size: $font-rem-base-desktop-size;
+        font-size: $font-rem-base-mobile-size;
+    }
+}
+
+@mixin font-size-responsive($font-size-mobile, $font-size-desktop) {
+    @if ($font-size-mobile != $font-size-desktop) {
+        font-size: $font-size-mobile;
+        @include media-breakpoint-up(lg) {
+            font-size: $font-size-desktop;
+        }
+    } @else {
+        font-size: $font-size-mobile;
     }
 }
 
@@ -303,11 +311,13 @@
 }
 
 // Full height text tiles / piece sections
-@mixin text-tile {
+@mixin text-tile($hide-overflow : true) {
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow: hidden; // fix for very small columns where single words may increase the column width
+    @if ($hide-overflow == true) {
+        overflow: hidden; // fix for very small columns where single words may increase the column width
+    }
     text-overflow: ellipsis;
     z-index: $overflow-z-index;
 
@@ -338,13 +348,15 @@
     }
 }
 
-@mixin colored-a($text-color, $highlight-color) {
+@mixin colored-a($text-color, $highlight-color: none) {
     a:not(.btn):not(.uncolored) {
         color: $text-color;
 
-        &:focus,
-        &:hover {
-            color: $highlight-color;
+        @if (($highlight-color != none) && ($highlight-color != $text-color)) {
+            &:focus,
+            &:hover {
+                color: $highlight-color;
+            }
         }
     }
 }
@@ -353,7 +365,7 @@
     @if ($nav-breakpoint-desktop != none) {
         @return breakpoint-max($nav-breakpoint-mobile);
     } @else {
-         @return 99999;
+         @return $nav-breakpoint-sticky-header-size - 1;
     }
 }
 
@@ -361,7 +373,15 @@
     @if ($nav-breakpoint-desktop != none) {
         @return breakpoint-min($nav-breakpoint-desktop);
     } @else {
-         @return 100000;
+         @return $nav-breakpoint-sticky-header-size;
+    }
+}
+
+@function breakpoint-sticky-header() {
+    @if ($nav-breakpoint-sticky-header != none) {
+        @return breakpoint-min($nav-breakpoint-sticky-header);
+    } @else {
+         @return $nav-breakpoint-sticky-header-size;
     }
 }
 
@@ -377,6 +397,86 @@
     @if ($nav-breakpoint-desktop != none) {
         @include media-breakpoint-up($nav-breakpoint-desktop) {
             @content;
+        }
+    }
+}
+
+@mixin use-hyphens-headings($hide-overflow: false) {
+    @if ($hide-overflow) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    @if ($piece-hyphens-headings) {
+        @if ($piece-hyphens-headings-xs and $piece-hyphens-headings-md) {
+            hyphens: auto;
+            word-wrap: break-word;
+        } @else {
+            @if ($piece-hyphens-headings-xs) {
+                @include media-breakpoint-down(sm) {
+                    hyphens: auto;
+                    word-wrap: break-word;
+                }
+            }
+            @if ($piece-hyphens-headings-md) {
+                @include media-breakpoint-up(md) {
+                    hyphens: auto;
+                    word-wrap: break-word;
+                }
+            }
+        }
+    }
+}
+
+@mixin use-hyphens-text($hide-overflow: false) {
+    @if ($hide-overflow) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    @if ($piece-hyphens-text) {
+        @if ($piece-hyphens-text-xs and $piece-hyphens-text-md) {
+            hyphens: auto;
+            word-wrap: break-word;
+        } @else {
+            @if ($piece-hyphens-text-xs) {
+                @include media-breakpoint-down(sm) {
+                    hyphens: auto;
+                    word-wrap: break-word;
+                }
+            }
+            @if ($piece-hyphens-text-md) {
+                @include media-breakpoint-up(md) {
+                    hyphens: auto;
+                    word-wrap: break-word;
+                }
+            }
+        }
+    }
+}
+
+@mixin list-category-label($add-box: true, $add-hover: true) {
+    // labels for categories used in list filter and download list
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1;
+    font-size: $font-size-sm;
+    color: $text-dark;
+    @if ($btn-font-family != $font-family-base) {
+        font-family: $btn-font-family;
+    }
+    &:before {
+        font-family: FontAwesome;
+        content: "\f02b";
+        padding-right: $default-margin-verysmall;
+    }
+    @if ($add-box) {
+        padding: $default-margin-verysmall;
+        border-radius: $list-category-radius;
+        background-color: $grey-lighter;
+        @if ($add-hover) {
+            &:hover {
+                background-color: $grey-light;
+                transition: background-color 0.33s;
+            }
         }
     }
 }

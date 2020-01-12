@@ -30,16 +30,19 @@
     noLinkOnVisual="${true}"
     pieceLayout="${setPieceLayout}"
     sizeDesktop="${setSizeDesktop}"
+    sizeMobile="${setSizeMobile}"
 
     teaserType="${displayType}"
     link="${linkToDetail}"
     hsize="${setHsize}"
     dateFormat="${setDateFormat}"
-    textLength="${setTextLength}"
+    textLength="${value['TeaserData/TeaserPreface'].isSet ? -1 : setTextLength}"
     buttonText="${setButtonText}">
 
     <jsp:attribute name="markupVisual">
-        <mercury:media-box content="${content}" ratio="${setRatio}" showMediaTime="${true}" />
+        <c:if test="${setShowVisual}">
+            <mercury:media-box content="${content}" ratio="${setRatio}" showMediaTime="${true}" />
+        </c:if>
     </jsp:attribute>
 
 </mercury:teaser-piece>

@@ -24,21 +24,21 @@
 // Main theme colors
 $main-theme:                    #b31b34; // dark red
 $main-theme-hover:              #ff264a; // light red
-$main-theme-complementary:      #144382; // dark blue
 
 $default-border-radius:         3px;
 $btn-border-radius:             2px;
 
 $focus-outline-color:           rgba(77,144,255,.5);
 
-$font-family-headings:          "Open Sans", sans-serif !default;
-$font-family-base:              "Montserrat", sans-serif !default;
-// $font-family-base:              "Merriweather", serif !default;
+$font-family-headings:          "Open Sans";
+$font-family-base:              "Montserrat";
+
 $font-weight-base:              300 !default;
-$font-weight-headings:          600 !default;
+$font-weight-bold:              600 !default;
+$font-weight-headings:          $font-weight-bold !default;
 $font-size-base:                1.6rem !default;
 $font-size-headings:            2.2rem !default;
-$font-weight-bold:              600 !default;
+$font-style-headings:           normal !default;
 
 $line-height-base:              1.4 !default;
 $line-height-headings:          1.25 !default;
@@ -51,10 +51,9 @@ $nav-breadcrump-padding:        5px 0 !default;
 $nav-menu-font-weight:          300 !default;
 $nav-menu-entry-border-bottom:  none !default;
 $nav-menu-border:               solid 1px $main-theme;
-$nav-side-boxed:                false !default;
 $nav-side-border-radius:        0 !default;
-$nav-side-left-padding-start:   2px !default;
-$header-logo-fixed-width:       220px !default;
+$nav-side-font-weight:          400 !default;
+$fh-ac-bg-color:                $main-theme !default;
 
 $white:                         #fff !default;
 $grey-light:                    #ddd !default;

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FlexibleData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="opencms://system/modules/alkacon.mercury.template/schemas/flexible.xsd">
+  <Flexible language="de">
+    <Title><![CDATA[Die OpenCms Mailing-Liste]]></Title>
+    <Code name="Code0">
+      <links/>
+      <content><![CDATA[<form method="post" action="http://lists.opencms.org/mailman/subscribe/opencms-dev" class="styled-form compact no-border no-bg" autocomplete="off">
+
+<fieldset>
+    <section>
+    <label for="email" class="label sr-only">Email Address</label>
+    <div class="input">
+        <span class="icon-append fa fa-envelope"></span>
+        <input type="text" id="email" placeholder="E-Mail Adresse" autocomplete="new-password">
+    </div>
+    </section>    
+    
+    <section>
+    <label for="pw" class="label sr-only">Pick a password</label>
+    <div class="input">
+        <span class="icon-append fa fa-unlock-alt"></span>
+        <input type="password" id="pw" placeholder="Passwort wählen" autocomplete="new-password">
+    </div> 
+    </section>
+    
+    <section>
+    <label for="pw-conf" class="label sr-only">Confirm password</label>
+    <div class="input">
+        <span class="icon-append fa fa-unlock-alt"></span>
+        <input type="password" id="pw-conf" placeholder="Passwort bestätigen" autocomplete="new-password">
+    </div>
+    </section>
+
+</fieldset>
+
+<footer>
+    <input type="submit" value="Abonnieren" class="btn btn-sm submitbutton">
+</footer>
+
+</form>
+
+]]></content>
+    </Code>
+  </Flexible>
+  <Flexible language="en">
+    <Title><![CDATA[The OpenCms mailing list form]]></Title>
+    <Code name="Code0">
+      <links/>
+      <content><![CDATA[<form method="post" action="http://lists.opencms.org/mailman/subscribe/opencms-dev" class="styled-form compact no-border no-bg" autocomplete="off">
+
+<fieldset>
+    <section>
+    <label for="email" class="label sr-only">Email Address</label>
+    <div class="input">
+        <span class="icon-append fa fa-envelope"></span>
+        <input type="text" id="email" placeholder="Email Address" autocomplete="new-password">
+    </div>
+    </section>    
+    
+    <section>
+    <label for="pw" class="label sr-only">Pick a password</label>
+    <div class="input">
+        <span class="icon-append fa fa-unlock-alt"></span>
+        <input type="password" id="pw" placeholder="Pick a password" autocomplete="new-password">
+    </div> 
+    </section>
+    
+    <section>
+    <label for="pw-conf" class="label sr-only">Confirm password</label>
+    <div class="input">
+        <span class="icon-append fa fa-unlock-alt"></span>
+        <input type="password" id="pw-conf" placeholder="Confirm password" autocomplete="new-password">
+    </div>
+    </section>
+
+</fieldset>
+
+<footer>
+    <input type="submit" value="Subscribe" class="btn btn-sm submitbutton">
+</footer>
+
+</form>
+]]></content>
+    </Code>
+  </Flexible>
+</FlexibleData>

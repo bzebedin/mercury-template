@@ -62,6 +62,11 @@
     <ResourceType>
       <TypeName><![CDATA[listconfig]]></TypeName>
       <Disabled><![CDATA[false]]></Disabled>
+      <Folder>
+        <Name><![CDATA[list-m]]></Name>
+      </Folder>
+      <NamePattern><![CDATA[list_%(number).xml]]></NamePattern>
+      <DetailPagesDisabled>true</DetailPagesDisabled>
       <ElementView>
         <link internal="true" type="WEAK">
           <target><![CDATA[/system/modules/alkacon.mercury.template/elementviews/advanced.xml]]></target>
@@ -141,6 +146,7 @@
       <TypeName><![CDATA[m-layout-area-complex]]></TypeName>
       <Disabled><![CDATA[false]]></Disabled>
     </ResourceType>
+    <RemoveAllFormatters>true</RemoveAllFormatters>
     <AddFormatters>
       <AddFormatter>
         <link type="WEAK">
@@ -432,6 +438,12 @@
       </AddFormatter>
       <AddFormatter>
         <link type="WEAK">
+          <target><![CDATA[/system/modules/alkacon.mercury.template/formatters/element/linksequence-header.xml]]></target>
+          <uuid>3a1d86f0-ce5b-11e9-a312-0242ac11002b</uuid>
+        </link>
+      </AddFormatter>
+      <AddFormatter>
+        <link type="WEAK">
           <target><![CDATA[/system/modules/alkacon.mercury.template/formatters/element/map-google.xml]]></target>
           <uuid>7bd4ba6a-f005-4732-8cf5-5ec60f80c627</uuid>
         </link>
@@ -652,6 +664,79 @@
           <uuid>f0225114-6a9a-4898-a2d2-2b5168f94b92</uuid>
         </link>
       </AddFormatter>
+      <AddFormatter>
+        <link type="WEAK">
+          <target><![CDATA[/system/modules/alkacon.mercury.template/formatters/privacy-policy/banner.xml]]></target>
+          <uuid>e9bb4c50-cfe2-456e-8c4e-72c9b2263577</uuid>
+        </link>
+      </AddFormatter>
     </AddFormatters>
+    <RemoveAllFunctions>true</RemoveAllFunctions>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/anchor.xml]]></target>
+        <uuid>82f4e477-e65f-4fd3-8976-c1d56d0fd35b</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/disqus.xml]]></target>
+        <uuid>96933da3-e1c4-4aee-9e19-b8d250efe747</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/pdf-download.xml]]></target>
+        <uuid>451b8424-6099-43f0-8782-5c5431374c68</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/login.xml]]></target>
+        <uuid>abf4813f-8476-4e86-b7e2-c135af3a5a19</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/search.xml]]></target>
+        <uuid>e92a6386-c73c-4f13-93ac-60cc1cc56425</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/pagetitle.xml]]></target>
+        <uuid>6acfc9a8-c9bb-4126-85b8-bcccadc465ee</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/sitename.xml]]></target>
+        <uuid>2c505a33-e743-45a8-83ef-1f3a643742cc</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/sourcesite.xml]]></target>
+        <uuid>66cccaa4-249c-4c10-905b-70008cd62d7f</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/header-config.xml]]></target>
+        <uuid>caf9cb05-c8e3-11e9-bfcb-0242ac11002b</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/opencms-info.xml]]></target>
+        <uuid>9d96c3d9-3b13-4c8b-8d94-3b38fb1c3b36</uuid>
+      </link>
+    </Function>
+    <Function>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/functions/privacy-policy-settings.xml]]></target>
+        <uuid>5fc02e59-fe05-496b-9fd8-7b40245ec3fc</uuid>
+      </link>
+    </Function>
   </SitemapMasterConfiguration>
 </SitemapMasterConfigurations>

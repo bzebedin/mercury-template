@@ -96,7 +96,7 @@
                 --%>); <%--
                    --%>return false;" action="<cms:link>${targetUri}</cms:link>"><%----%>
 
-                    <c:set var="searchPlaceholder"><fmt:message key="msg.page.search" /></c:set>
+                    <c:set var="searchPlaceholder"><fmt:message key="msg.page.search.inlist" /></c:set>
                     <c:set var="fieldId">textsearch_${filterId}</c:set>
                         <c:set var="escapedQuery">${fn:replace(search.controller.common.state.query,'"','&quot;')}</c:set>
                         <input type="hidden" name="${search.controller.common.config.lastQueryParam}" value="${escapedQuery}" /><%----%>
@@ -109,7 +109,7 @@
                             --%>id="${fieldId}" <%--
                             --%>type="text" <%--
                             --%>value="${escapedQuery}" <%--
-                            --%>placeholder="<fmt:message key="msg.page.search" />"><%----%>
+                            --%>placeholder="${searchPlaceholder}"><%----%>
                         </label><%----%>
                 </form><%----%>
             </div><%----%>
@@ -316,7 +316,7 @@
 
                         <%-- Check, if some item has been rendered at all and, if yes, if some nesting levels have to be closed. --%>
                         <c:if test="${not empty startFolderPath}">
-                            <li id="${folderId}" data-value="${previousFolder}" ${isCurrentPage ? ' class="currentpage"' : ''}"><%----%>
+                            <li id="${folderId}" data-value="${previousFolder}"${isCurrentPage ? ' class=\"currentpage\"' : ''}><%----%>
                                 <a ${onclick} href="<cms:link>${targetUri}?${folderParameterMap[previousFolder]}</cms:link>" class="nav-label">${label}</a><%----%>
                             </li><%----%>
                             <c:if test="${previousDeps > startDeps}">

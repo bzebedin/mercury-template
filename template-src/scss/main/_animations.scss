@@ -75,6 +75,18 @@
             }
         }
 
+        .effect-raise,
+        .effect-inset {
+            &.effect-piece {
+                &:hover {
+                    > .visual + .body  {
+                        // center top origin does not perform well for these cases
+                        transform-origin: center;
+                    }
+                }
+            }
+        }
+
         // "raise box" effect
         .effect-raise {
             &:not(.effect-piece) {
@@ -229,19 +241,6 @@ html.desktop .effect-rotate {
         opacity: 1;
     }
 }
-
-@keyframes fixHeader {
-    from {
-        opacity: 0;
-        transform: translate3d(0, -100%, 0);
-    }
-
-    to {
-        opacity: $nav-head-fixed-opacity;
-        transform: none;
-    }
-}
-
 
 // spinner animation, displays a rotating "currently loading" symbol
 // used e.g. by the list and the image gallery

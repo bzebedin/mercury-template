@@ -34,13 +34,19 @@
       <IncludeName><![CDATA[pieceLayout.onlyInlineHeadings]]></IncludeName>
     </Setting>
     <Setting>
+      <IncludeName><![CDATA[pieceSizeDesktop.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[pieceSizeMobile.default]]></IncludeName>
+    </Setting>
+    <Setting>
       <IncludeName><![CDATA[hsize.3]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[effect.contact]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[imageRatio.default]]></IncludeName>
+      <IncludeName><![CDATA[imageRatio.contact]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[linkOption.contact]]></IncludeName>

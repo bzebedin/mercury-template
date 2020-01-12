@@ -17,9 +17,6 @@
     description="Can be used to scale the image in a specific ratio,
     Allowed valued are: '1-1', '4-3', '3-2', '16-9', '2-1' and '2,35-1'" %>
 
-<%@ attribute name="width" type="java.lang.String" required="false"
-    description="The optional image width to use, will be added as attribute to the image tag." %>
-
 <%@ attribute name="lazyLoad" type="java.lang.Boolean" required="false"
     description="Use lazy loading or not?"%>
 

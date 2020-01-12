@@ -9,23 +9,27 @@
 <%@ taglib prefix="cms" uri="http://www.opencms.org/taglib/cms"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="mercury" tagdir="/WEB-INF/tags/mercury" %>
 
 <fmt:setLocale value="${cms.locale}" />
 <cms:bundle basename="alkacon.mercury.template.messages">
 
-    <c:set var="setting"            value="${cms.element.setting}" />
-    <c:set var="showFile"           value="${setting.showFile.toBoolean}" />
-    <c:set var="showDescription"    value="${setting.showDescription.toBoolean}" />
-    <c:set var="displayFormat"      value="${setting.listCssWrapper.toString}" />
+    <c:set var="setting"                value="${cms.element.setting}" />
+    <c:set var="showFile"               value="${setting.showFile.toBoolean}" />
+    <c:set var="showDescription"        value="${setting.showDescription.toBoolean}" />
+    <c:set var="showCategories"         value="${(setting.categoryOption.toString eq 'allnopath') or (setting.categoryOption.toString eq 'onlyleafs')}" />
+    <c:set var="showCategoryLeafsOnly"  value="${showCategories and (setting.categoryOption.toString eq 'onlyleafs')}" />
+    <c:set var="displayFormat"          value="${setting.listCssWrapper.toString}" />
+    <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
 
-    <c:set var="res"                value="${cms.wrap[cms.element.resource]}" />
-    <c:set var="rootPath"           value="${res.rootPath}" />
-    <c:set var="link"               value="${res.link}" />
-    <c:set var="mimeType"           value="${res.mimeType}" />
-    <c:set var="propertiesLocale"   value="${res.propertyLocale[cms.locale]}" />
-    <c:set var="suffix"             value="${fn:toUpperCase(res.extension)}" />
-    <c:set var="title"              value="${empty propertiesLocale['Title'] ? res.name : propertiesLocale['Title']}" />
-    <c:set var="description"        value="${propertiesLocale['Description']}"/>
+    <c:set var="res"                    value="${cms.wrap[cms.element.resource]}" />
+    <c:set var="rootPath"               value="${res.rootPath}" />
+    <c:set var="link"                   value="${res.link}" />
+    <c:set var="mimeType"               value="${res.mimeType}" />
+    <c:set var="propertiesLocale"       value="${res.propertyLocale[cms.locale]}" />
+    <c:set var="suffix"                 value="${fn:toUpperCase(res.extension)}" />
+    <c:set var="title"                  value="${empty propertiesLocale['Title'] ? res.name : propertiesLocale['Title']}" />
+    <c:set var="description"            value="${propertiesLocale['Description']}"/>
 
     <c:set var="date"><fmt:formatDate value="${cms:convertDate(res.dateLastModified)}" type="date" dateStyle="SHORT" /></c:set>
 
@@ -85,53 +89,89 @@
     <c:choose>
         <c:when test="${fn:contains(displayFormat, 'dl-list-compact')}">
 
-            <%-- ###### Compact display format ###### --%>
-            <div class="row ${showFile ? 'dl-show-file' : ''}">
-                <div class="col-12">
-                    <a class="dl-link" href="${link}" target="_blank" rel="noopener"><%--
-                    --%><span class="dl-type fa ${icon}"></span><%--
-                    --%><span class="dl-content"><%--
-                        --%><h3>${title}</h3><%--
-	                    --%><c:if test="${showFile and not empty propertiesLocale['Title']}"><%--
-                             --%><div class="dl-file">${res.name}</div><%--
-                        --%></c:if><%--
-						--%><c:if test="${showDescription and not empty description}"><%--
-						 	--%><div class="dl-desc">${description}</div><%--
-						--%></c:if><%--
-                    --%></span><%--
-                    --%><span class="dl-info"><%--
-                         --%><span class="dl-size"><span>${size}</span></span><%--
-                         --%><span class="dl-date"><span>${date}</span></span><%--
-                     --%></span><%--
-                     --%><span class="dl-dl fa fa-cloud-download"></span><%--
-                 --%></a>
-               </div>
-           </div>
+            <%-- ###### Compact / Minimal display format ###### --%>
+            <div class="dl-teaser dl-teaser-compact${showFile ? ' dl-show-file' : ''}${showDescription ? ' dl-show-desc' : ''}">
+                <a href="${link}" class="dl-link dl-link-disp" target="_blank" rel="noopener" rel="noopener" title="<fmt:message key="msg.page.display"/>"><%----%>
+                    <span class="dl-type fa ${icon}"></span><%----%>
+                    <span class="dl-content"><%----%>
+                        <mercury:heading level="${hsize}" text="${title}" css="dl-title" ade="${false}" />
+                        <c:if test="${showFile and not empty propertiesLocale['Title']}">
+                            <div class="dl-file">${res.name}</div><%----%>
+                        </c:if>
+                        <c:if test="${showCategories and not res.categories.isEmpty}">
+                            <c:set var="categories" value="${showCategoryLeafsOnly ? res.categories.leafItems : res.categories.allItems}" />
+                            <div class="dl-cat"><%----%>
+                                <c:forEach var="category" items="${categories}" varStatus="status">
+                                    <span class="dl-cat-label">${category.title}</span><%----%>
+                                </c:forEach>
+                            </div><%----%>
+                        </c:if>
+                        <c:if test="${showDescription and not empty description}">
+                            <div class="dl-desc">${description}</div><%----%>
+                        </c:if>
+                    </span><%----%>
+                </a><%----%>
+                <c:if test="${not fn:contains(displayFormat, 'dl-list-minimal')}">
+                    <a href="${link}" download class="dl-link dl-link-down" target="_blank" rel="noopener" title="<fmt:message key="msg.page.download"/>"><%----%>
+                        <span class="dl-info"><%----%>
+                            <span class="dl-size"><span>${size}</span></span><%----%>
+                            <span class="dl-date"><span>${date}</span></span><%----%>
+                        </span><%----%>
+                        <span class="dl-dl fa fa-cloud-download"></span><%----%>
+                    </a><%----%>
+                </c:if>
+            </div><%----%>
+            <mercury:nl />
 
         </c:when>
         <c:otherwise>
 
             <%-- ###### Elaborate display format ###### --%>
-            <div class="row">
-                <div class="dl-content fixcol-xs-75-rest fixcol-md-125-rest">
-                    <div class="dl-date">${date}</div>
-                    <h3><a href="${link}">${title}</a></h3>
-                    <c:if test="${showFile and not empty propertiesLocale['Title']}">
-                        <div class="dl-file"><a href="${link}"><c:out value="${res.name}" /></a></div>
-                    </c:if>
-                    <c:if test="${showDescription and not empty description}">
-                        <div class="dl-desc">${description}</div>
-                    </c:if>
-                    <a href="${link}" download class="btn dl-btn"><span class="fa fa-cloud-download"></span><fmt:message key="msg.page.download"/></a>
-                </div>
-                <div class="dl-info fixcol-xs-75 fixcol-md-125">
-                    <a href="${link}" target="_blank" rel="noopener"><span class="fa ${icon}"></span></a>
-                    <div class="dl-stats">
-                        <span class="dl-type">${suffix}</span>
-                        <span class="dl-size">${size}</span>
-                    </div>
-                </div>
-            </div>
+            <div class="dl-teaser dl-teaser-elaborate"><%----%>
+                <div class="row"><%----%>
+                    <div class="dl-content fixcol-md-125-rest"><%----%>
+                        <c:choose>
+                            <c:when test="${showCategories and not res.categories.isEmpty}">
+                                <div class="dl-date-cat"><%----%>
+                                    <div class="dl-date">${date}</div><%----%>
+                                    <c:set var="categories" value="${showCategoryLeafsOnly ? res.categories.leafItems : res.categories.allItems}" />
+                                    <div class="dl-cat"><%----%>
+                                        <c:forEach var="category" items="${categories}" varStatus="status">
+                                            <span class="dl-cat-label">${category.title}</span><%----%>
+                                        </c:forEach>
+                                    </div><%----%>
+                                </div><%----%>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="dl-date">${date}</div><%----%>
+                            </c:otherwise>
+                        </c:choose>
+                        <mercury:link link="${link}" title="${title}" css="dl-link" >
+                            <mercury:heading level="${hsize}" text="${title}" css="dl-title" ade="${false}" />
+                        </mercury:link>
+                        <c:if test="${showFile and not empty propertiesLocale['Title']}">
+                            <div class="dl-file"><a href="${link}"><c:out value="${res.name}" /></a></div><%----%>
+                        </c:if>
+                        <c:if test="${showDescription and not empty description}">
+                            <div class="dl-desc">${description}</div><%----%>
+                        </c:if>
+                        <a href="${link}" download class="btn dl-btn"><%----%>
+                            <span class="fa fa-cloud-download"></span><%----%>
+                            <fmt:message key="msg.page.download"/><%----%>
+                        </a><%----%>
+                    </div><%----%>
+                    <div class="dl-info fixcol-md-125"><%----%>
+                        <a href="${link}" class="btn-info" target="_blank" rel="noopener" title="<fmt:message key="msg.page.display"/>"><%----%>
+                            <span class="fa ${icon}"></span><span class="dl-info-text"><fmt:message key="msg.page.display"/></span><%----%>
+                        </a><%----%>
+                        <div class="dl-stats"><%----%>
+                            <span class="dl-type">${suffix}</span><%----%>
+                            <span class="dl-size">${size}</span><%----%>
+                        </div><%----%>
+                    </div><%----%>
+                </div><%----%>
+            </div><%----%>
+            <mercury:nl />
 
         </c:otherwise>
     </c:choose>

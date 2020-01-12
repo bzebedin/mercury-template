@@ -56,6 +56,7 @@ html {
         }
     }
 
+    // rem based font adjustment is done in mixin
     @include rem-base;
 }
 
@@ -155,6 +156,20 @@ a {
     }
 }
 
+@if ($color-linked-headings-on-hover) {
+    .box a, // required to override rule set in .box
+    a {
+        &:hover {
+            h1, h2, h3, h4, h5, h6 {
+                @include media-breakpoint-up(md) {
+                    @include color-transition;
+                }
+                color: $link-hover-color;
+            }
+        }
+    }
+}
+
 @if ($link-external-icon) {
 
     a.external:after {
@@ -197,6 +212,15 @@ span.badge {
     }
 }
 
+
+// Hyphenation for generic element headings
+
+.element:not(.piece) {
+    // piece already has handling for hyphens
+    > .heading {
+        @include use-hyphens-headings(true);
+    }
+}
 
 // Disabled elements, e.g. OSM maps
 
@@ -243,5 +267,16 @@ span.badge {
             flex: 0 0 100%;
             max-width: initial;
         }
+    }
+    body {
+        font-size: 12pt;
+        line-height: 1.35;
+        padding: 0;
+        margin: 0;
+    }
+    img,
+    .element,
+    .teaser {
+        page-break-inside: avoid;
     }
 }

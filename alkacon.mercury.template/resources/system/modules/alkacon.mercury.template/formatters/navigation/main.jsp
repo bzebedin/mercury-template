@@ -17,13 +17,21 @@
 
 <cms:formatter var="content" val="value">
 
+<c:set var="setting"                    value="${cms.element.setting}" />
+<c:set var="cssWrapper"                 value="${setting.cssWrapper}" />
+<c:set var="showSearch"                 value="${setting.showSearch.useDefault(true).toBoolean}" />
+<c:set var="textDisplay"                value="${setting.textDisplay.useDefault('cap-css').toString}" />
+
+<c:set var="searchPageUrl" value="${cms.functionDetail['Search page']}" />
+<c:set var="showSearch" value="${showSearch and not fn:startsWith(searchPageUrl,'[')}" />
+
 <c:set var="logoElements" value="${cms.elementsInContainers['header-image']}" />
 <c:if test="${not empty logoElements}">
     <c:set var="logoContent" value="${logoElements.get(0).toXml}" />
     <c:set var="logoImage" value="${logoContent.value.Image}" />
 </c:if>
 
-<nav class="nav-main-group ${logoImage.value.Image.isSet ? 'has-sidelogo' : ''}"><%----%>
+<nav class="nav-main-group ${logoImage.value.Image.isSet ? 'has-sidelogo ' : ''}${cssWrapper}"><%----%>
 
     <mercury:nav-items
         type="forSite"
@@ -41,13 +49,13 @@
         </c:if>
 
         <mercury:nl />
-        <ul class="nav-main-items ${not empty sidelogohtml ? 'hassidelogo' : ''}"><%----%>
+        <ul class="nav-main-items ${textDisplay}${' '}${not empty sidelogohtml ? 'hassidelogo ' : ''}${showSearch ? 'has-search' : 'no-search'}"><%----%>
         <mercury:nl />
 
         <c:set var="linkElements" value="${cms.elementsInContainers['header-linksequence']}" />
         <c:if test="${not empty linkElements}">
             <c:set var="linksequence" value="${linkElements.get(0).toXml}" />
-            <li id="nav-main-addition" aria-expanded="false"  class="hidden-lg hidden-xl"><%----%>
+            <li id="nav-main-addition" aria-expanded="false" class="hidden-lg hidden-xl"><%----%>
                 <a href="#" title="Search" aria-controls="nav_nav-main-addition" id="label_nav-main-addition">${linksequence.value.Title}</a><%----%>
                 <ul class="nav-menu" id="nav_nav-main-addition" aria-labelledby="label_nav-main-addition"><%----%>
                     <mercury:nl />
@@ -72,13 +80,11 @@
             <c:set var="nextIsTopLevel" value="${nextLevel eq navStartLevel}" />
             <c:set var="navTarget" value="${fn:trim(navElem.info)eq 'extern' ? ' target=\"_blank\"' : ''}" />
 
-            <c:set var="isCurrentPage" value="${navElem.navigationLevel ?
-                (navElem.navTreeLevel > navStartLevel) and fn:startsWith(cms.requestContext.uri, navElem.parentFolderName) :
-                fn:startsWith(cms.requestContext.uri, navElem.resourceName)}" />
+            <c:set var="isCurrentPage" value="${fn:startsWith(cms.requestContext.uri, cms.sitePath[navElem.resource.rootPath])}" />
 
-            <c:set var="menuType">
-                ${isCurrentPage ? ' active' : ''}
-            </c:set>
+            <c:set var="menuType" value="${isCurrentPage ? 'active ' : ''}" />
+            <c:set var="menuType" value="${i == 0 ? menuType.concat('nav-first ') : menuType}" />
+            <c:set var="menuType" value="${i == navLength ? menuType.concat('nav-last ') : menuType}" />
 
             <c:if test="${navElem.navigationLevel}">
                 <c:set var="lastNavLevel" value="${navElem}" />
@@ -95,7 +101,7 @@
                 <c:if test="${cms.vfs.existsXml[megaMenuVfsPath]}">
                     <c:set var="megaMenuLink"><cms:link>${megaMenuVfsPath}</cms:link></c:set>
                     <c:set var="megaMenu" value=' data-megamenu="${megaMenuLink}"' />
-                    <c:set var="menuType" value="${menuType} mega" />
+                    <c:set var="menuType" value="${menuType.concat('mega')}" />
                 </c:if>
             </c:if>
 
@@ -133,7 +139,7 @@
                 <c:when test="${startSubMenu}">
                     <%-- Navigation item with sub-menu and direct child pages --%>
                     <a href="${navLink}"${navTarget} class="nav-label" id="${parentLabelId}">${navText}</a><%--
-                --%><a href="${navLink}"${navTarget} aria-controls="${targetMenuId}">&nbsp;</a><%--
+                --%><a href="${navLink}"${navTarget} aria-controls="${targetMenuId}" aria-label="<fmt:message key="msg.page.navigation.sublevel" />">&nbsp;</a><%--
             --%></c:when>
 
                 <c:otherwise>
@@ -156,10 +162,7 @@
 
         </c:forEach>
 
-        <c:set var="searchPageUrl" value="${cms.functionDetail['Search page']}" />
-        <c:set var="hidesearch" value="${fn:startsWith(searchPageUrl,'[')}" />
-
-        <c:if test="${not hidesearch}">
+        <c:if test="${showSearch}">
             <li id="nav-main-search" aria-expanded="false"><%----%>
                 <a href="#" title="Search" aria-controls="nav_nav-main-search" id="label_nav-main-search"><%----%>
                     <span class="search search-btn fa fa-search"></span><%----%>

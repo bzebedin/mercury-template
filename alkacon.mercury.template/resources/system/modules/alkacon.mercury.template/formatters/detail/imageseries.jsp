@@ -69,6 +69,7 @@
                     --%>srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" <%--
                     --%>data-srcset="%(tileSrcSet)" <%--
                     --%>data-sizes="auto" <%--
+                    --%>alt="%(titleAttr)"<%--
                     --%>class="lazyload"><%--
                 --%><span class="zoom-icon"><%--
                     --%><span class="fa fa-search"></span><%--
@@ -124,8 +125,10 @@
 <mercury:nl />
 
 <c:if test="${(not empty titleMarkup) or showDate or showImageCount}">
-    <div class="detail-visual full"><%----%>
-        ${titleMarkup}
+    <div class="detail-visual piece full"><%----%>
+        <div class="heading"><%----%>
+            ${titleMarkup}
+        </div><%----%>
         <c:if test="${showDate or showImageCount}">
             <div class="visual-info ${not showImageCount ? 'right' : '' }"><%----%>
                 <c:if test="${showDate}"><div class="info date"><div>${datePrefix}${date}</div></div></c:if>

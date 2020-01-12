@@ -17,9 +17,10 @@
 <cms:bundle basename="alkacon.mercury.template.messages">
 
 <c:set var="setting"                value="${cms.element.setting}" />
-<c:set var="cssWrapper"             value="${setting.cssWrapper}" />
+<c:set var="cssWrapper"             value="${setting.cssWrapper.toString}" />
+<c:set var="addCssWrapper"          value="${setting.addCssWrapper.isSetNotNone ? setting.addCssWrapper.toString : null}" />
 <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
-<c:set var="iconClass"              value="${setting.iconClass.isSet ? setting.iconClass.toString : 'warning'}" />
+<c:set var="iconClass"              value="${setting.iconClass.useDefault('caret-right').toString}" />
 <c:set var="linksequenceType"       value="${setting.linksequenceType.toString}" />
 
 <c:choose>
@@ -50,10 +51,10 @@
 </c:choose>
 
 <mercury:nl />
-<div class="element type-linksequence ${linksequenceType}${' '}${cssWrapper}${' '}${listBulletStyle}">
+<div class="element type-linksequence ${linksequenceType}${' '}${listBulletStyle}${' '}${cssWrapper}${' '}${addCssWrapper}">
 <%----%>
 
-    <mercury:heading level="${hsize}" text="${value.Title}" css="head" />
+    <mercury:heading level="${hsize}" text="${value.Title}" css="heading" />
 
     <c:if test="${text.isSet}">
         <div class="text-box" ${text.rdfaAttr}>${text}</div><%----%>
@@ -67,14 +68,14 @@
             </c:if>
             <li ${liWrapper}><%----%>
                 <mercury:link link="${link}" css="${aWrapper}">
-                    ${linkText}
+                    <span class="ls-item">${linkText}</span><%----%>
                 </mercury:link>
             </li><%----%>
         </c:forEach>
     </ul><%----%>
 
-</div>
-<%----%>
+</div><%----%>
+<mercury:nl />
 
 </cms:bundle>
 </cms:formatter>

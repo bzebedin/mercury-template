@@ -55,6 +55,7 @@
         &.row-tile {
             margin-left: -#{$space}px;
             margin-right: -#{$space}px;
+            padding-bottom: #{$grid-gutter-width - (2px * $space)};
         }
 
         .tile-col {
@@ -92,14 +93,20 @@
     display: flex;
     flex-direction: column;
 
-    &.bg-grey {
+    &.bg-highlight {
+        background-color: $highlight-color;
+    }
+    &.bg-switch:nth-of-type(even) {
         background-color: $highlight-color;
     }
     &.bg-theme {
         background-color: $main-theme;
     }
-    &.bg-switch:nth-of-type(even) {
-        background-color: $highlight-color;
+    &.bg-grey-light {
+        background-color: $grey-light;
+    }
+    &.bg-grey {
+        background-color: $grey;
     }
 }
 

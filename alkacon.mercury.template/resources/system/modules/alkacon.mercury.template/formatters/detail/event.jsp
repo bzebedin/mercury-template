@@ -59,7 +59,7 @@
 <c:set var="ade"                    value="${empty cms.detailContentId or (not empty date) and (value.Dates.toDateSeries.isExtractedDate or value.Dates.toDateSeries.isSingleDate)}" />
 
 <mercury:nl />
-<div class="detail-page type-event ${cssWrapper}"><%----%>
+<div class="detail-page type-event layout-${setting.keyPieceLayout.toInteger}${' '}${cssWrapper}"><%----%>
 <mercury:nl />
 
 <mercury:event-booking
@@ -72,7 +72,7 @@
         cssWrapper="detail-visual"
         pieceLayout="${keyPieceLayout}"
         allowEmptyBodyColumn="${true}"
-        sizeDesktop="${6}"
+        sizeDesktop="${keyPieceLayout > 1 ? 6 : 12}"
         sizeMobile="${12}">
 
         <jsp:attribute name="heading">
@@ -99,36 +99,39 @@
         </jsp:attribute>
 
         <jsp:attribute name="text">
-            <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${not showOverlay and (keyPieceLayout != 0)}" />
+            <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${not showOverlay and (keyPieceLayout > 1)}" />
 
             <c:if test="${showLocation}">
                 <c:set var="location">
-                    <div>
-                    <c:if test="${not empty locData.name}">
-                        <div class="locname">${locData.name}</div>
-                    </c:if>
-                    <div class="address">
-                        <div class="street"> ${locData.streetAddress}</div>
-                        <c:if test="${not empty locData.extendedAddress}">
-                            <div class="extended"> ${locData.extendedAddress}</div>
+                    <div class="locdata"><%----%>
+                    <c:if test="${not empty locData}">
+                        <c:if test="${not empty locData.name}">
+                            <div class="locname">${locData.name}</div><%----%>
                         </c:if>
-                        <div class="city">
-                            <span class="code"> ${locData.postalCode}</span>
-                            <span class="locality"> ${locData.locality}</span>
-                        </div>
-                        <div class="region">
-                            <c:if test="${not empty locData.region}">
-                                <span class="region"> ${locData.region}</span>
+                        <div class="address">
+                            <div class="street"> ${locData.streetAddress}</div><%----%>
+                            <c:if test="${not empty locData.extendedAddress}">
+                                <div class="extended"> ${locData.extendedAddress}</div><%----%>
                             </c:if>
-                            <c:if test="${not empty locData.country}">
-                                <span class="country"> ${locData.country}</span>
-                            </c:if>
-                        </div>
-                    </div>
-                    <c:if test="${locationNote.isSet}">
-                        <div class="adressInfo" ${ade ? loocationNote.rdfaAttr : ''}>${locationNote}</div>
+                            <div class="city">
+                                <span class="code"> ${locData.postalCode}</span><%----%>
+                                <span class="locality"> ${locData.locality}</span><%----%>
+                            </div>
+                            <div class="region">
+                                <c:if test="${not empty locData.region}">
+                                    <span class="region"> ${locData.region}</span><%----%>
+                                </c:if>
+                                <c:if test="${not empty locData.country}">
+                                    <span class="country"> ${locData.country}</span><%----%>
+                                </c:if>
+                            </div><%----%>
+                        </div><%----%>
                     </c:if>
-                    </div>
+                    <c:if test="${locationNote.isSet}">
+                        <div class="adressInfo" ${ade ? loocationNote.rdfaAttr : ''}>${locationNote}</div><%----%>
+                    </c:if>
+                    </div><%----%>
+                    <mercury:nl />
                 </c:set>
             </c:if>
 
@@ -142,7 +145,7 @@
                 </div><%----%>
             </c:if>
 
-            <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showOverlay}" />
+            <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showOverlay or (keyPieceLayout == 1)}" />
         </jsp:attribute>
 
     </mercury:piece>

@@ -41,6 +41,9 @@
       <IncludeName><![CDATA[pieceSizeDesktop.default]]></IncludeName>
     </Setting>
     <Setting>
+      <IncludeName><![CDATA[pieceSizeMobile.default]]></IncludeName>
+    </Setting>
+    <Setting>
       <IncludeName><![CDATA[textLength.elaborate]]></IncludeName>
     </Setting>
     <Setting>
@@ -63,6 +66,15 @@
     </Setting>
     <Setting>
       <IncludeName><![CDATA[listEntryMinHeight.125]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[listWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[listCssWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[listEntryWrapper.default]]></IncludeName>
     </Setting>
   </NewFormatter>
 </NewFormatters>
