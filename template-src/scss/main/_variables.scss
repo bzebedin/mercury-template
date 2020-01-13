@@ -773,6 +773,10 @@ $border-styles:                     () !default;
 
 $images-sizes:                      () !default;
 
+// Min-heights (BZ - ADDED)
+$min-heights:                       (25vh,50vh,75vh,100vh) !default;
+
+
 // Further variables used by generics
 $box-padding:                       20px !default;
 
