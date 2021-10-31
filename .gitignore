@@ -5,3 +5,5 @@
 /build/
 /output/
 /module-export.sh
+/.idea/
+/${OCMOUNT}/system/modules/alkacon.mercury.theme/css/
