@@ -16,11 +16,10 @@
 
 <cms:formatter var="content" val="value">
 
-<c:set var="setting"                value="${cms.element.setting}" />
-<c:set var="cssWrapper"             value="${setting.cssWrapper}" />
+<mercury:setting-defaults>
+
 <c:set var="keyPieceLayout"         value="${setting.keyPieceLayout.toInteger}" />
 <c:set var="pieceLayout"            value="${setting.pieceLayout.toInteger}" />
-<c:set var="visualEffect"           value="${setting.effect.toString}" />
 <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
 <c:set var="titleOption"            value="${setting.titleOption.toString}" />
 <c:set var="imageRatio"             value="${setting.imageRatio}" />
@@ -44,24 +43,26 @@
 <c:set var="showDate"               value="${not empty date}" />
 <c:set var="ade"                    value="${cms.isEditMode}" />
 
-<c:set var="showText"               value="${setting.showText.toBoolean}" />
+<c:set var="showText"               value="${setting.showText.toBoolean and text.isSet}" />
+<c:set var="showTextDetailContent"  value="${showText and setting.showTextDetailContent.toBoolean}" />
 <c:set var="showPrefaceAsSubtitle"  value="${false}" />
 <c:set var="showPreface"            value="${not showPrefaceAsSubtitle and setting.showPreface.toBoolean}" />
 <c:set var="showMediaTime"          value="${true}" />
 <c:set var="showOverlay"            value="${keyPieceLayout == 50}" />
 <c:set var="showIntro"              value="${titleOption ne 'none'}" />
-<c:set var="keyPieceLayout"         value="${showOverlay ? 0 : keyPieceLayout}" />
 
 <c:set var="isAudio"                value="${value.MediaContent.value.Audio.isSet}" />
 
 <mercury:nl />
-<div class="detail-page type-media ${isAudio ? 'audio ' : ''}layout-${setting.keyPieceLayout.toInteger}${' '}${cssWrapper}"><%----%>
+<div class="detail-page type-media ${isAudio ? 'audio ' : ''}layout-${keyPieceLayout}${setCssWrapper123}"><%----%>
 <mercury:nl />
 
+<c:set var="keyPieceLayout"         value="${showOverlay ? 0 : keyPieceLayout}" />
+
 <mercury:piece
-    cssWrapper="detail-visual"
+    cssWrapper="detail-visual${setCssWrapperKeyPiece}"
     pieceLayout="${keyPieceLayout}"
-    sizeDesktop="${keyPieceLayout > 1 ? 6 : 12}"
+    sizeDesktop="${(keyPieceLayout < 2 || keyPieceLayout == 10) ? 12 : 6}"
     sizeMobile="${12}">
 
     <jsp:attribute name="heading">
@@ -74,7 +75,7 @@
     <jsp:attribute name="visual">
         <mercury:key-visual-piece
             image="${image}"
-            effect="${visualEffect}"
+            effect="${setEffect}"
             showOverlay="${showOverlay}"
             imageRatio="${imageRatio}"
             showImageSubtitle="${showImageSubtitle}"
@@ -87,7 +88,7 @@
             <jsp:attribute name="markupImage">
                 <mercury:media-box
                     content="${content}"
-                    effect="${visualEffect}"
+                    effect="${setEffect}"
                     ratio="${imageRatio}"
                     hsize="${hsize}"
                     mediaDate="${showDate ? datePrefix.concat(date) : ''}"
@@ -106,7 +107,7 @@
     <jsp:attribute name="text">
         <mercury:heading text="${preface}" level="${7}" css="sub-header" ade="${ade}" test="${showPreface and not showOverlay and (keyPieceLayout > 1)}" />
 
-        <c:if test="${showText and text.isSet}">
+        <c:if test="${showText and not showTextDetailContent}">
             <div class="detail-content" ${ade ? text.rdfaAttr : ''}><%----%>
                 ${text}
             </div><%----%>
@@ -117,10 +118,27 @@
 
 </mercury:piece>
 
+<c:if test="${showTextDetailContent}">
+
+    <div class="detail-content"><%----%>
+        <mercury:section-piece
+            cssWrapper="${setCssWrapperParagraphs}"
+            pieceLayout="${1}"
+            text="${text}"
+            hsize="${hsize + 1}"
+            ade="${ade}"
+        />
+    </div><%----%>
+    <mercury:nl />
+
+</c:if>
+
 <mercury:container-attachment content="${content}" name="attachments" type="${containerType}" />
 
 </div><%----%>
 <mercury:nl />
+
+</mercury:setting-defaults>
 
 </cms:formatter>
 </mercury:init-messages>

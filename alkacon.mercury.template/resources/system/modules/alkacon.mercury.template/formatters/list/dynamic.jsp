@@ -69,7 +69,7 @@
 
     <c:if test="${isCompatible}">
 
-        <mercury:heading level="${wrappedSettings.listHsize.toInteger}" text="${value.Title}" css="heading" />
+        <mercury:heading level="${wrappedSettings.listHsize.toInteger}" text="${value.Title}" css="heading pivot" />
 
         <c:set var="count" value="${wrappedSettings.itemsPerPage.isSet ? wrappedSettings.itemsPerPage : 5}" />
         <c:set var="listTag" value="${wrappedSettings.listTag.isSet ? wrappedSettings.listTag : 'ul' }" />
@@ -106,7 +106,19 @@
             <c:set var="initparams" value="${initparams}&facet_parent-folders=${param['facet_parent-folders']}" />
         </c:if>
         <c:if test="${not isLoadAll and not empty param['page']}">
-            <c:set var="initparams" value="${initparams}&page=${param['page']}" />
+            <c:set var="initPage">${param['page']}</c:set>
+            <c:if test="${not empty initPage}">
+                <c:catch>
+                    <fmt:parseNumber value="${initPage}" integerOnly="true" var="pageNum"/>
+                    <c:if test="${pageNum > 0}"><c:set var="initparams" value="${initparams}&page=${pageNum}"/></c:if>
+                </c:catch>
+            </c:if>
+        </c:if>
+        <c:if test="${not empty param['coordinates']}">
+            <c:set var="initparams" value="${initparams}&coordinates=${param['coordinates']}" />
+        </c:if>
+        <c:if test="${not empty param['radius']}">
+            <c:set var="initparams" value="${initparams}&radius=${param['radius']}" />
         </c:if>
         <c:if test="${not empty initparams}">
             <c:set var="initparams" value="reloaded${initparams}" />
@@ -191,7 +203,7 @@
 
             <%-- ####### List pagination ######## --%>
             <c:if test="${settings.appendSwitch != 'disable'}">
-                <div class="list-pagination ${settings.listPaginationWrapper}"><%----%>
+                <div class="list-pagination pivot ${settings.listPaginationWrapper}"><%----%>
                     <noscript><%----%>
                         <mercury:list-pagination
                             search="${search}"
@@ -205,10 +217,10 @@
 
             <%-- ####### Boxes to create new entries in case of empty result ######## --%>
             <c:if test="${cms.isEditMode}">
-                <c:forEach var="type" items="${content.valueList.TypesToCollect}">
-                    <c:set var="createType">${fn:substringBefore(type.stringValue, ':')}</c:set>
+                <mercury:list-types types="${content.valueList.TypesToCollect}" var="types" uploadFolder="${cms.getBinaryUploadFolder(content)}" />
+                <c:forEach var="createType" items="${types}">
                     <div class="list-editbox" style="display: none;" ><%----%>
-                        <mercury:list-messages type="${createType}" defaultCats="${content.value.Category}" />
+                        <mercury:list-messages type="${createType}" defaultCats="${content.value.Category}" uploadFolder="${cms.getBinaryUploadFolder(content)}" />
                     </div><%----%>
                     <mercury:nl />
                 </c:forEach>

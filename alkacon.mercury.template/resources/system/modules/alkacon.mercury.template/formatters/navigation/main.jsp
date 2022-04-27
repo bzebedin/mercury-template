@@ -22,9 +22,7 @@
 <c:set var="showSearch"                 value="${setting.showSearch.useDefault(true).toBoolean}" />
 <c:set var="textDisplay"                value="${setting.textDisplay.useDefault('cap-css').toString}" />
 <c:set var="metaLinks"                  value="${setting.metaLinks.useDefault('top').toString}" />
-<c:set var="showImageLink"              value="${setting.showImageLink.useDefault(false).toBoolean}" />
-
-<c:set var="temlateVariant"             value="${cms.sitemapConfig.attribute['template.variant'].useDefault('default').toString}" />
+<c:set var="showImageLink"              value="${setting.showImageLink.toBoolean}" />
 
 <c:set var="searchPageUrl" value="${cms.functionDetail['Search page']}" />
 <c:set var="showSearch" value="${showSearch and not fn:startsWith(searchPageUrl,'[')}" />
@@ -44,34 +42,13 @@
         currentPageFolder="${currentPageFolder}"
         currentPageUri="${currentPageUri}">
 
+        <c:set var="mobileHeaderPlugins" value="${cms.plugins['nav-mobile-header']}" />
         <c:choose>
-            <c:when test="${temlateVariant eq 'burger'}">
-                <div class="nav-menu-header"><%----%>
-                    <div class="nav-menu-toggle"><%----%>
-                        <label for="nav-toggle-check" id="nav-toggle-label-close" class="nav-toggle-label"><%----%>
-                            <span class="nav-toggle"><%----%>
-                                <span><fmt:message key="msg.page.navigation.toggle" /></span><%----%>
-                            </span><%----%>
-                        </label><%----%>
-                    </div><%----%>
-                    <c:if test="${(cssWrapper ne 'no-image') and (not empty logoImage)}">
-                        <div class="nav-menu-logo"><%----%>
-                            <mercury:link
-                                link="${logoContent.value.Link}"
-                                test="${showImageLink}"
-                                testFailTag="div"
-                                setTitle="${true}"
-                                css="mobile-logolink" >
-                                <mercury:image-simple
-                                    image="${logoImage}"
-                                    sizes="200,350,400,700,800"
-                                    cssWrapper="img-responsive"
-                                    title="${imageTitleCopyright}"
-                                />
-                            </mercury:link>
-                        </div><%----%>
-                    </c:if>
-                </div>
+            <c:when test="${not empty mobileHeaderPlugins}">
+                <c:set var="mobileHeaderPlugin" value="${mobileHeaderPlugins.get(0)}" />
+                <c:set var="reqScopeLogoContent" value="${logoContent}" scope="request" />
+                <c:set var="reqScopeSetting" value="${setting}" scope="request" />
+                <cms:include file="${mobileHeaderPlugin.path}" cacheable="false" />
             </c:when>
             <c:otherwise>
                 <div class="nav-main-mobile-logo"><%----%>
@@ -86,41 +63,52 @@
                                 image="${logoImage}"
                                 sizes="100,200,400,800"
                                 cssWrapper="img-responsive"
-                                title="${imageTitleCopyright}"
                             />
-
                         </mercury:link>
                     </c:if>
                 </div><%----%>
+                <mercury:nl />
             </c:otherwise>
         </c:choose>
-
-        <mercury:nl />
-        <ul class="nav-main-items ${textDisplay}${' '}${not empty sidelogohtml ? 'hassidelogo ' : ''}${showSearch ? 'has-search' : 'no-search'}"><%----%>
-        <mercury:nl />
 
         <c:if test="${metaLinks ne 'none'}">
             <c:set var="metaLinkElements" value="${cms.elementsInContainers['header-linksequence']}" />
             <c:if test="${not empty metaLinkElements}">
                 <c:set var="metaLinksHtml">
-                    <c:set var="metaLinksequence" value="${metaLinkElements.get(0).toXml}" />
-                    <li id="nav-main-addition" aria-expanded="false" class="hidden-lg hidden-xl"><%----%>
-                        <a href="#" title="Search" aria-controls="nav_nav-main-addition" id="label_nav-main-addition">${metaLinksequence.value.Title}</a><%----%>
-                        <ul class="nav-menu" id="nav_nav-main-addition" aria-labelledby="label_nav-main-addition"><%----%>
-                            <mercury:nl />
-                            <c:forEach var="link" items="${metaLinksequence.valueList.LinkEntry}" varStatus="status">
-                                <c:set var="linkText" value="${link.value.Text}" />
-                                <c:if test="${fn:startsWith(linkText, 'icon:')}">
-                                    <c:set var="linkText"><span class="fa fa-${fn:substringAfter(linkText, 'icon:')}"></span></c:set>
-                                </c:if>
-                                <li><mercury:link link="${link}">${linkText}</mercury:link></li><mercury:nl />
-                            </c:forEach>
-                        </ul><%----%>
-                    </li><%----%>
+                    <c:set var="metaLinksContent" value="${metaLinkElements.get(0).toXml}" />
+                    <c:set var="metaLinksPlugins" value="${cms.plugins['nav-meta-links']}" />
+                    <c:choose>
+                        <c:when test="${not empty metaLinksPlugins}">
+                            <c:set var="metaLinksPlugin" value="${metaLinksPlugins.get(0)}" />
+                            <c:set var="reqScopeMetaLinksContent" value="${metaLinksContent}" scope="request" />
+                            <c:set var="reqScopeSetting" value="${setting}" scope="request" />
+                            <cms:include file="${metaLinksPlugin.path}" cacheable="false" />
+                        </c:when>
+                        <c:otherwise>
+                            <li id="nav-main-addition" class="expand hidden-lg hidden-xl"><%----%>
+                                <a href="#" aria-controls="nav_nav-main-addition" id="label_nav-main-addition">${metaLinksContent.value.Title}</a><%----%>
+                                <ul class="nav-menu" id="nav_nav-main-addition" aria-labelledby="label_nav-main-addition"><%----%>
+                                    <mercury:nl />
+                                    <c:forEach var="link" items="${metaLinksContent.valueList.LinkEntry}" varStatus="status">
+                                         <li><mercury:link-icon link="${link}" /></li><mercury:nl />
+                                    </c:forEach>
+                                </ul><%----%>
+                            </li><%----%>
+                        </c:otherwise>
+                    </c:choose>
                 </c:set>
             </c:if>
         </c:if>
-        <c:if test="${not empty metaLinksHtml and metaLinks ne 'bottom'}">
+
+        <c:set var="navPluginHtml">
+            <mercury:load-plugins group="nav-main-additions" type="jsp-nocache" />
+        </c:set>
+
+        <mercury:nl />
+        <ul class="nav-main-items ${textDisplay}${' '}${not empty sidelogohtml ? 'hassidelogo ' : ''}${showSearch ? 'has-search' : 'no-search'}"><%----%>
+        <mercury:nl />
+
+        <c:if test="${not empty metaLinksHtml and (metaLinks ne 'bottom')}">
             ${metaLinksHtml}
         </c:if>
 
@@ -184,10 +172,9 @@
                 </c:otherwise>
             </c:choose>
 
-            <c:set var="menuType" value="${empty menuType ? '' : ' class=\"'.concat(menuType).concat('\"')}" />
-            <c:set var="menuType" value="${startSubMenu or hasMegaMenu ? menuType.concat(' aria-expanded=\"false\"') : menuType}" />
+            <c:set var="menuType" value="${startSubMenu or hasMegaMenu ? menuType.concat(' expand') : menuType}" />
 
-            <c:out value='<li${menuType}${megaMenu}>${empty menuType ? "" : nl}' escapeXml="false" />
+            <c:out value='<li class="${menuType}"${megaMenu}>${empty menuType ? "" : nl}' escapeXml="false" />
 
             <c:set var="navText"><c:out value="${(empty navElem.navText or fn:startsWith(navElem.navText, '???'))
                 ? navElem.title : navElem.navText}" /></c:set>
@@ -197,25 +184,41 @@
 
                 <c:when test="${startSubMenu and not navElem.navigationLevel}">
                     <%-- Navigation item with sub-menu and direct child pages --%>
-                    <a href="${navLink}"${navTarget} class="nav-label" id="${parentLabelId}">${navText}</a><%----%>
-                    <a href="${navLink}"${navTarget} aria-controls="${targetMenuId}" aria-label="<fmt:message key="msg.page.navigation.sublevel" />">&nbsp;</a><%----%>
+                    <a href="${navLink}"${navTarget}${' '}<%--
+                    --%>id="${parentLabelId}"${' '}<%--
+                    --%>class="nav-label"${' '}<%--
+                    --%>title="<fmt:message key="msg.page.navigation.showpage" />"<%--
+                    --%>${'>'}${navText}</a><%----%>
+
+                    <a href="${navLink}"${navTarget}${' '}<%--
+                    --%>role="button"${' '}<%--
+                    --%>aria-expanded="false"${' '}<%--
+                    --%>aria-controls="${targetMenuId}"${' '}<%--
+                    --%>aria-labelledby="${parentLabelId}"<%--
+                    --%>title="<fmt:message key="msg.page.navigation.sublevel" />"<%--
+                    --%>${'>'}&nbsp;</a><%----%>
                 </c:when>
 
                 <c:when test="${startSubMenu}">
                     <%-- Navigation item with sub-menu but without direct child pages --%>
                     <a href="${navLink}"${navTarget}${' '}<%--
                     --%>id="${parentLabelId}"${' '}<%--
-                    --%>aria-controls="${targetMenuId}">${navText}</a><%----%>
+                    --%>role="button"${' '}<%--
+                    --%>aria-expanded="false"${' '}<%--
+                    --%>aria-controls="${targetMenuId}"${' '}<%--
+                    --%>title="<fmt:message key="msg.page.navigation.sublevel" />"<%--
+                    --%>${'>'}${navText}</a><%----%>
                 </c:when>
 
                 <c:otherwise>
                     <%--Navigation item without sub-menu --%>
-                    <a href="${navLink}"${navTarget}<%----%>
+                    <a href="${navLink}"${navTarget}${' '}<%----%>
                     <c:if test="${hasMegaMenu}">
                         <%-- mega menu requires aria-controls - will be removed by JavaScript if mega menu is not displayed in mobile --%>
-                        ${' '}aria-controls="${targetMenuId}"<%----%>
+                        aria-controls="${targetMenuId}"${' '}<%----%>
                     </c:if>
-                    ${'>'}${navText}</a><%----%>
+                    <%----%>title="<fmt:message key="msg.page.navigation.showpage" />"<%--
+                    --%>${'>'}${navText}</a><%----%>
                 </c:otherwise>
             </c:choose>
 
@@ -238,13 +241,17 @@
 
         </c:forEach>
 
-        <c:if test="${not empty metaLinksHtml and metaLinks eq 'bottom'}">
+        <c:if test="${not empty metaLinksHtml and (metaLinks eq 'bottom')}">
             ${metaLinksHtml}
         </c:if>
 
+        <c:if test="${not empty navPluginHtml}">
+            ${navPluginHtml}
+        </c:if>
+
         <c:if test="${showSearch}">
-            <li id="nav-main-search" aria-expanded="false"><%----%>
-                <a href="#" title="Search" aria-controls="nav_nav-main-search" id="label_nav-main-search"><%----%>
+            <li id="nav-main-search" class="expand"><%----%>
+                <a href="${searchPageUrl}" title="<fmt:message key="msg.page.search" />" role="button" aria-controls="nav_nav-main-search" aria-expanded="false" id="label_nav-main-search" class="click-direct"><%----%>
                     <span class="search search-btn fa fa-search"></span><%----%>
                 </a><%----%>
                 <ul class="nav-menu" id="nav_nav-main-search" aria-labelledby="label_nav-main-search"><%----%>
@@ -252,9 +259,11 @@
                         <div class="styled-form search-form"><%----%>
                             <form action="${searchPageUrl}" method="post"><%----%>
                                 <div class="input button"><%----%>
-                                    <label for="searchNavQuery" class="sr-only">Search</label><%----%>
+                                    <label for="searchNavQuery" class="sr-only"><fmt:message key="msg.page.search" /></label><%----%>
                                     <input id="searchNavQuery" name="q" type="text" class="blur-focus" autocomplete="off" placeholder='<fmt:message key="msg.page.search.enterquery" />' /><%----%>
-                                    <button class="btn" type="button" onclick="this.form.submit(); return false;"><fmt:message key="msg.page.search.submit" /></button><%----%>
+                                    <button class="btn" type="button" title="<fmt:message key="msg.page.search" />" onclick="this.form.submit(); return false;"><%----%>
+                                        <fmt:message key="msg.page.search.submit" /><%----%>
+                                    </button><%----%>
                                 </div><%----%>
                             </form><%----%>
                         </div><%----%>

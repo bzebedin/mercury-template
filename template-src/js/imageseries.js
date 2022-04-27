@@ -276,6 +276,12 @@ function initZoomers($elements) {
                     e.preventDefault();
                     openPhotoSwipe(targetIndex, "imagezoom");
                 });
+                $this.keyup(function(e) {
+                    if (e.keyCode === 13) {
+                        e.preventDefault();
+                        openPhotoSwipe(targetIndex, "imagezoom");
+                    }
+                });
             }
 
             if (DEBUG) console.info("Image zoom element added path=" + imageData.src + ", index=" + imageData.index);
@@ -289,6 +295,15 @@ function initZoomers($elements) {
 }
 
 /****** Exported functions ******/
+
+export function reInit(jQ, DEBUG, parent) {
+    var $imageZoomElements = jQ(parent + ' [data-imagezoom]');
+    if ($imageZoomElements.length > 0) {
+        if (DEBUG) console.info("ImageSeries.reInit() parent=" + parent + " [data-imagezoom] elements=" + $imageZoomElements.length);
+        initZoomers($imageZoomElements);
+    }
+}
+
 
 export function init(jQuery, debug) {
 
@@ -312,6 +327,7 @@ export function init(jQuery, debug) {
         if ($imageZoomElements.length > 0) {
             initZoomers($imageZoomElements);
         }
+        Mercury.addUpdateCallback(reInit);
     }
 }
 

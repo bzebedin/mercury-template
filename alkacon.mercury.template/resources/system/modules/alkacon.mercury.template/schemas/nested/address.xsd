@@ -12,12 +12,14 @@
 
     <xsd:complexType name="OpenCmsAddress">
         <xsd:sequence>
+            <xsd:element name="Name" type="OpenCmsString" minOccurs="0" />
             <xsd:element name="StreetAddress" type="OpenCmsString" />
             <xsd:element name="ExtendedAddress" type="OpenCmsString" minOccurs="0" />
             <xsd:element name="PostalCode" type="OpenCmsString" />
             <xsd:element name="Locality" type="OpenCmsString" />
             <xsd:element name="Region" type="OpenCmsString" minOccurs="0" />
             <xsd:element name="Country" type="OpenCmsString" minOccurs="0"/>
+            <xsd:element name="Coord" type="OpenCmsString" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="language" type="OpenCmsLocale" use="optional"/>
     </xsd:complexType>
@@ -25,6 +27,12 @@
     <xsd:annotation>
         <xsd:appinfo>
             <FieldSettings>
+                <Setting>
+                    <PropertyName>Name</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.ExtendedAddress.Name)]]></DisplayName>
+                    <Description><![CDATA[%(key.label.ExtendedAddress.Name.help)]]></Description>
+                    <Widget>string</Widget>
+                </Setting>
                 <Setting>
                     <PropertyName>StreetAddress</PropertyName>
                     <DisplayName><![CDATA[%(key.label.StreetAddress)]]></DisplayName>
@@ -60,6 +68,15 @@
                     <DisplayName><![CDATA[%(key.label.Country)]]></DisplayName>
                     <Description><![CDATA[%(key.label.Country.help)]]></Description>
                     <Widget>string</Widget>
+                </Setting>
+                <Setting>
+                    <PropertyName>Coord</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.Poi.Coord)]]></DisplayName>
+                    <Description><![CDATA[%(key.label.Poi.Coord.help)]]></Description>
+                    <Widget>location</Widget>
+                    <Default>lat:51.163409,lng:10.447721,zoom:6,type:'roadmap',mode:'dynamic'</Default>
+                    <WidgetConfig>inline:['address'],edit:['coords','address','zoom','map']</WidgetConfig>
+                    <Search>false</Search>
                 </Setting>
             </FieldSettings>
         </xsd:appinfo>

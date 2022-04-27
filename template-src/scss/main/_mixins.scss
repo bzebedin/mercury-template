@@ -65,6 +65,10 @@
     pointer-events: none;
     z-index: #{$overflow-z-index + 2};
     box-shadow: none;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    hyphens: auto;
 }
 
 // Add an image overlay that is aligned to the right
@@ -126,10 +130,10 @@
         line-height: $line-height-lead;
     }
     @include media-breakpoint-down(md) {
-        font-size: $h3-font-size-mobile;
+        font-size: $lead-font-size-mobile;
     }
     @include media-breakpoint-up(lg) {
-        font-size: $h3-font-size;
+        font-size: $lead-font-size;
     }
 }
 
@@ -211,6 +215,23 @@
     }
 }
 
+// Colored buttons with hover effects - simplified for less markup
+@mixin button-color-simple($bg-color, $hover-color, $hover: true) {
+    background-color: $bg-color;
+    color: get-text-color($bg-color);
+
+    @if ($hover) {
+        &:focus,
+        &:hover {
+            color: get-text-color($hover-color);
+            background-color: $hover-color;
+            @if ($btn-border-style != none) {
+                border-color: $hover-color;
+            }
+        }
+    }
+}
+
 // Default buttons
 @mixin button-base {
     margin: 0;
@@ -243,6 +264,50 @@
     }
     @include round-corners($btn-border-radius);
     @include button-color($btn-default, $btn-default-hover, $btn-disabled);
+}
+
+// Reset buttons
+@mixin reset-button {
+    padding: 0;
+    text-align: inherit;
+    user-select: initial;
+    @if ($btn-border-style != none) {
+        border: none;
+    }
+    @if ($btn-white-space != normal) {
+        white-space: normal;
+    }
+    @if ($btn-text-transform != none) {
+        text-transform: none;
+    }
+    @if ($btn-min-width > 0) {
+        min-width: 0;
+    }
+    @if ($btn-font-family != $font-family-base) {
+        font-family: inherit;
+    }
+    @if ($btn-font-size != $font-size-base) {
+        font-size: inherit;
+    }
+    @if ($btn-font-weight != $font-weight-base) {
+        font-weight: inherit;
+    }
+    @if ($btn-line-height != $line-height-base) {
+        line-height: inherit;
+    }
+    border-radius: 0;
+    background-color: inherit;
+    color: $link-color;;
+    text-decoration: $link-decoration;
+
+    &:focus,
+    &:hover,
+    &.active {
+        color: $link-hover-color;
+        background-color: inherit;
+        text-decoration: $link-hover-decoration;
+        border: none;
+    }
 }
 
 // Font size REM rebasing, usually on the HTML element
@@ -398,18 +463,21 @@
     @if ($piece-hyphens-headings) {
         @if ($piece-hyphens-headings-xs and $piece-hyphens-headings-md) {
             hyphens: auto;
-            overflow-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         } @else {
             @if ($piece-hyphens-headings-xs) {
                 @include media-breakpoint-down(sm) {
                     hyphens: auto;
-                    overflow-wrap: break-word;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
                 }
             }
             @if ($piece-hyphens-headings-md) {
                 @include media-breakpoint-up(md) {
                     hyphens: auto;
-                    overflow-wrap: break-word;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
                 }
             }
         }
@@ -424,18 +492,21 @@
     @if ($piece-hyphens-text) {
         @if ($piece-hyphens-text-xs and $piece-hyphens-text-md) {
             hyphens: auto;
-            overflow-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         } @else {
             @if ($piece-hyphens-text-xs) {
                 @include media-breakpoint-down(sm) {
                     hyphens: auto;
-                    overflow-wrap: break-word;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
                 }
             }
             @if ($piece-hyphens-text-md) {
                 @include media-breakpoint-up(md) {
                     hyphens: auto;
-                    overflow-wrap: break-word;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
                 }
             }
         }
@@ -480,6 +551,62 @@
         }
     }
 }
+
+@mixin awesome-icons() {
+    // Adds font definitions required to switch to ForkAwesome font
+    font-family: ForkAwesome;
+    font-size: inherit;
+    line-height: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+@mixin box-color($bg-color) {
+    // for a colored background, make sure the text and link color matches the background
+    // normally this means dark background > light text and light background > dark text
+    $color: get-text-color($bg-color);
+    $color-headings-base: conditional-value($color == $text-light, $text-light, $headings-color); // we normally want light text
+    $color-headings: get-text-color($bg-color, $color-headings-base);
+
+    $color-links: get-link-colors($bg-color, $color);
+    $color-link: nth($color-links, 1);
+    $color-hover: nth($color-links, 2);
+
+    background-color: $bg-color;
+    color: $color;
+
+    @include colored-a($color-link, $color-hover, true);
+
+    h1, h2, h3, h4, h5, h6  {
+        // required in order to override colors set in headings
+        color: $color-headings;
+    }
+
+    @if ($linked-headings-color != none) {
+        a:hover {
+            h1, h2, h3, h4, h5, h6 {
+                color: $color-hover;
+            }
+        }
+    }
+
+    .sub-header, // detail page
+    .text > a, // list teaser
+    .teaser-date, // list teaser
+    .intro-headline > .intro {
+        color:  $color !important;
+    }
+
+    .btn {
+        @include button-color-simple($color-link, $color-hover);
+    }
+    .btn-colored {
+        @include button-color-simple($color-link, $color-hover, false);
+    }
+}
+
 
 
 

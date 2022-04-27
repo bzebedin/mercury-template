@@ -45,6 +45,20 @@
             }
         }
 
+        img {
+            height: $nav-breadcrumb-image-size;
+            width: $nav-breadcrumb-image-size;
+            object-fit: contain;
+            vertical-align: baseline;
+        }
+
+        i,
+        img {
+            + span {
+                margin-left: $nav-breadcrumb-space-left;
+            }
+        }
+
         + li {
             &::before {
                 content: $nav-breadcrumb-separator;
@@ -80,8 +94,8 @@
 
     @if $use-hyphens {
         hyphens: auto;
-        word-break: normal;
-        overflow-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     @if ($nav-side-boxed) {

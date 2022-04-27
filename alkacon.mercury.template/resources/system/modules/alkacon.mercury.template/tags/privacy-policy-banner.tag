@@ -33,7 +33,6 @@
         <c:set var="sitePolicy" value="${'/.content/'.concat(policyfile)}" />
         <c:set var="policyfile" value="${cms.vfs.exists[subSitePolicy] ? subSitePolicy : sitePolicy}" />
     </c:if>
-    <c:set var="policyfile"><cms:link>${policyfile}</cms:link></c:set>
     <c:set var="policyfileBase64"><mercury:obfuscate text="${policyfile}" type="base64"/></c:set>
     <c:set var="uriBase64"><mercury:obfuscate text="${contentUri}" type="base64"/></c:set>
     <c:set var="rootBase64"><mercury:obfuscate text="${cms.requestContext.siteRoot}" type="base64"/></c:set>
@@ -48,6 +47,7 @@
         </c:if>
     </cms:jsonobject>
 
+    <div id="privacy-policy-placeholder"></div><%----%>
     <div id="privacy-policy-banner" class="pp-banner" data-banner='${bannerData.compact}'></div><%----%>
     <mercury:nl />
 

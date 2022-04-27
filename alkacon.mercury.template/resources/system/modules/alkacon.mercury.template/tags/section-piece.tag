@@ -16,6 +16,8 @@
     // 7. Image right, Heading, Text and Link left (separate column)
     // 8. Image left, Heading, Text and Link right (floating around image)
     // 9. Image right, Heading, Text and Link left (floating around image)
+    // 10. Heading, Text, Link, Image (full width)
+    // 11. Heading, Text, Image, Link (full width)
     " %>
 
 <%@ attribute name="sizeMobile" type="java.lang.Integer" required="false"
@@ -96,9 +98,20 @@
     description="Markup shown for the visual if the visual is not an image.
     If both attributes 'markupVisual' and 'image' are provided, only the 'markupVisual' will be displayed." %>
 
+<%@ attribute name="cssVisual" type="java.lang.String" required="false"
+    description="'class' selectors to add to the tag surrounding the visual." %>
+
 <%@ attribute name="markupText" fragment="true" required="false"
     description="Markup shown for the text if the text is not an XML content value.
     If both attributes 'markupText' and 'text' are provided, only the 'markupText' will be displayed." %>
+
+<%@ attribute name="cssText" type="java.lang.String" required="false"
+    description="'class' selectors to add to the tag surrounding the text." %>
+
+<%@ attribute name="addHeadingId" type="java.lang.Boolean" required="false"
+    description="Adds an automatically generated ID attribute for the heading, for use in anchor links.
+    The ID attribute will be generated from the provided text, which will be translated according to the configured file name translation rules.
+    The result will also be all lower case." %>
 
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -120,6 +133,35 @@
 <c:set var="showLink"           value="${empty link or linkHeading ? false : showLinkOption}" />
 <c:set var="defaultText"        value="${showText and empty markupText}" />
 
+<c:if test="${showVisual and empty markupVisual}">
+    <c:set var="visualFromImage">
+        <c:set var="showImageLink"  value="${empty showImageLink ? false : showImageLink}" />
+        <c:set var="showImageZoom" value="${empty showImageZoom ? true : showImageZoom}" />
+        <mercury:link
+            link="${link}"
+            test="${showImageLink}"
+            attr="${showLink or linkHeading ? 'tabindex=\"-1\"' : ''}"
+            setTitle="${true}" >
+            <mercury:image-animated
+                image="${image}"
+                ratio="${imageRatio}"
+                setTitle="${not showImageLink}"
+                showCopyright="${showImageCopyright}"
+                showImageZoom="${showImageZoom and not showImageLink}"
+                ade="${ade}">
+                <c:set var="imageSubtext">
+                    <c:if test="${showImageSubtitle and not empty imageTitle}">
+                        <div class="subtitle"${showImageLink ? '' : ' aria-hidden=\"true\"'}>${imageTitle}</div><%----%>
+                    </c:if>
+                </c:set>
+                <c:set var="emptyImage" value="${empty imageBean}" />
+                <c:set var="imageOri" value="${' '.concat(imageOrientation)}" />
+            </mercury:image-animated>
+        </mercury:link>
+        <c:out value="${imageSubtext}" escapeXml="false" />
+    </c:set>
+</c:if>
+
 <c:choose>
 <c:when test="${showHeading or showText or showVisual or showLink}">
     <mercury:piece
@@ -130,9 +172,9 @@
         sizeMobile="${sizeMobile}"
         pieceTag="${pieceTag}"
         pieceClass="${pieceClass}"
-        cssText="${showText and (textOption ne 'default') ? textOption : ''}"
+        cssText="${showText and (textOption ne 'default') ? textOption : ''}${not empty cssText ? ' '.concat(cssText) : null}"
         attrVisual="${ade ? image.rdfaAttr : null}"
-        cssVisual="rs_skip"
+        cssVisual="rs_skip${imageOri}${not empty cssVisual ? ' '.concat(cssVisual) : null}"
         textAlignment="${textAlignment}"
         attrBody="${ade and showLinkOption and (empty link or (link.exists and not link.isSet)) ? link.rdfaAttr : null}"
         cssBody="${defaultText ? 'default' :_null}"
@@ -142,33 +184,15 @@
         <jsp:attribute name="heading">
             <c:if test="${showHeading}">
                 <mercury:link link="${link}" css="piece-heading-link" test="${linkHeading}" setTitle="true">
-                    <mercury:heading text="${heading}" level="${hsize}" ade="${linkHeading ? false : ade}" css="piece-heading" />
+                    <mercury:heading text="${heading}" level="${hsize}" ade="${linkHeading ? false : ade}" css="piece-heading" addId="${addHeadingId}" />
                 </mercury:link>
             </c:if>
         </jsp:attribute>
 
         <jsp:attribute name="visual">
             <c:choose>
-                <c:when test="${showVisual and empty markupVisual}">
-                    <c:set var="showImageLink"  value="${empty showImageLink ? false : showImageLink}" />
-                    <c:set var="showImageZoom" value="${empty showImageZoom ? true : showImageZoom}" />
-                    <mercury:link link="${link}" test="${showImageLink}" setTitle="${true}" >
-                        <mercury:image-animated
-                            image="${image}"
-                            ratio="${imageRatio}"
-                            setTitle="${not showImageLink}"
-                            showCopyright="${showImageCopyright}"
-                            showImageZoom="${showImageZoom}"
-                            ade="${ade}">
-                            <c:set var="imageSubtext">
-                                <c:if test="${showImageSubtitle and not empty imageTitle}">
-                                    <div class="subtitle">${imageTitle}</div><%----%>
-                                </c:if>
-                            </c:set>
-                            <c:set var="emptyImage" value="${empty imageBean}" />
-                        </mercury:image-animated>
-                    </mercury:link>
-                    <c:out value="${imageSubtext}" escapeXml="false" />
+                <c:when test="${not empty visualFromImage}">
+                    <c:out value="${visualFromImage}" escapeXml="false" />
                 </c:when>
                 <c:when test="${showVisual}">
                     <jsp:invoke fragment="markupVisual"/>

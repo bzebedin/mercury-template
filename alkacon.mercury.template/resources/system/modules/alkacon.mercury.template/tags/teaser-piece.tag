@@ -23,6 +23,8 @@
     // 7. Image right, Heading, Text and Link left (separate column)
     // 8. Image left, Heading, Text and Link right (floating around image)
     // 9. Image right, Heading, Text and Link left (floating around image)
+    // 10. Heading, Text, Link, Image (full width)
+    // 11. Heading, Text, Image, Link (full width)
     " %>
 
 <%@ attribute name="sizeMobile" type="java.lang.Integer" required="false"
@@ -72,6 +74,9 @@
 
 <%@ attribute name="link" type="java.lang.Object" required="false"
     description="The link used in the teaser element." %>
+
+<%@ attribute name="linkOption" type="java.lang.String" required="false"
+    description="Controls if and how the link is displayed. Default is 'button'." %>
 
 <%@ attribute name="buttonText" type="java.lang.String" required="false"
     description="An optional button label used on the link button, or 'none' which means no link button will be shown.
@@ -128,13 +133,13 @@
 <c:set var="pieceLayout"        value="${empty pieceLayout ? 6 : pieceLayout}" />
 <c:set var="hsize"              value="${empty hsize ? 3 : hsize}" />
 <c:choose>
-    <c:when test="${(teaserType eq 'teaser-text-tile') or (teaserType eq 'teaser-masonry')}">
+    <c:when test="${fn:contains(teaserType, 'teaser-text-tile') or fn:contains(teaserType, 'teaser-masonry')}">
         <c:set var="addButtonDiv" value="${true}" />
         <c:set var="pieceLayout" value="${1}"/>
         <c:set var="sizeDesktop" value="${12}" />
         <c:set var="sizeMobile" value="${12}" />
     </c:when>
-    <c:when test="${teaserType eq 'teaser-compact'}">
+    <c:when test="${fn:contains(teaserType, 'teaser-compact')}">
         <c:set var="hideImage"  value="${true}"/>
     </c:when>
 </c:choose>
@@ -186,6 +191,7 @@
         ${not empty intro ? ': ' : ''}
         <mercury:out value="${headline}" />
     </c:set>
+    <c:set var="linkHeadline" value="${linkOnHeadline and (hsize > 0)}" />
 </c:if>
 
 <c:if test="${(not empty date) and (dateFormat ne 'none')}">
@@ -215,15 +221,17 @@
         <c:if test="${not empty headline or not empty intro}">
             <mercury:link
                 link="${link}"
-                title="${linkTitle}"
-                test="${linkOnHeadline and (hsize > 0)}">
+                test="${linkHeadline}">
+
                 <mercury:intro-headline
                     intro="${intro}"
                     headline="${headline}"
                     prefix="${headlinePrefix}"
                     suffix="${headlineSuffix}"
                     level="${hsize}"
+                    tabindex="${not linkHeadline}"
                     ade="${ade}" />
+
             </mercury:link>
         </c:if>
     </jsp:attribute>
@@ -234,7 +242,8 @@
         </c:if>
         <mercury:link
             link="${link}"
-            title="${linkTitle}"
+            title="${linkHeadline ? null : linkTitle}"
+            attr="${linkHeadline ? 'tabindex=\"-1\"' : null}"
             test="${not empty markupVisualOutput and not noLinkOnVisual}">
             ${markupVisualOutput}
         </mercury:link>
@@ -291,8 +300,9 @@
 
                 <mercury:link
                     link="${link}"
-                    title="${linkTitle}"
+                    title="${linkHeadline ? null : linkTitle}"
                     css='uncolored'
+                    attr="${linkHeadline ? 'tabindex=\"-1\"' : null}"
                     test="${linkOnText and not empty markupTextOutput}">
                     ${markupTextOutput}
                 </mercury:link>
@@ -317,9 +327,24 @@
                             </cms:bundle>
                         </c:set>
                     </c:if>
+                    <c:choose>
+                        <c:when test="${linkOption eq 'button-full'}">
+                            <c:set var="linkCss" value="btn btn-block piece-btn" />
+                        </c:when>
+                        <c:when test="${linkOption eq 'button-sm'}">
+                            <c:set var="linkCss" value="btn btn-sm piece-btn" />
+                        </c:when>
+                        <c:when test="${linkOption eq 'text'}">
+                            <c:set var="linkCss" value="piece-text-link" />
+                        </c:when>
+                        <c:otherwise>
+                            <%-- default is 'button' --%>
+                            <c:set var="linkCss" value="btn piece-btn" />
+                        </c:otherwise>
+                    </c:choose>
                     <mercury:link
                         link="${link}"
-                        css="btn teaser-btn"
+                        css="${linkCss}"
                         text="${buttonText}"
                         forceText="${forceText}"
                         title="${linkTitle}"

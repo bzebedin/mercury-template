@@ -19,6 +19,8 @@
 
 package alkacon.mercury.webform;
 
+import alkacon.mercury.template.captcha.CmsCaptchaPluginLoader;
+import alkacon.mercury.template.captcha.I_CmsCaptchaProvider;
 import alkacon.mercury.webform.captcha.CmsCaptchaServiceCache;
 import alkacon.mercury.webform.fields.CmsCaptchaField;
 import alkacon.mercury.webform.fields.CmsCheckboxField;
@@ -48,6 +50,7 @@ import org.opencms.cache.CmsVfsMemoryObjectCache;
 import org.opencms.file.CmsFile;
 import org.opencms.file.CmsProperty;
 import org.opencms.file.CmsResource;
+import org.opencms.flex.CmsFlexController;
 import org.opencms.i18n.CmsEncoder;
 import org.opencms.i18n.CmsMessages;
 import org.opencms.i18n.CmsMultiMessages;
@@ -136,6 +139,12 @@ public class CmsFormHandler extends CmsJspActionElement {
 
     /** Form error: validation error of input. */
     public static final String ERROR_VALIDATION = "validation";
+
+    /** HTTP webform response header. */
+    public static final String HEADER_OC_WEBFORM = "X-Oc-Webform";
+
+    /** HTTP webform response header value. */
+    public static final String HEADER_VALUE_OC_WEBFORM = "YES";
 
     /** Form info: mandatory upload field filled out already. */
     public static final String INFO_UPLOAD_FIELD_MANDATORY_FILLED_OUT = "uploadfield_mandatory_filled_out";
@@ -1021,6 +1030,9 @@ public class CmsFormHandler extends CmsJspActionElement {
 
         super.init(context, req, res);
         try {
+            // set the webform HTTP header
+            HttpServletResponse topResponse = CmsFlexController.getController(req).getTopResponse();
+            topResponse.setHeader(HEADER_OC_WEBFORM, HEADER_VALUE_OC_WEBFORM);
             // initialize the form configuration
             configureForm(req, formConfigUri, dynamicConfig, extraConfig);
             m_initSuccess = true;
@@ -1455,32 +1467,42 @@ public class CmsFormHandler extends CmsJspActionElement {
                 }
             }
             sTemplate.setAttribute(I_CmsTemplateCheckPage.ATTR_CAPTCHA_ERROR, errorMessage);
-            String tokenId = getParameter(CmsCaptchaField.C_PARAM_CAPTCHA_TOKEN_ID);
-            if (tokenId.isEmpty()) {
-                tokenId = UUID.randomUUID().toString();
-            }
-            if (captchaField.getCaptchaSettings().isMathField()) {
-                TextCaptchaService service = (TextCaptchaService)CmsCaptchaServiceCache.getSharedInstance().getCaptchaService(
-                    captchaField.getCaptchaSettings(),
-                    this.getCmsObject());
-                String captchaChallenge = service.getTextChallengeForID(
-                    tokenId,
-                    this.getCmsObject().getRequestContext().getLocale());
-                sTemplate.setAttribute(I_CmsTemplateCheckPage.ATTR_CAPTCHA_TEXT, captchaChallenge);
+            CmsCaptchaPluginLoader captchaPluginLoader = new CmsCaptchaPluginLoader(this.getRequest());
+            if (captchaPluginLoader.findPlugin() != null) {
+                I_CmsCaptchaProvider captchaPlugin = captchaPluginLoader.loadCaptchaProvider(getCmsObject());
+                String widgetMarkup = captchaPlugin.getWidgetMarkup(
+                    this.getCmsObject(),
+                    this.getRequest(),
+                    captchaField.getName());
+                sTemplate.setAttribute("captchawidget", widgetMarkup);
             } else {
-                sTemplate.setAttribute(
-                    I_CmsTemplateCheckPage.ATTR_CAPTCHA_IMAGE_LINK,
-                    OpenCms.getLinkManager().substituteLink(
-                        getCmsObject(),
-                        PATH_CAPTCHA_JSP
-                            + "?"
-                            + captchaField.getCaptchaSettings().toRequestParams(getCmsObject())
-                            + "&"
-                            + CmsCaptchaField.C_PARAM_CAPTCHA_TOKEN_ID
-                            + "="
-                            + tokenId));
+                String tokenId = getParameter(CmsCaptchaField.C_PARAM_CAPTCHA_TOKEN_ID);
+                if (tokenId.isEmpty()) {
+                    tokenId = UUID.randomUUID().toString();
+                }
+                if (captchaField.getCaptchaSettings().isMathField()) {
+                    TextCaptchaService service = (TextCaptchaService)CmsCaptchaServiceCache.getSharedInstance().getCaptchaService(
+                        captchaField.getCaptchaSettings(),
+                        this.getCmsObject());
+                    String captchaChallenge = service.getTextChallengeForID(
+                        tokenId,
+                        this.getCmsObject().getRequestContext().getLocale());
+                    sTemplate.setAttribute(I_CmsTemplateCheckPage.ATTR_CAPTCHA_TEXT, captchaChallenge);
+                } else {
+                    sTemplate.setAttribute(
+                        I_CmsTemplateCheckPage.ATTR_CAPTCHA_IMAGE_LINK,
+                        OpenCms.getLinkManager().substituteLink(
+                            getCmsObject(),
+                            PATH_CAPTCHA_JSP
+                                + "?"
+                                + captchaField.getCaptchaSettings().toRequestParams(getCmsObject())
+                                + "&"
+                                + CmsCaptchaField.C_PARAM_CAPTCHA_TOKEN_ID
+                                + "="
+                                + tokenId));
+                }
+                sTemplate.setAttribute(I_CmsTemplateCheckPage.ATTR_CAPTCHA_TOKEN_ID, tokenId);
             }
-            sTemplate.setAttribute(I_CmsTemplateCheckPage.ATTR_CAPTCHA_TOKEN_ID, tokenId);
         }
 
         List<I_CmsField> fields = getFormConfiguration().getAllFields(true, false, false);

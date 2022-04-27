@@ -108,7 +108,7 @@
         html.noscript {
             // JavaScript disabled navigation
             // displays the menu elements on hover if JavaScript is disabled
-            .area-header#{$selector} .nav-main-items li[aria-expanded]:hover > .nav-menu {
+            .area-header#{$selector} .nav-main-items li.expand:hover > .nav-menu {
                 display: block;
             }
         }
@@ -147,7 +147,7 @@
             .h-info {
                 .h-meta {
                     // make sure meta links are aligned to navigation
-                    padding-left: $grid-gutter-width-half;
+                    padding-left: $fh-grid-gutter-width-half;
                 }
             }
         }
@@ -240,8 +240,8 @@
             width: 100%;
             padding-top: $default-margin-verysmall;
             padding-bottom: $default-margin-verysmall;
-            padding-right: $grid-gutter-width-half;
-            padding-left: $grid-gutter-width-half;
+            padding-right: $fh-grid-gutter-width-half;
+            padding-left: $fh-grid-gutter-width-half;
         }
 
         .h-ac {
@@ -449,7 +449,7 @@
 
             &.lp-l {
                 .h-info {
-                    padding-right: $grid-gutter-width-half;
+                    padding-right: $fh-grid-gutter-width-half;
                 }
             }
 
@@ -466,7 +466,7 @@
                     order: 3;
                     .h-meta,
                     .h-title {
-                        padding-left: $grid-gutter-width-half;
+                        padding-left: $fh-grid-gutter-width-half;
                     }
                 }
             }
@@ -526,7 +526,7 @@
                 .h-info {
                     .h-title {
                         // make sure title is aligned to navigation
-                        padding-left: $grid-gutter-width-half;
+                        padding-left: $fh-grid-gutter-width-half;
                     }
                 }
             }
@@ -577,7 +577,7 @@
                     .h-info .h-nav,
                     .h-nav .co-lg-xl {
                         // remove gutter from surrounding container
-                        padding-left: $grid-gutter-width-half - $nav-header-hor-padding;
+                        padding-left: $fh-grid-gutter-width-half - $nav-header-hor-padding;
                     }
                     .nav-main-items {
                         justify-content: flex-start;
@@ -727,6 +727,13 @@
                     @if ($fh-ac-bg-color == none) {
                         // add top margin only if no bg color is set, colored bg and top margin looks crappy
                         margin-top: $default-margin-verysmall;
+                    }
+                }
+
+                &.ac-full-size {
+                    .h-ac {
+                        // full size container - remove top margin on the meta container
+                        margin-top: 0;
                     }
                 }
             }
@@ -898,7 +905,7 @@
                             }
                         }
                     }
-                    @if (($logo-padding == $default-margin-verysmall) && ($fh-title-bg-color != none)) {
+                    @if (($logo-padding == $default-margin-verysmall) and ($fh-title-bg-color != none)) {
                         &.header-notfixed,
                         &.header-isfixed.fix-complete {
                             &.nav-below {
@@ -992,8 +999,8 @@
                             content: "";
                             position: absolute;
                             top: $nav-header-total-height;
-                            left: calc(#{$grid-gutter-width-half} - #{$fixed-logo-padding});
-                            width: calc(100% - #{$grid-gutter-width} + #{2 * $fixed-logo-padding});
+                            left: calc(#{$fh-grid-gutter-width-half} - #{$fixed-logo-padding});
+                            width: calc(100% - #{$fh-grid-gutter-width} + #{2 * $fixed-logo-padding});
                             height: calc(100% - #{$nav-header-total-height});
                             box-shadow: 0 8px 10px -4px $dropshadow;
                             background-color: $fh-header-bg-color;
@@ -1024,8 +1031,8 @@
                     &.padding-none {
                         .h-logo {
                             &::before {
-                                left: $grid-gutter-width-half;
-                                width: calc(100% - #{$grid-gutter-width});
+                                left: $fh-grid-gutter-width-half;
+                                width: calc(100% - #{$fh-grid-gutter-width});
                             }
                         }
                     }
@@ -1042,7 +1049,7 @@
                 }
                 @if ($logo-size < 6) {
                     .nav-main-mobile-logo .mobile-logolink {
-                        width: calc-abs-col(lg, $logo-size) - $grid-gutter-width;
+                        width: calc-abs-col(lg, $logo-size) - $fh-grid-gutter-width;
                         max-width: 100%;
                     }
                 }
@@ -1059,7 +1066,7 @@
                     &.header-isfixed {
                         &.fix-compact {
                             .h-logo {
-                                max-width: floor((calc-abs-col(xl, $logo-size) - $grid-gutter-width) * 0.5) + $grid-gutter-width;
+                                max-width: floor((calc-abs-col(xl, $logo-size) - $fh-grid-gutter-width) * 0.5) + $fh-grid-gutter-width;
                             }
                         }
                         &.fix-overlay {
@@ -1154,15 +1161,20 @@
         .nav-main-container {
             #{$toggle-position}: -1 * $nav-mobile-width-xs;
             transition: #{$toggle-position} 0.5s, opacity 0.25s;
+            > .nav-main-group {
+                display: none;
+            }
         }
     }
 
-    html.active-nav header.bh.#{$position-selector},
-    html.noscript header.bh.#{$position-selector} #nav-toggle-check:checked ~ #nav-toggle-group {
+    html.active-nav header.bh.#{$position-selector} {
         // nav menu is active
         .nav-main-container {
             opacity: 1;
             #{$toggle-position}: 0;
+            > .nav-main-group {
+                display: block;
+            }
         }
     }
 }
@@ -1281,8 +1293,8 @@
                 flex-grow: 10000;
                 order: 2;
 
-                padding-right: $grid-gutter-width;
-                padding-left: $grid-gutter-width;
+                padding-right: $fh-grid-gutter-width;
+                padding-left: $fh-grid-gutter-width;
 
                 .h-title {
                     width: 100%;
@@ -1308,12 +1320,12 @@
             }
             &.lp-l {
                 .h-toggle-col {
-                    right: $grid-gutter-width / 2;
+                    right: $fh-grid-gutter-width-half;
                 }
             }
             &.lp-r {
                 .h-toggle-col {
-                    left: $grid-gutter-width / 2;
+                    left: $fh-grid-gutter-width-half;
                 }
             }
         }
@@ -1435,10 +1447,8 @@
             }
             &.ac-full-size {
                 .h-ac {
-                    @if (($fh-meta-bg-color != none) and ($fh-meta-bg-color != $fh-header-bg-color)) {
-                        // full size container - remove margin if there is a bg color on the meta container
-                        margin-top: 0;
-                    }
+                    // full size container - remove top margin on the meta container
+                    margin-top: 0;
                 }
             }
         }
@@ -1489,7 +1499,7 @@
             .nav-menu-toggle {
                 display: flex;
                 align-items: center;
-                padding-right: $grid-gutter-width;
+                padding-right: $fh-grid-gutter-width;
             }
 
             .nav-menu-logo {
@@ -1523,7 +1533,7 @@
                 .nav-menu-toggle {
                     order: 2;
                     padding-right: 0;
-                    padding-left: $grid-gutter-width;
+                    padding-left: $fh-grid-gutter-width;
                 }
 
                 .nav-menu-logo {
@@ -1540,11 +1550,34 @@
 
         .nav-main-items {
             // this expands the arrow links to the right so they can be touch-clicked easier
-            li[aria-expanded] > a::after {
+            li.expand > a::after {
                 right: $nav-mobile-toggle-side;
             }
-            li[aria-expanded] > a {
+            li.expand > a {
                 padding-right: $nav-mobile-toggle-side + $nav-mobile-box-height !important;
+            }
+
+            .nav-meta-icons > ul {
+                margin: 0;
+                padding: 0 $nav-mobile-indent-offset;
+                border-bottom: $nav-mobile-border;
+
+                > li {
+                    display: inline-block;
+
+                    > a {
+                        display: inline-block;
+                        border-bottom: none;
+                        font-size: $nav-mobile-line-height;
+                        padding-left: 0;
+                        padding-right: 0;
+                        margin-right: round($nav-mobile-line-height * 0.5);
+
+                        .fa {
+                            min-width: $nav-mobile-line-height;
+                        }
+                    }
+                }
             }
         }
 
@@ -1567,10 +1600,10 @@
                 li > a {
                     padding-left: $nav-mobile-toggle-side-xs;
                 }
-                li[aria-expanded] > a::after {
+                li.expand > a::after {
                     right: $nav-mobile-toggle-side-xs;
                 }
-                li[aria-expanded] > a {
+                li.expand > a {
                     padding-right: $nav-mobile-toggle-side-xs + $nav-mobile-box-height !important;
                 }
             }
@@ -1657,10 +1690,10 @@
                     }
                 }
 
-                $logo-px-size-md: calc-abs-col(md, $logo-size) - $grid-gutter-width;
-                $logo-px-size-lg: calc-abs-col(lg, $logo-size) - $grid-gutter-width;
-                $logo-px-size-xl: calc-abs-col(xl, $logo-size) - $grid-gutter-width;
-                $toggle-offset: $nav-toggle-size + $nav-toggle-border-width + $grid-gutter-width;
+                $logo-px-size-md: calc-abs-col(md, $logo-size) - $fh-grid-gutter-width;
+                $logo-px-size-lg: calc-abs-col(lg, $logo-size) - $fh-grid-gutter-width;
+                $logo-px-size-xl: calc-abs-col(xl, $logo-size) - $fh-grid-gutter-width;
+                $toggle-offset: $nav-toggle-size + $nav-toggle-border-width + $fh-grid-gutter-width;
 
                 @include media-breakpoint-up(md) {
 
@@ -1721,7 +1754,7 @@
                 font-size: $bh-title-ac-font-size;
             }
 
-            @include add-meta("bh", $bh-header-padding-verysmall);
+            @include add-meta("bh", $bh-header-padding-meta);
 
             // breadcrumbs
 
@@ -1796,8 +1829,7 @@
 
                     > a {
                         color: $fh-meta-color;
-                        // default is uppercase if not set (for backwards compatibility)
-                        text-transform: uppercase;
+                        text-transform: $fh-meta-text-transform;
 
                         &:hover {
                             text-decoration: none;
@@ -2035,6 +2067,8 @@ html.opencms-group-editor {
                     transition: none;
 
                     .nav-main-group {
+                        display: block;
+
                         &.has-sidelogo {
                             padding-top: 0;
                         }

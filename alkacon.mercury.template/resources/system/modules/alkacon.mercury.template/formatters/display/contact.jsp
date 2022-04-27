@@ -19,38 +19,55 @@
 
 <c:set var="title"                  value="${value.Title}" />
 
-<c:choose>
-    <c:when test="${value.Kind.toString eq 'org'}">
-        <c:set var="kind">itemscope itemtype="https://schema.org/Organization"</c:set>
-    </c:when>
-    <c:otherwise>
-        <c:set var="kind">itemscope itemtype="http://schema.org/Person"</c:set>
-    </c:otherwise>
-</c:choose>
+<c:set var="compactLayout"          value="${setting.compactLayout.toBoolean ? ' compact' : ''}" />
 
-<c:set var="compactLayout"          value="${setting.compactLayout.toBoolean ? 'compact ' : ''}" />
+<c:set var="showOrganization"       value="${setting.showOrganization.toBoolean}" />
+<c:set var="showPosition"           value="${setting.showPosition.toBoolean}" />
+<c:set var="showAddress"            value="${setting.showAddress.toString eq 'true'}" />
+<c:set var="showAddressAlways"      value="${setting.showAddress.toString eq 'always'}" />
+<c:set var="showTitle"              value="${setting.showTitle.toBoolean}" />
+<c:set var="showDescription"        value="${setting.showDescription.toBoolean}" />
+<c:set var="showPhone"              value="${setting.showPhone.toBoolean}" />
+<c:set var="showWebsite"            value="${setting.showWebsite.toBoolean}" />
+<c:set var="showEmail"              value="${setting.showEmail.toBoolean}" />
+<c:set var="showVcard"              value="${setting.showVcard.toBoolean}" />
+
+<c:set var="linkTarget"             value="${setting.linkTarget.toString}" />
+<c:set var="labelOption"            value="${setting.labels.toString}" />
+<c:set var="websiteNewWin"          value="${setting.websiteNewWin.toBoolean}" />
+
 <c:set var="hsizeTitle"             value="${setHsize}" />
-<c:set var="hsize"                  value="${title.isSet ? hsizeTitle + 1 : hsizeTitle}" />
+<c:set var="hsize"                  value="${showTitle and title.isSet ? hsizeTitle + 1 : hsizeTitle}" />
+
+
+<mercury:contact-vars
+    content="${content}"
+    showPosition="${showPosition}"
+    showOrganization="${showOrganization}">
+
+<c:set var="linkTarget"             value="${(setLinkOption ne 'none') and (linkTarget ne 'none') ? (linkTarget eq 'detail' ? linkToDetail : value.Link) : null}" />
 
 <mercury:teaser-piece
-    cssWrapper="type-contact ${compactLayout}${setEffect}${' '}${setCssWrapper}"
+    cssWrapper="type-contact ${kindCss}${compactLayout}${setCssWrapper}${setEffect}"
     attrWrapper="${kind}"
-    headline="${title}"
+    headline="${showTitle ? title : null}"
     pieceLayout="${setPieceLayout}"
     sizeDesktop="${setSizeDesktop}"
     sizeMobile="${setSizeMobile}"
 
     teaserType="${displayType}"
-    link="${setting.linkOption.toString ne 'none' ? value.Link : null}"
+    link="${linkTarget}"
+    linkOption="${setLinkOption}"
+    buttonText="${setButtonText}"
     hsize="${hsizeTitle}">
 
     <jsp:attribute name="markupVisual">
         <c:if test="${setShowVisual}">
             <mercury:contact
-                kind="${value.Kind.toString}"
+                kind="${valKind}"
                 image="${value.Image}"
-                name="${value.Name}"
-                organization="${value.Organization}"
+                name="${valName}"
+                organization="${valOrganization}"
                 imageRatio="${setRatio}"
                 hsize="${hsize}"
                 showImageCopyright="${setShowCopyright}"
@@ -61,28 +78,31 @@
 
     <jsp:attribute name="markupBody">
         <mercury:contact
-            kind="${value.Kind.toString}"
-            name="${value.Name}"
-            position="${value.Position}"
-            organization="${value.Organization}"
+            kind="${valKind}"
+            name="${valName}"
+            position="${valPosition}"
+            organization="${valOrganization}"
             description="${value.Description}"
             data="${value.Contact}"
-            labelOption="${setting.labels.toString}"
+            address="${valAddress}"
+            labelOption="${labelOption}"
             hsize="${hsize}"
-            showName="${true}"
-            showPosition="${setting.showPosition.toBoolean}"
-            showAddress="${setting.showAddress.toBoolean}"
-            showAddressAlways="${setting.showAddress.toString eq 'always'}"
-            showOrganization="${setting.showOrganization.toBoolean}"
-            showDescription="${setting.showDescription.toBoolean}"
-            showPhone="${setting.showPhone.toBoolean}"
-            showWebsite="${setting.showWebsite.toBoolean}"
-            showEmail="${setting.showEmail.toBoolean}"
-            showVcard="${setting.showVcard.toBoolean}"
+            showName="${setShowName}"
+            showPosition="${setShowPosition}"
+            showAddress="${showAddress}"
+            showAddressAlways="${showAddressAlways}"
+            showOrganization="${setShowOrganization}"
+            showDescription="${showDescription}"
+            showPhone="${showPhone}"
+            showWebsite="${showWebsite}"
+            websiteNewWin="${websiteNewWin}"
+            showEmail="${showEmail}"
+            showVcard="${showVcard}"
         />
     </jsp:attribute>
 
 </mercury:teaser-piece>
+</mercury:contact-vars>
 
 </mercury:teaser-settings>
 </cms:formatter>

@@ -64,19 +64,6 @@ function initBannerData() {
 function loadPolicy(callback) {
 
     if (! m_policy.loaded) {
-        var policyUrl = "/system/modules/alkacon.mercury.template/elements/privacy-policy.jsp";
-        var policyPath = window.atob(m_bannerData.policy);
-
-        try {
-            var hostUrl = new URL(policyPath);
-            var policyHost = hostUrl.protocol + "//" + hostUrl.host;
-            policyUrl = policyHost + policyUrl;
-            policyPath = hostUrl.pathname;
-            m_bannerData.policy = window.btoa(policyPath);
-            if (DEBUG) console.info("PrivacyPolicy: policyHost=" + policyHost + " policyPath=" + policyPath);
-        } catch (err) {
-            // assuming policyPath omits the server name and starts and with "/"
-        }
 
         var params =
             "policy=" + encodeURIComponent(m_bannerData.policy) + "&" +
@@ -88,6 +75,7 @@ function loadPolicy(callback) {
             params += "&display=" + m_bannerData.display;
         }
 
+        var policyUrl = Mercury.addContext("/system/modules/alkacon.mercury.template/elements/privacy-policy.jsp");
         var policyLink = policyUrl + '?' + params;
 
         if (DEBUG) console.info("PrivacyPolicy: Loading policy data from " + policyLink);
@@ -152,15 +140,18 @@ function displayBanner() {
 
         // append the banner HTML - still hidden by CSS
         $banner.appendTo($bannerElement);
-
+        // move policy banner on top so that screen readers read this first
+        var body = document.querySelector('body');
+        body.insertBefore(document.querySelector('#privacy-policy-banner'), body.firstChild);
         // now reveal the banner
         $banner.slideDown(800, function() {
             if (onTop && Mercury.isEditMode()) {
                 $banner.css({top: Mercury.toolbarHeight()});
             }
-            $bannerElement.height($banner.outerHeight());
+            jQ("#privacy-policy-placeholder").height($banner.outerHeight());
         });
         $banner.addClass("fixed " + (onTop ? "top" : "bottom" ));
+        $banner.find(".title").focus();
         if (DEBUG) console.info("PrivacyPolicy: Banner loaded and displayed");
     } else {
         if (DEBUG) console.info("PrivacyPolicy: No banner displayed");
@@ -345,7 +336,7 @@ function createExternalElementToggle(heading, message, footer, isModal) {
 
     var cookieHtml =
         '<div class=\"cookie-content\">' +
-            '<div class=\"cookie-header\">' + heading + '</div>' +
+            '<div class=\"cookie-header\" tabindex=\"0\">' + heading + '</div>' +
             '<div class=\"cookie-message\">' + message + '</div>' +
             '<div class=\"cookie-switch pp-toggle pp-toggle-external animated\">' +
                 '<input id=\"' + toggleId + '\" type=\"checkbox\" class=\"toggle-check\"' + (isModal ? ' disabled' : '') + '>' +

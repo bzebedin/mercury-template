@@ -58,6 +58,7 @@
     --%><c:if test="${not empty googleApiKeyWorkplace}">"googleApiKeyWorkplace":"${googleApiKeyWorkplace}",</c:if><%--
     --%>"editMode":"${cms.isEditMode}",<%--
     --%>"project":"${project}",<%--
+    --%>"context":"<cms:link>/</cms:link>",<%--
     --%>"locale":"${cms.locale}"<%--
 --%>}'${' '}${piwikData}><%----%>
 <mercury:nl/>
@@ -67,5 +68,5 @@
 </div><%----%>
 <mercury:nl/>
 
-<div id="topcontrol"></div>
+<div id="topcontrol" tabindex="0"></div>
 

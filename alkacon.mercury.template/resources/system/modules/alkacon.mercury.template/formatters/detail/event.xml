@@ -33,14 +33,25 @@
       <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
     </Setting>
     <Setting>
+      <IncludeName><![CDATA[cssWrapper2.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper3.default]]></IncludeName>
+    </Setting>
+    <Setting>
       <IncludeName><![CDATA[keyPieceLayout.detail]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapperKeyPiece.detail]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[pieceLayout.detail]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[bookingOption.default]]></IncludeName>
-      <Default><![CDATA[simple]]></Default>
+      <IncludeName><![CDATA[cssWrapperParagraphs.detail]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[bookingOption.simple]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[hsize.detail]]></IncludeName>

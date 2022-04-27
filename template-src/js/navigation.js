@@ -24,20 +24,48 @@ var VERBOSE;
 
 "use strict";
 
+var KEYBOARD_PERMANENT = "keyboard-permenent";
+
 var m_fixedHeader = null;
 var m_$anchor = null;
 var m_menuTimeout = null;
 var m_subMenuTimeout = null;
 var m_firstInit = true;
+var m_isBurgerHeader = false;
+var m_keyboardNavActive = false;
+var m_keyboardNavPermanent = false;
+
 var $topControl = null;
 
-var m_isBurgerHeader = false;
+function removeKeyboardClass(event) {
+    setKeyboardClass(false);
+}
 
 function setKeyboardClass(active) {
-    if (active) {
-        jQ(document.documentElement).addClass('keyboard-nav');
+    if (active || m_keyboardNavPermanent) {
+        if (! m_keyboardNavActive) {
+            m_keyboardNavActive = true;
+            jQ(document.documentElement).addClass('keyboard-nav');
+            jQ(document.documentElement).on('mousemove', removeKeyboardClass);
+        }
     } else {
-        jQ(document.documentElement).removeClass('keyboard-nav');
+        if (m_keyboardNavActive) {
+            m_keyboardNavActive = false;
+            jQ(document.documentElement).removeClass('keyboard-nav');
+            jQ(document.documentElement).off('mousemove', removeKeyboardClass);
+        }
+    }
+}
+
+function setKeyboardNavPermanent(active) {
+    m_keyboardNavPermanent = active;
+    if (m_keyboardNavPermanent) {
+        setKeyboardClass(true);
+        jQ('#keyboard-toggle').attr("aria-checked", "true");
+        PrivacyPolicy.setCookie(KEYBOARD_PERMANENT, "true");
+    } else {
+        jQ('#keyboard-toggle').attr("aria-checked", "false");
+        PrivacyPolicy.removeCookie(KEYBOARD_PERMANENT);
     }
 }
 
@@ -75,7 +103,7 @@ function initMegaMenu() {
     if (DEBUG) console.info("Navigation.initMegaMenu()");
 
     if (Mercury.gridInfo().isMobileNav()) {
-        // .mega-only marks mega menus that are a) not displayed in mobile and b) have no submenu
+        // .mega-only marks mega menus that a) are not displayed in mobile and b) have no submenu
         var $megaMenus = jQ(".mega-only[data-megamenu]");
         if (DEBUG) console.info("Navigation.initMegaMenu() .mega-only[data-megamenu] elements found: " + $megaMenus.length);
         $megaMenus.each(function() {
@@ -122,29 +150,32 @@ function initMenu() {
     if (initMenuStatus != lastInitMenuStatus) {
         lastInitMenuStatus = initMenuStatus;
         // Close all menus
-        var $allMenus = jQ('.nav-main-items [aria-expanded]');
-        if (DEBUG) console.info("Navigation.initMenu() .nav-main-items [aria-expanded] elements found: " + $allMenus.length);
+        var $allMenus = jQ('.nav-main-items li.expand');
+        if (DEBUG) console.info("Navigation.initMenu() .nav-main-items li.expand elements found: " + $allMenus.length);
         if ($allMenus.length > 0 ) {
-            $allMenus.attr("aria-expanded", "false");
+            $allMenus.children("[aria-expanded]").attr('aria-expanded', false);
+            $allMenus.removeClass("ed");
         }
         if (Mercury.gridInfo().isMobileNav()) {
             // Activate current menu position
-            var $activeMenus = jQ('.nav-main-items [aria-expanded].active');
-            if (DEBUG) console.info("Navigation.initMenu() .nav-main-items [aria-expanded].active elements found: " + $activeMenus.length);
+            var $activeMenus = jQ('.nav-main-items li.expand.active');
+            if (DEBUG) console.info("Navigation.initMenu() .nav-main-items li.expand.active elements found: " + $activeMenus.length);
             if ($activeMenus.length > 0 ) {
-                $activeMenus.attr("aria-expanded", "true");
+                $activeMenus.children("[aria-expanded]").attr('aria-expanded', true);
+                $activeMenus.addClass("ed");
             }
         }
     }
 }
 
 function resetMenu($menuToggle) {
-    jQ(".nav-main-items [aria-expanded]").each(function(i) {
+    jQ(".nav-main-items li.expand").each(function() {
         if (!$menuToggle || !jQ.contains(this, $menuToggle[0])) {
             var $this = jQ(this);
+            $this.removeClass("ed");
             $this.removeClass("open-left");
             $this.removeClass("open-right");
-            $this.attr("aria-expanded", "false");
+            $this.children("[aria-expanded]").attr('aria-expanded', false);
             $this.find(".nav-menu").first().css("right", "");
         }
     });
@@ -159,7 +190,7 @@ function toggleMenu($submenu, $menuToggle, targetmenuId, event) {
     var eventTouchstart = event.type == "touchstart";
     var eventClick = event.type == "click";
 
-    var expanded = $submenu.attr("aria-expanded") == "true";
+    var expanded = $submenu.hasClass("ed");
     var stopEventPropagation = false;
 
     if (eventMouseenter && m_menuTimeout) {
@@ -170,13 +201,19 @@ function toggleMenu($submenu, $menuToggle, targetmenuId, event) {
     }
 
     if (Mercury.gridInfo().isDesktopNav()) {
-        if (VERBOSE) console.info("Navigation.toggleMenu, isDesktopNav=true eventMouseenter=" + eventMouseenter + " eventMouseleave=" + eventMouseleave);
+        if (eventClick && m_keyboardNavActive) {
+            // screen reades like NVDA will send click instead of keydown
+            eventKeydown = true;
+            eventClick = false;
+        }
+        if (VERBOSE) console.info("Navigation.toggleMenu, isDesktopNav=true eventMouseenter=" + eventMouseenter + " eventMouseleave=" + eventMouseleave, $submenu ,$menuToggle);
         // desktop navigation
         var $targetmenu = jQ("#" + targetmenuId).first();
         if (!expanded && (eventMouseenter || eventKeydown || eventTouchstart)) {
             stopEventPropagation = true;
             resetMenu($menuToggle);
-            $submenu.attr("aria-expanded", "true");
+            $submenu.addClass("ed");
+            $submenu.children("[aria-expanded]").attr('aria-expanded', true);
             if ($submenu.parent().hasClass("nav-main-items")) {
                 // this is a toplevel menu entry
                 if ($targetmenu.offset().left + $targetmenu.outerWidth() > Mercury.windowWidth()) {
@@ -208,19 +245,26 @@ function toggleMenu($submenu, $menuToggle, targetmenuId, event) {
                 if (!$submenu.parent().hasClass("nav-main-items")) {
                     // stopEventPropagation must remain false, otherwise top level menus would not close
                     m_subMenuTimeout = setTimeout(function() {
-                        $submenu.attr("aria-expanded", "false");
+                        $submenu.removeClass("ed");
+                        $submenu.children("[aria-expanded]").attr('aria-expanded', false);
                     }, 375);
                 }
             } else {
                 stopEventPropagation = true;
-                $submenu.attr("aria-expanded", "false");
+                $submenu.removeClass("ed");
+                $submenu.children("[aria-expanded]").attr('aria-expanded', false);
             }
         }
     } else if (eventTouchstart || eventClick) {
         // mobile navigation
         stopEventPropagation = true;
         resetMenu($menuToggle);
-        $submenu.attr("aria-expanded", !expanded);
+        $submenu.children("[aria-expanded]").attr('aria-expanded', !expanded);
+        if (expanded) {
+            $submenu.removeClass("ed");
+        } else {
+            $submenu.addClass("ed");
+        }
     }
 
     if (stopEventPropagation) {
@@ -229,11 +273,24 @@ function toggleMenu($submenu, $menuToggle, targetmenuId, event) {
     }
 }
 
+function toggleHeadNavigation() {
+    var toggle = jQ('.nav-toggle');
+    toggle.toggleClass('active');
+    var active = toggle.hasClass('active');
+    toggle.attr('aria-expanded', active);
+    jQ(document.documentElement).toggleClass('active-nav');
+    if (active) {
+        jQ('#nav-toggle-label-close > .nav-toggle.active').focus();
+    } else {
+        jQ('#nav-toggle-label-open > .nav-toggle').focus();
+    }
+}
+
 // Elements in head navigation
 function initHeadNavigation() {
 
     // If the mouse leaves a toplevel menu, set a timeout to close the menu
-    jQ('.nav-main-items > li[aria-expanded]').on('mouseleave', function(e) {
+    jQ('.nav-main-items > li.expand').on('mouseleave', function(e) {
         if (m_subMenuTimeout) {
             clearTimeout(m_subMenuTimeout);
         }
@@ -243,7 +300,7 @@ function initHeadNavigation() {
     });
 
     // If the mouse enters a toplevel menu, close all other menus
-    jQ('.nav-main-items > li > a').on('mouseenter', function(e) {
+    jQ('.nav-main-items > li > a:last-of-type:not([aria-controls])').on('mouseenter', function(e) {
         // This will be triggered only for toplevel menu items
         if (Mercury.gridInfo().isDesktopNav()) {
             if (m_menuTimeout) {
@@ -263,15 +320,17 @@ function initHeadNavigation() {
     if ($menuToggles.length > 0 ) {
         $menuToggles.each(function() {
 
-            // initialize menus with values from data attributes
+            // initialize menus with values from aria attributes
             var $menuToggle = jQ(this);
             var targetmenuId = $menuToggle.attr("aria-controls");
             if (typeof targetmenuId !== 'undefined') {
                 var $submenu = $menuToggle.parent();
-                $menuToggle.on('keydown touchstart click', function(e) {
-                    // open menus if trigger is clicked
-                    toggleMenu($submenu, $menuToggle, targetmenuId, e);
-                });
+                if (!$menuToggle.hasClass("click-direct")) {
+                    $menuToggle.on('keydown touchstart click', function(e) {
+                        // open menus if trigger is clicked
+                        toggleMenu($submenu, $menuToggle, targetmenuId, e);
+                    });
+                }
                 $submenu.on('mouseenter mouseleave', function(e) {
                     // also open menus if mouse enters (hovers) above it and closes if mouse leaves
                     toggleMenu($submenu, $menuToggle, targetmenuId, e);
@@ -287,10 +346,7 @@ function initHeadNavigation() {
     m_isBurgerHeader = false || jQ('header.bh').length;
 
     // Responsive navbar toggle button
-    jQ('.nav-toggle').click(function() {
-        jQ('.nav-toggle').toggleClass('active');
-        jQ(document.documentElement).toggleClass('active-nav');
-    });
+    jQ('.nav-toggle').on('click', toggleHeadNavigation);
     jQ('.head-overlay').click(function() {
         jQ('.nav-toggle').removeClass('active');
         jQ(document.documentElement).removeClass('active-nav');
@@ -300,10 +356,11 @@ function initHeadNavigation() {
     var $topControlBtn = jQ('#topcontrol, .topcontrol, .topcontrol-nohide');
     // multiple selectors allow to add topcontrol in template as well
     if ($topControlBtn) {
-            // just the function, no hiding of the button on mobile
-            $topControlBtn.on('click', function(e) {
+        // just the function, no hiding of the button on mobile
+        $topControlBtn.on('click', function(e) {
             scrollToAnchor(jQ('body'));
         });
+        addEnterIsClick($topControlBtn);
     }
     $topControl = jQ('#topcontrol, .topcontrol');
     if ($topControl) {
@@ -338,10 +395,15 @@ function initHeadNavigation() {
         }
     });
 
-    // If the mouse is moved, remove focus highlight marker class
-    jQ(document.documentElement).on('mousemove', function(e) {
-        setKeyboardClass(false);
+    jQ('#skip-to-content').on('keydown', function(e) {
+        if ((e.which == 13) || (e.which == 32)) {
+            setKeyboardNavPermanent(!m_keyboardNavPermanent);
+        }
     });
+
+    if (PrivacyPolicy.hasCookie(KEYBOARD_PERMANENT)) {
+        setKeyboardNavPermanent(true);
+    }
 
     // Fixed / sticky header
     var $header = jQ('.area-header');
@@ -459,7 +521,7 @@ function updateFixed(resize) {
             // if mobile nav is active, don't fix the header, otherwise there would be an ugly css effect on the mobile nav
             if (!mobileNavActive()) {
                 // header should be fixed, but is not
-                if (VERBOSE) console.info("Fixed header fixing at m_lastScrollTop=" + m_lastScrollTop  +  " m_checkScrollTop=" + m_checkScrollTop);
+                if (VERBOSE) console.info("Fixed header fixing at m_lastScrollTop=" + m_lastScrollTop  +  " m_checkScrollTop=" + m_checkScrollTop + " m_fixedHeader.bottom=" + m_fixedHeader.bottom);
                 if (m_lastScrollTop < m_checkScrollTop) {
                     m_fixedHeader.isFixed = true;
                     m_fixedHeader.isScrolled = false;
@@ -528,6 +590,7 @@ function initSmoothScrolling() {
             if ($target.length) {
                 jQ(this).blur();
                 scrollToAnchor($target);
+                focusOnElement($target);
                 return false;
             }
         }
@@ -537,6 +600,7 @@ function initSmoothScrolling() {
     if (location.hash.length) {
         if (DEBUG) console.info("Navigation.initSmoothScrolling() Initial anchor (location.hash): " + location.hash);
         scrollToAnchor(jQ(location.hash));
+        focusOnElement(jQ(location.hash));
     }
 }
 
@@ -600,6 +664,34 @@ function initExternalLinks() {
     }
 }
 
+function addEnterIsClick($element) {
+    if (DEBUG) console.info("Navigation.addEnterIsClick()", $element);
+    $element.keyup(function(event) {
+        if (event.keyCode === 13) {
+            $element.trigger('click');
+            return false;
+        }
+    });
+}
+
+// fix 'skip links'
+// see https://axesslab.com/skip-links/
+// see https://github.com/selfthinker/dokuwiki_template_writr/blob/master/js/skip-link-focus-fix.js
+// even though the problem is apparently fixed in regular browser use, it is stell needed because of our initSmoothScrolling() function
+function focusOnElement($element) {
+    if (DEBUG) console.info("Navigation.focusOnElement()", $element);
+    if (!$element.length) {
+        return;
+    }
+    if (!($element.is(':input:enabled, a[href], area[href], object, [tabindex]') && !$element.is(':hidden'))) {
+        // add tabindex to make focusable and remove again
+        $element.attr('tabindex', -1).on('blur focusout', function () {
+            $(this).removeAttr('tabindex');
+        });
+    }
+    $element.focus();
+}
+
 // functions that require the Mercury object
 var debUpdateFixedResize;
 var debUpdateFixedScroll;
@@ -607,6 +699,9 @@ var debInitMenu;
 var debScrollToAnchor;
 
 function initDependencies() {
+
+    // add id to first 'main' element'
+    jQ('#mercury-page main').first().attr('id', 'main-content');
 
     debUpdateFixedResize = Mercury.debounce(function() {
         updateFixed(true)
@@ -625,7 +720,7 @@ function initDependencies() {
             offset = offset || 0;
             var targetTop = $anchor.offset().top + offset;
             targetTop = targetTop < 0 ? 0 : targetTop;
-            if (DEBUG) console.info("Navigation.debScrollToAnchor(#" + $anchor.attr('id') + ") position:" + targetTop);
+            if (DEBUG) console.info("Navigation.debScrollToAnchor(#" + $anchor.attr('id') + ") position:" + targetTop, $anchor);
             if (fixedHeaderActive() && (targetTop > m_fixedHeader.bottom)) {
                 if (m_fixedHeader.height < 0) {
                     // fixed header height is unknown, i.e. page was not scrolled down so far

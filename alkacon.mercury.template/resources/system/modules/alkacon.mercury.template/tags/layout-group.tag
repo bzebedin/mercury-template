@@ -112,6 +112,7 @@
                 <c:set var="bcDisplay"          value="${config.setting.bcDisplay.useDefault('bc-show').toString}" />
                 <c:set var="bcAlignment"        value="${config.setting.bcAlignment.useDefault('bc-left').toString}" />
                 <c:set var="showBreadcrumbs"    value="${showBreadcrumbs and (bcDisplay eq 'bc-show')}" />
+                <c:set var="bcAlignment"        value="${not showBreadcrumbs ? 'bc-hide' : bcAlignment}" />
 
                 <c:set var="showNavAside"       value="${not logoPosCenter and (navPosition ne 'nav-below')}" />
                 <c:set var="showMetaAside"      value="${not logoPosCenter and showMeta and (metaPosition ne 'meta-above')}" />
@@ -137,13 +138,12 @@
                 </c:choose>
 
                 <c:set var="navToggleElement">
-                    <input type="checkbox" id="nav-toggle-check"><%-- Must be here so it works even when JavaScript is disabled --%>
                     <div id="nav-toggle-group"><%----%>
-                        <label for="nav-toggle-check" id="nav-toggle-label"><%----%>
-                            <span class="nav-toggle"><%----%>
+                        <span id="nav-toggle-label"><%----%>
+                            <button class="nav-toggle" aria-expanded="false" aria-controls="nav-toggle-group"><%----%>
                                 <span><fmt:message key="msg.page.navigation.toggle" /></span><%----%>
-                            </span><%----%>
-                        </label><%----%>
+                            </button><%----%>
+                        </span><%----%>
                     </div><%----%>
                     <mercury:nl />
                 </c:set>
@@ -419,13 +419,12 @@
         <header class="area-header logo-left${cssWrapper}"><%----%>
             <mercury:nl />
 
-            <input type="checkbox" id="nav-toggle-check"><%-- Must be here so it works even when JavaScript is disabled --%>
             <div id="nav-toggle-group"><%----%>
-                <label for="nav-toggle-check" id="nav-toggle-label"><%----%>
-                    <span class="nav-toggle"><%----%>
+                <span id="nav-toggle-label"><%----%>
+                    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-toggle-group"><%----%>
                         <span><fmt:message key="msg.page.navigation.toggle" /></span><%----%>
-                    </span><%----%>
-                </label><%----%>
+                    </button><%----%>
+                </span><%----%>
                 <div class="head-overlay"></div><%----%>
             </div><%----%>
             <mercury:nl />

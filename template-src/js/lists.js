@@ -95,17 +95,20 @@ var m_archiveFilterGroups = {};
 /** @type {List[]} all auto loading lists as array for easy iteration  */
 var m_autoLoadLists = [];
 
+/** @type {boolean} flag indicating whether to scroll to the list head on filter or on page change. */
+var m_flagScrollToAnchor = true;
+
 /**
  * Calculates the search state parameters.
  * @param {*} filter
- * @param {string} liId id of the list the search state parameters should be calculated for.
+ * @param {string} elId id of the element the search state parameters should be calculated for.
  * @param {boolean} resetActive flag, indicating if other active filters should be reset.
  * @returns {string} the search state parameters corresponding to the filter action.
  */
-function calculateStateParameter(filter, liId, resetActive) {
-    var $li = $( 'li#' + liId);
-    var value = $li.data("value")
-    var paramkey = liId.indexOf('cat_') == 0 ? (resetActive && $li.hasClass("active") ? '' : filter.catparamkey) : liId.indexOf('folder_') == 0 ? filter.folderparamkey : resetActive && $li.hasClass("active") ? '' : filter.archiveparamkey;
+function calculateStateParameter(filter, elId, resetActive) {
+    var $el = $( '#' + elId);
+    var value = $el.data("value")
+    var paramkey = elId.indexOf('cat_') == 0 ? (resetActive && $el.hasClass("active") ? '' : filter.catparamkey) : elId.indexOf('folder_') == 0 ? filter.folderparamkey : resetActive && $el.hasClass("active") ? '' : filter.archiveparamkey;
     var stateParameter =
         typeof paramkey !== 'undefined' && paramkey != '' && typeof value !== 'undefined' && value != ''
             ? '&' + paramkey + '=' + encodeURIComponent(value)
@@ -147,7 +150,7 @@ function getAdditionalFilterParams(filter) {
                 if(typeof query !== 'undefined' && query != '') {
                     params += '&' + fi.$textsearch.attr('name') + '=' + encodeURIComponent(query);
                 }
-                fi.$element.find("li.active").each( function() {
+                fi.$element.find(".active").each( function() {
                     var p = calculateStateParameter(fi, this.id, false);
                     params += p;
                 });
@@ -169,7 +172,7 @@ function getAdditionalFilterParams(filter) {
  */
 function listFilter(id, triggerId, filterId, searchStateParameters, removeOthers) {
 
-    if (DEBUG) console.info("List: listFilter() called elementId=" + id);
+    if (DEBUG) console.info("Lists.listFilter() called elementId=" + id);
 
     // reset filters of not sorting
     var filterGroup = m_archiveFilterGroups[id];
@@ -184,17 +187,17 @@ function listFilter(id, triggerId, filterId, searchStateParameters, removeOthers
             // remove all active / highlighted filters
             // unless filters should be combined
             if (removeOthers && (removeAllFilters || !fi.combinable || fi.id == filterId)) {
-                var $liactive = fi.$element.find("li.active");
-                $liactive.removeClass("active");
+                var $elactive = fi.$element.find(".active");
+                $elactive.removeClass("active");
                 // clear text input if wanted
                 if (triggerId != fi.$textsearch.id) {
                     fi.$textsearch.val('');
                 }
             }
             if (triggerId != null) {
-                fi.$element.find("li.currentpage").removeClass("currentpage");
+                fi.$element.find(".currentpage").removeClass("currentpage");
                 var $current = fi.$element.find("#" + triggerId).first();
-                if (DEBUG) console.info("List: Current has class active? : " + $current.hasClass("active") + " - " + $current.attr("class"));
+                if (DEBUG) console.info("Lists.listFilter() Current has class active? : " + $current.hasClass("active") + " - " + $current.attr("class"));
                 // activate / highlight clicked filter
                 if (triggerId.indexOf("folder_") == 0) {
                     $current.addClass("currentpage");
@@ -235,12 +238,12 @@ function listFilter(id, triggerId, filterId, searchStateParameters, removeOthers
         // list is not on this page, check filter target attribute
         var target = archive.target;
         if (typeof target !== "undefined" && target !== window.location.pathname && target + "index.html" !== window.location.pathname) {
-            if (DEBUG) console.info("List: No list group found on page, trying redirect to " + target);
+            if (DEBUG) console.info("Lists.listFilter() No list group found on page, trying redirect to " + target);
             var params = splitRequestParameters("reloaded=true&" + searchStateParameters);
 
             Mercury.post(target, params);
         } else {
-            console.error("List: Unable to load list!\nNo dynamic list found on the page and property 'mercury.list' not set.");
+            console.error("Lists.listFilter() Unable to load list!\nNo dynamic list found on the page and property 'mercury.list' not set.");
         }
     }
 }
@@ -260,10 +263,10 @@ function updateInnerList(id, searchStateParameters, reloadEntries) {
 
     var list = m_lists[id];
 
-    if (DEBUG) console.info("List: updateInnerList() called instanceId=" + list.id + " elementId=" + list.elementId + " parameters=" + searchStateParameters);
+    if (DEBUG) console.info("Lists.updateInnerList() called instanceId=" + list.id + " elementId=" + list.elementId + " parameters=" + searchStateParameters);
 
     if ((list.ajax == null)) {
-        if (DEBUG) console.warn("List: updateInnerList() called instanceId=" + list.id + " elementId=" + list.elementId + " parameters=" + searchStateParameters + " does not support updates since no AJAX link is provided.");
+        if (DEBUG) console.warn("Lists.updateInnerList() called instanceId=" + list.id + " elementId=" + list.elementId + " parameters=" + searchStateParameters + " does not support updates since no AJAX link is provided.");
     } else {
         if (!list.locked) {
             list.locked = true;
@@ -291,7 +294,7 @@ function updateInnerList(id, searchStateParameters, reloadEntries) {
             var visibleHeight = Math.min(scrollTop + windowHeight, elementTop + elementHeight) - Math.max(scrollTop, elementTop);
             var spinnerPos = ((0.5 * visibleHeight) + offsetTop) / elementHeight * 100.0;
 
-            if (false && DEBUG) console.info("List: Spinner animation" +
+            if (false && DEBUG) console.info("Lists.updateInnerList() Spinner animation" +
                 " scrollTop=" + scrollTop +
                 " windowHeight=" + windowHeight +
                 " elementTop=" + elementTop +
@@ -316,7 +319,7 @@ function updateInnerList(id, searchStateParameters, reloadEntries) {
                     page = pageFromParam;
                 }
             }
-            if (DEBUG) console.info("List: showing page " + page);
+            if (DEBUG) console.info("Lists.updateInnerList() showing page " + page);
 
             jQ.get(buildAjaxLink(list, ajaxOptions, searchStateParameters), function(ajaxListHtml) {
                 generateListHtml(list, reloadEntries, ajaxListHtml, page)
@@ -336,7 +339,7 @@ function updateInnerList(id, searchStateParameters, reloadEntries) {
  */
 function buildAjaxLink(list, ajaxOptions, searchStateParameters) {
 
-    if (DEBUG) console.info("List: buildAjaxLink() called - searchStateParameters='" + searchStateParameters + "' ajaxOptions='" + ajaxOptions + "'");
+    if (DEBUG) console.info("Lists.buildAjaxLink() called - searchStateParameters='" + searchStateParameters + "' ajaxOptions='" + ajaxOptions + "'");
 
     var params = "contentpath=" + list.path
         + "&instanceId="
@@ -373,21 +376,21 @@ function buildAjaxLink(list, ajaxOptions, searchStateParameters) {
  * @returns {void}
 */
 function generateListHtml(list, reloadEntries, listHtml, page) {
-    if (DEBUG) console.info("List: generateListHtml() called");
+    if (DEBUG) console.info("Lists.generateListHtml() called");
 
     var $result = jQ(listHtml);
     // collect information about the search result
     var resultData = $result.find('#resultdata').first().data('result');
     list.pageData = resultData;
     list.pageData.itemsPerPage = parseInt(list.itemsPerPage, 10);
-    if (DEBUG) console.info("List: Search result - list=" + list.id + ", reloaded=" + list.pageData.reloaded + ", start=" + list.pageData.start + ", end=" + list.pageData.end + ", entries=" + list.pageData.found + ", pages=" + list.pageData.pages + ", currentPage=" + list.pageData.currentPage + ", page to show=" + page);
+    if (DEBUG) console.info("Lists.generateListHtml() Search result - list=" + list.id + ", reloaded=" + list.pageData.reloaded + ", start=" + list.pageData.start + ", end=" + list.pageData.end + ", entries=" + list.pageData.found + ", pages=" + list.pageData.pages + ", currentPage=" + list.pageData.currentPage + ", page to show=" + page);
 
     var $newEntries;
     var $groups = $result.find("div[listgroup]");
     var hasGroups = $groups.length > 0;
     if (hasGroups) {
         // the search results should be grouped
-        if (DEBUG) console.info("List: Search result - list=" + list.id + " contains " + $groups.length + " groups");
+        if (DEBUG) console.info("Lists.generateListHtml() Search result - list=" + list.id + " contains " + $groups.length + " groups");
         hasGroups = combineGroups($groups, false);
         $newEntries = $result.find(".list-entry:parent");
     } else {
@@ -408,7 +411,7 @@ function generateListHtml(list, reloadEntries, listHtml, page) {
     // but never skip if all items are displayed
     var skipInitialLoad = list.initialLoad && !hasGroups && !list.loadAll;
     list.initialLoad = false;
-    if (DEBUG && skipInitialLoad) console.info("List: Skipping initial reload for list=" + list.id);
+    if (DEBUG && skipInitialLoad) console.info("Lists.generateListHtml() Skipping initial reload for list=" + list.id);
 
     if (reloadEntries && !skipInitialLoad) {
         // set min-height of list to avoid screen flicker
@@ -499,12 +502,14 @@ function generateListHtml(list, reloadEntries, listHtml, page) {
     }
 
     // there may be media elements in the list
-    Mercury.initElements('#' + list.id);
+    Mercury.update('#' + list.id);
 
     if (resultData.reloaded == "true" && reloadEntries) {
         if (! list.$element.visible()) {
-            if (DEBUG) console.info("List: Scrolling to anchor");
-            Mercury.scrollToAnchor(list.$element, -20);
+            if (DEBUG) console.info("Lists.generateListHtml() Scrolling to anchor");
+            if (m_flagScrollToAnchor) {
+                Mercury.scrollToAnchor(list.$element, -20);
+            }
         }
     }
 }
@@ -711,7 +716,7 @@ function generatePaginationItem(liClasses, isDisabled, isActive, page, title, la
  */
 function combineGroups($groups, isStatic) {
     isStatic = isStatic || false;
-    if (DEBUG) console.info("List: Combining list with " + $groups.length + " groups for a " + (isStatic ? "static" : "dynamic") + " list" );
+    if (DEBUG) console.info("Lists.combineGroups() Combining list with " + $groups.length + " groups for a " + (isStatic ? "static" : "dynamic") + " list" );
     var lastGroupId, $lastGroup;
     var hasGroups = false;
     $groups.each(function(index) {
@@ -864,10 +869,12 @@ export function switchPage(id, page) {
         jQ(paginationString).appendTo(list.$pagination);
     }
     // there may be media elements in the list
-    Mercury.initElements('#' + list.id);
+    Mercury.update('#' + list.id);
     if (! list.$element.visible()) {
-        if (DEBUG) console.info("List: switchPage() - scrolling to anchor");
-        Mercury.scrollToAnchor(list.$element, -20);
+        if (DEBUG) console.info("Lists.switchPage() - scrolling to anchor");
+        if (m_flagScrollToAnchor) {
+            Mercury.scrollToAnchor(list.$element, -20);
+        }
     }
 }
 
@@ -887,7 +894,7 @@ export function appendPage(id, page) {
         jQ(paginationString).appendTo(list.$pagination);
     }
     // there may be media elements in the list
-    Mercury.initElements('#' + list.id);
+    Mercury.update('#' + list.id);
 }
 
 /**
@@ -915,7 +922,7 @@ export function update(id, searchStateParameters, reloadEntries) {
  */
 export function injectResults(id, resultHtml, paginationCallback, pageToShow) {
 
-    if (DEBUG) console.info("List: injectResults id=" + id + ", pageToShow=" + pageToShow);
+    if (DEBUG) console.info("Lists.injectResults() id=" + id + ", pageToShow=" + pageToShow);
     pageToShow = pageToShow || 1;
     var list = m_lists[id];
     list.paginationCallback = paginationCallback;
@@ -980,6 +987,7 @@ export function init(jQuery, debug) {
                     list.option = "paginate";
                     $list.removeClass("list-append").addClass("list-paginate");
                 }
+                if (DEBUG) console.info("Lists.init() List data found - id=" + list.id + ", elementId=" + list.elementId + " option=" + list.option);
                 if ((list.option === "append") && (list.appendOption === "noclick")) {
                     // list automatically loads in scrolling
                     list.autoload = true;
@@ -995,13 +1003,12 @@ export function init(jQuery, debug) {
                 } else {
                     m_listGroups[list.elementId] = [list];
                 }
-                if (DEBUG) console.info("List: Data found - id=" + list.id + ", elementId=" + list.elementId + " option=" + list.option);
             }
 
             var initParams = "";
             if (typeof list.initparams !== "undefined") {
                 initParams = list.initparams;
-                if (DEBUG) console.info("List: Data init params - " + initParams);
+                if (DEBUG) console.info("Lists.init() Data init params - " + initParams);
             }
             // load the initial list
             updateInnerList(list.id, initParams, true);
@@ -1026,7 +1033,7 @@ export function init(jQuery, debug) {
             var $groups = $clone.find("div[listgroup]");
             if ($groups.length > 0) {
                 // the search results should be grouped
-                if (DEBUG) console.info("List: Found static list with " + $groups.length + " groups");
+                if (DEBUG) console.info("Lists.init() Found static list with " + $groups.length + " groups");
                 combineGroups($groups, true);
                 $list.replaceWith($clone);
             }
@@ -1034,10 +1041,10 @@ export function init(jQuery, debug) {
         _OpenCmsReinitEditButtons(DEBUG);
     }
 
-    var $listArchiveFilters = jQ('.type-list-filter');
+    var $listArchiveFilters = jQ('.type-list-filter, .type-list-calendar');
     if (DEBUG) console.info("Lists.init() .type-list-filter elements found: " + $listArchiveFilters.length);
 
-    if ($listArchiveFilters.length > 0 ) {
+    if ($listArchiveFilters.length > 0) {
         $listArchiveFilters.each(function() {
 
             // initialize filter archives
@@ -1050,6 +1057,20 @@ export function init(jQuery, debug) {
                 filter.id = $archiveFilter.attr("id");
                 filter.elementId = $archiveFilter.data("id");
                 filter.$textsearch = $archiveFilter.find("#textsearch_" + filter.id);
+
+                // unfold categories if on desktop and responsive setting is used
+                var $collapses = $archiveFilter.find('#cats_' + filter.id + ', #folder_' + filter.id  + ', #arch_' + filter.id);
+                if ($collapses.length > 0) {
+                    if (DEBUG) console.info("Lists.init() collapse elements found for filter id " + filter.id + ": " + $collapses.length);
+                    $collapses.each(function() {
+                        var $collapse = jQ(this);
+                        if (($collapse.hasClass('op-lg') && Mercury.gridInfo().isMinLg())
+                            || ($collapse.hasClass('op-md') && Mercury.gridInfo().isMinMd())
+                            || ($collapse.hasClass('op-sm') && Mercury.gridInfo().isMinSm())) {
+                            $collapse.collapse('show');
+                        }
+                    });
+                }
 
                 // store filter data in global array
                 m_archiveFilters[filter.id] = filter;
@@ -1069,17 +1090,22 @@ export function init(jQuery, debug) {
                         e.preventDefault();
                     }
                 });
-                if (DEBUG) console.info("List: .type-list-filter data found - id=" + filter.id + ", elementId=" + filter.elementId);
+                if (DEBUG) console.info("Lists.init() .type-list-filter data found - id=" + filter.id + ", elementId=" + filter.elementId);
 
                 if (typeof filter.initparams !== "undefined" && filter.initparams != "") {
-                    if (DEBUG) console.info("List: Data filter init params - " + filter.initparams);
+                    if (DEBUG) console.info("Lists.init() Data filter init params - " + filter.initparams);
                     // highlight filter correctly
                     listFilter(filter.elementId, null, filter.id, filter.initparams, false);
                 }
             } else {
-                if (DEBUG) console.info("List: .type-list-filter found without data, ignoring!");
+                if (DEBUG) console.info("Lists.init() .type-list-filter found without data, ignoring!");
             }
 
         });
     }
+}
+
+export function setFlagScrollToAnchor(flagScrollToAnchor) {
+
+    m_flagScrollToAnchor = !!flagScrollToAnchor;
 }

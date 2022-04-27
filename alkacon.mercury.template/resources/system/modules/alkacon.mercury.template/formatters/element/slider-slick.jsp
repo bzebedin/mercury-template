@@ -16,10 +16,9 @@
 <fmt:setLocale value="${cms.locale}" />
 <cms:bundle basename="alkacon.mercury.template.messages">
 
-<c:set var="setting"                value="${cms.element.setting}" />
-<c:set var="cssWrapper"             value="${setting.cssWrapper}" />
+<mercury:setting-defaults>
+
 <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
-<c:set var="visualEffect"           value="${setting.effect.toString}" />
 
 <c:set var="useFade"                value="${setting.transition eq 'fade'}" />
 <c:set var="animationSpeed"         value="${useFade ? 1000 : 500}" />
@@ -105,8 +104,8 @@
         <c:set var="showDots" value="${false}" />
         <c:set var="pauseOnHover" value="${false}" />
         <c:set var="adoptRatioToScreen" value="${false}" />
-        <c:set var="animationTrigger" value="${visualEffect eq 'none' ? '' : visualEffect}" />
-        <c:set var="animationTarget" value="${visualEffect eq 'none' ? '' : 'effect-box'}" />
+        <c:set var="animationTrigger" value="${empty setEffect ? '' : setEffect}" />
+        <c:set var="animationTarget" value="${empty setEffect ? '' : 'effect-box'}" />
     </c:when>
     <c:otherwise>
     <%-- ###### Hero slider (default) ###### --%>
@@ -118,7 +117,7 @@
     </c:otherwise>
 </c:choose>
 
-<div class="element type-slider type-slick-slider ${sliderClass}${' '}${cssWrapper}${' '}${textDisplay}" <%--
+<div class="element type-slider type-slick-slider pivot pivot-full ${sliderClass}${setCssWrapper123}${' '}${textDisplay}" <%--
 --%>id="<mercury:idgen prefix='sl' uuid='${cms.element.id}' />"<%--
 --%>><mercury:nl />
 
@@ -159,13 +158,15 @@
         </c:when>
         <c:otherwise>
             <c:set var="sliderAttrs">
-                class="slide-definitions list-of-slides ${slideRowSpace}" data-typeslick='{<%--
+                class="slide-definitions list-of-slides ${slideRowSpace}" data-typeslick-new='${cms.isOnlineProject ? sliderData.compact : sliderData.verbose}' data-typeslick='{<%--
                 --%>"dots": ${showDots}, <%--
                 --%>"arrows": ${showArrows}, <%--
                 --%>"autoplaySpeed": ${rotationTime}, <%--
                 --%>"animationSpeed": ${animationSpeed}, <%--
                 --%>"pauseOnHover": ${pauseOnHover}, <%--
                 --%>"pauseOnFocus": ${pauseOnHover}, <%--
+                --%>"prevArrow": "<button class=\"slick-prev\" aria-label=\"<fmt:message key='msg.page.list.pagination.previous.title' />\" type=\"button\"><fmt:message key='msg.page.list.pagination.previous.title' /></button>", <%--
+                --%>"nextArrow": "<button class=\"slick-next\" aria-label=\"<fmt:message key='msg.page.list.pagination.next.title' />\" type=\"button\"><fmt:message key='msg.page.list.pagination.next.title' /></button>", <%--
                 --%>"fade": ${useFade}, <%--
                 --%>"slidesToShow": ${visibleSlidesXL}, <%--
                 --%>${responsiveData}<%--
@@ -218,8 +219,8 @@
                         .concat(slideLink)
                         .concat('" rel="noopener"')
                         .concat(image.value.NewWin.toBoolean ? ' target="_blank"' : '')
-                        .concat('>')
-                    : ''}
+                        .concat(' class="captions">')
+                    : '<span class="captions">'}
 
                     <cms:addparams>
                         <cms:param name="cssgrid">${adoptRatioToScreen ? 'col-xs-12 hidden-sm hidden-md hidden-lg hidden-xl' : cssgridCols}</cms:param>
@@ -291,10 +292,10 @@
 
                     </c:if>
 
-                ${not empty slideLink ? '</a>':''}
+                ${not empty slideLink ? '</a>':'</span>'}
 
                 <c:if test="${showImageCopyright and (not empty copyright)}">
-                    <div class="copyright rs_skip">${copyright}</div><mercury:nl/>
+                    <div class="copyright rs_skip" aria-hidden="true">${copyright}</div><mercury:nl/>
                 </c:if>
             </div><mercury:nl/>
 
@@ -306,8 +307,8 @@
                         .concat(slideLink)
                         .concat('" rel="noopener"')
                         .concat(image.value.NewWin.toBoolean ? ' target="_blank"' : '')
-                        .concat('>')
-                    : ''}
+                        .concat(' class="captions">')
+                    : '<span class="captions">'}
 
                 <div class="caption background ${posTop}${' '}${posLeft} rs_skip" aria-hidden="true" ${bgStyle}><%----%>
                     <c:if test="${image.value.SuperTitle.isSet}">
@@ -341,7 +342,7 @@
                     </c:if>
                 </div><%----%>
 
-                ${not empty slideLink ? '</a>':''}
+                ${not empty slideLink ? '</a>':'</span>'}
 
                 <mercury:nl />
             </c:if>
@@ -355,6 +356,8 @@
 
 </div><%----%>
 <mercury:nl />
+
+</mercury:setting-defaults>
 
 </cms:bundle>
 </cms:formatter>

@@ -30,7 +30,7 @@ import lazySizes                    from 'lazysizes';
 
 import * as DynamicListElemements   from './lists.js';
 import * as NavigationElements      from './navigation.js';
-import * as DisqusElements          from './disqus.js';
+import * as CommentElements         from './comments.js';
 import * as AnalyticElements        from './analytics.js';
 import * as PrivacyPolicy           from './privacy-policy.js';
 
@@ -66,6 +66,9 @@ var Mercury = function(jQ) {
 
     // width of current window
     var m_windowWidth = m_$window.width();
+
+    // element update callback functions
+    var m_updateCallbacks = [];
 
     // attach event listener to window resize event (debounced)
     m_$window.resize(debounce(function() {
@@ -149,6 +152,15 @@ var Mercury = function(jQ) {
 
         var locale = getInfo("locale");
         return (typeof locale !== "undefined") ? locale : "en";
+    }
+
+
+    function addContext(path) {
+
+        var contextPath = getInfo("context");
+        contextPath = (typeof contextPath !== "undefined") ? contextPath : "/";
+        path = path.startsWith("/") ? path.substr(1) : path;
+        return contextPath + path;
     }
 
 
@@ -497,26 +509,46 @@ var Mercury = function(jQ) {
     }
 
 
-    function initElements(parent) {
+    function update(parent) {
+        // called by Ajax methods to update dynamic template elements
+        // used for example after new elements have been loaded in dynamic lists
+        if (DEBUG) console.info("Mercury.update() parent=" + parent);
 
-        if (DEBUG) console.info("Mercury.initElements() parent=" + parent);
-
-        // call back for Ajax methods to initialize dynamic template elements
         initFitVids();
         // in case a dynamic list contains audio elements, make sure the required audio script is available
         loadAudioScript(function() { initMedia(parent) });
         initOnclickActivation(parent);
         initTooltips(parent);
 
+        // run registered update callbacks
+        for (var i=0; i < m_updateCallbacks.length; i++) {
+            try {
+                if (DEBUG) console.info("Mercury.update() running callback: " + m_updateCallbacks[i].name);
+                m_updateCallbacks[i](jQ, DEBUG, parent);
+            } catch (err) {
+                console.warn("Mercury.update() error in callback", err);
+            }
+        }
+
         // reset the OpenCms edit buttons
         debounce(_OpenCmsReinitEditButtons, 500);
+    }
+
+
+    function addUpdateCallback(callback) {
+        if (typeof callback === "function") {
+            if (DEBUG) console.info("Mercury.addUpdateCallback() added function: " + callback.name);
+            m_updateCallbacks.push(callback);
+        } else {
+            console.warn("Mercury.addUpdateCallback() added object is not a function", callback);
+        }
     }
 
 
     function loadAudioScript(callback) {
         // load audio script if required
         var audioScriptRequired = requiresModule(".type-media.audio, [data-audio]");
-        if (audioScriptRequired && (typeof window.AudioData === "undefined")) {
+        if (audioScriptRequired && ((typeof window.AudioData === "undefined") || (typeof window.AudioData.initAudioElement !== "function"))) {
             window.AudioData = false;
             if (DEBUG) console.info("Mercury.loadAudioScript() - Loading audio script...");
             try {
@@ -604,12 +636,13 @@ var Mercury = function(jQ) {
     function revalOnClickTemplate($element, template, isMedia, autoplay) {
         if (DEBUG) console.info("revalOnClickTemplate(): isMedia=" + isMedia + " autoplay=" + autoplay);
         $element.removeClass("reveal-registered");
+        $element.off("click");
+        $element.off("keydown");
         var $p = $element.parent();
         $p.removeClass("concealed enlarged");
         $p.addClass("revealed");
         if (template == "audio") {
             autoplay = (typeof autoplay === "undefined") ? true : autoplay;
-            $element.off("click");
             if (window.AudioData) {
                 window.AudioData.initAudioElement($element, autoplay);
             }
@@ -628,6 +661,34 @@ var Mercury = function(jQ) {
     }
 
 
+    function registerRevealFunttion($element, template, isMedia, autoplay) {
+        // adds a placeholder that has to be clicked in edit mode in order to reveal the template
+        // mostly used for JavaScripts that contact external servers which may not be wanted in edit mode
+        var revealFunction = function() {
+            // first we create a finction that revelas the template when clicked
+            revalOnClickTemplate($element, template, isMedia, autoplay);
+        };
+        if (!initPlaceholder($element, revealFunction)) {
+            // check if a placeholder is required in edit mode, otherwise directly show the element
+            revealFunction();
+        }
+    }
+
+
+    function checkOnClickTemplateCookies(event) {
+        var data = event.data;
+        var cookieData = data.$element.data("modal-external-cookies");
+        if (!cookieData || PrivacyPolicy.cookiesAcceptedExternal()) {
+            revalOnClickTemplate(data.$element, data.template, data.isMedia);
+        } else {
+            PrivacyPolicy.createExternalElementModal(cookieData.header, cookieData.message, cookieData.footer,
+            function() {
+                revalOnClickTemplate(data.$element, cata.template, cata.isMedia);
+            });
+        }
+    }
+
+
     function initOnclickTemplates(selector, isMedia) {
         var $onclickTemplates = jQ(selector);
         if (DEBUG) console.info("Mercury.initOnclickTemplates(): " + selector + " elements found: " + $onclickTemplates.length);
@@ -638,6 +699,8 @@ var Mercury = function(jQ) {
             if (data && data.template) {
                 var template = data.template;
                 var color = getThemeJSON("main-theme");
+                data.isMedia = isMedia;
+                data.$element = $element;
                 if (typeof color !== "undefined") {
                     template = template.replace("XXcolor-main-themeXX", color.substring(1));
                 }
@@ -647,34 +710,23 @@ var Mercury = function(jQ) {
                 // for autoplay check if element is rendered in our template - like e.g. the audio player - or from an external server
                 var noAutoPlay = (template == "audio") && (!PrivacyPolicy.cookiesAcceptedExternal() || isEditMode());
                 if ($element.hasClass("ensure-external-cookies") && !noAutoPlay) {
-                    // this external element should be rendered directly (e.g. video that plays when the page is loaded)
+                    // this element requires external coodies to be accepted before it is shown
+                    // if cookies are not accepted the external cookie notice will be rendered from initExternalElements() in privacy-policy.js
                     if (PrivacyPolicy.cookiesAcceptedExternal()) {
                         // only render this if external cookies are allowed
-                        var revealFunction = function() {
-                            revalOnClickTemplate($element, template, isMedia, !isEditMode());
-                        };
-                        if (!initPlaceholder($element, revealFunction)) {
-                            // add placeholder if in edit mode, otherwise directly show the element
-                            revealFunction();
-                        }
+                        registerRevealFunttion($element, template, isMedia, !isEditMode());
                     }
-                    // if external cookies are not accepted, the external element will not be rendered directly
-                    // in this case the external cookie notice will be rendered from initExternalElements() in privacy-policy.js
+                } else if ($element.hasClass("placeholder-in-editor") && !noAutoPlay) {
+                    // this element has a placeholder so it should NOT be shown direclty in edit mode, only online or in preview mode
+                    registerRevealFunttion($element, template, isMedia, !isEditMode());
                 } else {
-                    // this external element has a preview template that has to be clicked before the external content is shown
+                    // this element has a preview template that has to be clicked before the external content is shown
                     if (! $element.hasClass("reveal-registered")) {
-                        // only attach event listerner once, important for dynamic lists
+                        // only attach event listerners once, important for dynamic lists
                         $element.addClass("reveal-registered");
-                        $element.on("click", data, function() {
-                            var cookieData = $element.data("modal-external-cookies");
-                            if (!cookieData || PrivacyPolicy.cookiesAcceptedExternal()) {
-                                revalOnClickTemplate($element, template, isMedia);
-                            } else {
-                                PrivacyPolicy.createExternalElementModal(cookieData.header, cookieData.message, cookieData.footer,
-                                function() {
-                                    revalOnClickTemplate($element, template, isMedia);
-                                });
-                            }
+                        $element.on("click", data, checkOnClickTemplateCookies);
+                        $element.on("keydown", data, function(e) {
+                            if (e.which == 13) { checkOnClickTemplateCookies(e); }
                         });
                     }
                 }
@@ -694,15 +746,6 @@ var Mercury = function(jQ) {
         // add click handlers to generic onclick activation elements
         parent = parent || '';
         initOnclickTemplates(parent + ' .onclick-activation', false);
-    }
-
-
-    function checkVersion() {
-        // writes version information about the template to the console
-        var sassVersion = getThemeJSON("sass-version", "unknown");
-        if (DEBUG) console.info("Mercury asset versions: " +
-        "SASS " + sassVersion +
-        " - JavaScript " + WEBPACK_SCRIPT_VERSION);
     }
 
 
@@ -745,6 +788,7 @@ var Mercury = function(jQ) {
         }
     }
 
+
     function requiresModule(selector) {
         // checks if a specific module is required by checking for special selectors
         return (jQ(selector).length > 0);
@@ -762,6 +806,7 @@ var Mercury = function(jQ) {
         }
     }
 
+
     function initAfterCss() {
 
         if (DEBUG) console.info("Mercury.initAfterCss() - CSS wait time: " + m_cssTimer + "ms");
@@ -770,7 +815,6 @@ var Mercury = function(jQ) {
         // initialize
         try {
             initInfo();
-            checkVersion(); // output a JS console information about the template version
         } catch (err) {
             console.warn("Mercury.initInfo() error", err);
         }
@@ -789,9 +833,9 @@ var Mercury = function(jQ) {
         }
 
         try {
-            initElements();
+            update();
         } catch (err) {
-            console.warn("Mercury.initElements() error", err);
+            console.warn("Mercury.update() error", err);
         }
 
         try {
@@ -808,9 +852,9 @@ var Mercury = function(jQ) {
         }
 
         try {
-            DisqusElements.init(jQ, DEBUG);
+            CommentElements.init(jQ, DEBUG);
         } catch (err) {
-            console.warn("Disqus.init() error", err);
+            console.warn("Comments.init() error", err);
         }
 
         try {
@@ -840,6 +884,9 @@ var Mercury = function(jQ) {
                     "./map-osm.js").then( function ( OsmMap ) {
                        OsmMap.init(jQ, DEBUG);
                        window.OsmMap = OsmMap;
+                       window.dispatchEvent(new CustomEvent("load-module-map-osm", {
+                           detail: OsmMap
+                       }));
                  });
             } catch (err) {
                  console.warn("OsmMap.init() error", err);
@@ -851,8 +898,19 @@ var Mercury = function(jQ) {
                 import(
                     /* webpackChunkName: "mercury-map-google" */
                     "./map-google.js").then( function ( GoogleMap ) {
-                    GoogleMap.init(jQ, DEBUG);
                     window.GoogleMap = GoogleMap;
+                    let response = GoogleMap.init(jQ, DEBUG);
+                    if (response) {
+                        response.then(function(event) {
+                            window.dispatchEvent(new CustomEvent("load-module-map-google", {
+                                detail: GoogleMap
+                            }));
+                        });
+                    } else { // Google map was loaded already
+                        window.dispatchEvent(new CustomEvent("load-module-map-google", {
+                            detail: GoogleMap
+                        }));
+                    }
                 });
             } catch (err) {
                  console.warn("GoogleMap.init() error", err);
@@ -889,6 +947,7 @@ var Mercury = function(jQ) {
                     /* webpackChunkName: "mercury-imageseries" */
                     "./imageseries.js").then( function ( ImageSeries ) {
                     ImageSeries.init(jQ, DEBUG);
+                    window.ImageSeries = ImageSeries;
                 });
             } catch (err) {
                 console.warn("ImageSeries.init() error", err);
@@ -972,6 +1031,8 @@ var Mercury = function(jQ) {
     // public available functions
     return {
         init: init,
+        addContext: addContext,
+        addUpdateCallback: addUpdateCallback,
         calcRatio: calcRatio,
         debounce: debounce,
         device: device,
@@ -982,7 +1043,7 @@ var Mercury = function(jQ) {
         getThemeJSON: getThemeJSON,
         gridInfo: gridInfo,
         hasInfo: hasInfo,
-        initElements: initElements,
+        initElements: update,
         initPlaceholder: initPlaceholder,
         initTabAccordion: initTabAccordion,
         isEditMode: isEditMode,
@@ -990,6 +1051,7 @@ var Mercury = function(jQ) {
         post: post,
         scrollToAnchor: scrollToAnchor,
         toolbarHeight: toolbarHeight,
+        update: update,
         windowHeight: windowHeight,
         windowWidth: windowWidth,
         windowScrollTop: windowScrollTop

@@ -24,14 +24,14 @@
 </c:if>
 
 <mercury:nl/>
-<div class="element type-disqus ${cssWrapper}"><%----%>
+<div class="element type-comments comments-disqus pivot ${cssWrapper}"><%----%>
 
 <c:choose>
     <c:when test="${cms.edited}">
         <div>${cms.enableReload}</div><%----%>
         <mercury:alert type="error" css="box-noheight">
             <jsp:attribute name="head">
-                <fmt:message key="msg.page.disqus.edited" />
+                <fmt:message key="msg.page.comments.edited" />
             </jsp:attribute>
         </mercury:alert>
     </c:when>
@@ -62,14 +62,14 @@
         </c:choose>
 
         <c:if test="${clickToLoad}">
-            <button type="button" class="btn-block btn btn-disqus btn-toggle" ><%----%>
-                <span class="pull-left"><fmt:message key="msg.page.disqus.comments" /></span><%----%>
-                <span id="disqus_toggle" class="fa fa-chevron-down pull-right"></span><%----%>
+            <button type="button" class="btn-toggle btn-block btn" ><%----%>
+                <span class="pull-left"><fmt:message key="msg.page.comments" /></span><%----%>
+                <span class="fa fa-chevron-down pull-right"></span><%----%>
             </button><%----%>
         </c:if>
 
-        <%-- Generate DISQUS data JSON --%>
-        <cms:jsonobject var="disqusData">
+        <%-- Generate Comments data JSON --%>
+        <cms:jsonobject var="commentsData">
             <cms:jsonvalue key="site" value="${cms:encode(disqusSite)}" />
             <cms:jsonvalue key="load" value="${clickToLoad}" />
             <cms:jsonvalue key="id" value="${pageId}" />
@@ -80,13 +80,13 @@
 
         <div id="disqus_thread" <%--
         --%><c:if test="${clickToLoad}">style="display: none;" </c:if><%--
-            --%>data-disqus='${disqusData.compact}'<%--
+            --%>data-comments='${commentsData.compact}'<%--
             --%><mercury:data-external-cookies message="${cookieMessage}" /><%--
         --%>></div><%----%>
 
             <mercury:alert-online showJsWarning="${true}" >
                 <jsp:attribute name="text">
-                    <fmt:message key="msg.page.noscript.disqus" />
+                    <fmt:message key="msg.page.noscript.comments" />
                 </jsp:attribute>
             </mercury:alert-online>
     </c:otherwise>

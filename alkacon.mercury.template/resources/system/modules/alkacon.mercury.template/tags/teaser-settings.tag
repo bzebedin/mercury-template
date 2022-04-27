@@ -16,6 +16,8 @@
 <%@ variable name-given="setting"           declare="true" variable-class="java.util.Map" %>
 <%@ variable name-given="inList"            declare="true" variable-class="java.lang.Boolean" %>
 <%@ variable name-given="setCssWrapper"     declare="true" %>
+<%@ variable name-given="setCssWrapperRequired" declare="true" %>
+<%@ variable name-given="setCssWrapperAll"  declare="true" %>
 <%@ variable name-given="setEffect"         declare="true" %>
 <%@ variable name-given="setDateFormat"     declare="true" %>
 <%@ variable name-given="setRatio"          declare="true" %>
@@ -31,14 +33,16 @@
 <%@ variable name-given="setShowVisual"     declare="true" %>
 <%@ variable name-given="pageUri"           declare="true" %>
 <%@ variable name-given="displayType"       declare="true" %>
+<%@ variable name-given="setLinkOption"     declare="true" %>
 
 <%@ variable name-given="paragraph"         declare="true" %>
 <%@ variable name-given="linkToDetail"      declare="true" %>
 
 <c:set var="setting"                        value="${cms.element.setting}" />
 <c:set var="inList"                         value="${setting.nglist.toBoolean}" />
-<c:set var="setCssWrapper"                  value="${inList ? null : setting.cssWrapper.toString}" />
-<c:set var="setEffect"                      value="${setting.effect.isSetNotNone ? setting.effect.toString : null}" />
+<c:set var="setCssWrapper"                  value="${inList ? ' in-list' : (setting.cssWrapper.isSetNotNone ? ' no-list '.concat(setting.cssWrapper.toString) : ' no-list')}" />
+<c:set var="setCssWrapperRequired"          value="${setting.requiredCssWrapper.isSetNotNone ? ' '.concat(setting.requiredCssWrapper.toString) : null}" />
+<c:set var="setEffect"                      value="${setting.effect.isSetNotNone ? ' '.concat(setting.effect.toString) : null}" />
 <c:set var="setDateFormat"                  value="${setting.dateFormat.toString}" />
 <c:set var="setRatio"                       value="${setting.imageRatio.toString}"/>
 <c:set var="setTextLength"                  value="${setting.textLength.toInteger}" />
@@ -50,9 +54,9 @@
 <c:set var="setSizeDesktop"                 value="${setting.pieceSizeDesktop.toInteger}" />
 <c:set var="setSizeMobile"                  value="${setting.pieceSizeMobile.toInteger}" />
 <c:set var="setShowVisual"                  value="${setting.visualOption.toString ne 'none'}" />
+<c:set var="setLinkOption"                  value="${setting.linkOption.isSet ? setting.linkOption.toString : cms.sitemapConfig.attribute['linkOption.default'].toString}" />
 
 <c:set var="pageUri"                        value="${setting.pageUri.toString}" />
-<c:set var="requiredCssWrapper"             value="${setting.requiredCssWrapper.toString}" />
 <c:set var="listEntryWrapper"               value="${setting.listEntryWrapper.toString}" />
 
 <c:set var="displayType"                    value="${setting.displayType.toString}" />
@@ -65,13 +69,12 @@
     </c:when>
 </c:choose>
 
+<c:set var="setCssWrapper"                  value="${setCssWrapper}${setCssWrapperRequired}" />
+<c:set var="setCssWrapperAll"               value="${setCssWrapper}${setEffect}" />
+
 <c:set var="paragraph"                      value="${content.valueList.Paragraph['0']}" />
 
 <c:set var="linkToDetail"><cms:link baseUri="${pageUri}">${content.filename}</cms:link></c:set>
-
-<c:if test="${not empty requiredCssWrapper}">
-    <c:set var="setCssWrapper">${setCssWrapper}${' '}${requiredCssWrapper}</c:set>
-</c:if>
 
 <c:if test="${setting.dateFormatAddTime.toBoolean and fn:startsWith(setDateFormat, 'fmt-') and not fn:endsWith(setDateFormat, '-TIME')}">
     <c:set var="setDateFormat" value="${setDateFormat}-TIME" />

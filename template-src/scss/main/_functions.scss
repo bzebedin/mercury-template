@@ -27,14 +27,13 @@
     @return null;
 }
 
-@function get-link-colors($bg-color, $text-color, $l-color: $link-color, $lh-color: $link-hover-color, $contrast-threshold: 2.5) {
+@function get-link-colors($bg-color, $text-color: $text-dark, $l-color: $link-color, $lh-color: $link-hover-color, $contrast-threshold: 2.5) {
     @if (($bg-color == transparent) or ($bg-color == none)) {
         // if no background color is set, no need to set any color
         @return ($l-color, $lh-color);
     } @else if (map-get($match-text-bg-colors, $bg-color) != null) {
         // if we have a predefined color match, use this
         $colors: map-get($match-text-bg-colors, $bg-color);
-        $t-color: nth($colors, 1);
         $li-color: nth($colors, conditional-value(length($colors) > 1, 2, 1));
         $lih-color: nth($colors, conditional-value(length($colors) > 2, 3, 1));
         @return ($li-color, $lih-color);
@@ -455,28 +454,54 @@ $linear-channel-values:
     @return $svg;
 }
 
-
 @function divide($dividend, $divisor, $precision: 10) {
-    $sign: if($dividend > 0 and $divisor > 0, 1, -1);
+    $sign: if($dividend > 0 and $divisor > 0 or $dividend < 0 and $divisor < 0, 1, -1);
     $dividend: abs($dividend);
     $divisor: abs($divisor);
-    $quotient: 0;
-    $remainder: $dividend;
     @if $dividend == 0 {
         @return 0;
     }
     @if $divisor == 0 {
         @error "Cannot divide by 0";
     }
-    @if $divisor == 1 {
-        @return $dividend;
+    $remainder: $dividend;
+    $result: 0;
+    $factor: 10;
+    @while ($remainder > 0 and $precision >= 0) {
+        $quotient: 0;
+        @while ($remainder >= $divisor) {
+            $remainder: $remainder - $divisor;
+            $quotient: $quotient + 1;
+        }
+        $result: $result * 10 + $quotient;
+        $factor: $factor * .1;
+        $remainder: $remainder * 10;
+        $precision: $precision - 1;
+        @if ($precision < 0 and $remainder >= $divisor * 5) {
+        $result: $result + 1;
+        }
     }
-    @while $remainder >= $divisor {
-        $quotient: $quotient + 1;
-        $remainder: $remainder - $divisor;
+    $result: $result * $factor * $sign;
+    $dividend-unit: unit($dividend);
+    $divisor-unit: unit($divisor);
+    $unit-map: (
+        "px": 1px,
+        "rem": 1rem,
+        "em": 1em,
+        "%": 1%
+    );
+    @if ($dividend-unit != $divisor-unit and map-has-key($unit-map, $dividend-unit)) {
+        $result: $result * map-get($unit-map, $dividend-unit);
     }
-    @if $remainder > 0 and $precision > 0 {
-        $remainder: divide($remainder * 10, $divisor, $precision - 1) * .1;
-    }
-    @return ($quotient + $remainder) * $sign;
+    @return $result;
+}
+
+// Name of the previous breakpoint, or null for the first breakpoint.
+//
+//    >> breakpoint-prev(md)
+//    sm
+//
+@function breakpoint-prev($name, $breakpoints: $grid-breakpoints, $breakpoint-names: map-keys($breakpoints)) {
+    $n: index($breakpoint-names, $name);
+    @return if(($n != null and $n > 1), nth($breakpoint-names, $n - 1), null);
 }

@@ -16,12 +16,15 @@
 <mercury:init-messages>
 
 <cms:formatter var="content" val="value">
+<fmt:setLocale value="${cms.workplaceLocale}" />
+<cms:bundle basename="alkacon.mercury.template.messages">
 
-<c:set var="setting"                value="${cms.element.setting}" />
-<c:set var="cssWrapper"             value="${setting.cssWrapper}" />
+<mercury:setting-defaults>
+
 <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
 <c:set var="visualOption"           value="${setting.visualOption.toString}" />
 <c:set var="firstOpen"              value="${setting.firstOpen.toBoolean}" />
+<c:set var="multipleOpen"           value="${setting.multipleOpen.toBoolean}" />
 <c:set var="containerType"          value="${setting.containerType.useDefault('element').toString}" />
 
 <c:set var="ade"                    value="${cms.isEditMode}" />
@@ -32,8 +35,6 @@
 <c:set var="parent_classes"     value="${param_parts[1]}" />
 
 
-<fmt:setLocale value="${cms.workplaceLocale}" />
-<cms:bundle basename="alkacon.mercury.template.messages">
 
 <c:choose>
     <c:when test="${containerType eq 'row'}">
@@ -45,10 +46,10 @@
 </c:choose>
 
 <mercury:nl />
-<div class="element type-tab variant-accordion ${cssWrapper}"><%----%>
+<div class="element type-tab variant-accordion${setCssWrapperAll}"><%----%>
 <mercury:nl />
 
-    <mercury:heading level="${hsize}" text="${value.Title}" ade="${ade}" css="heading" />
+    <mercury:heading level="${hsize}" text="${value.Title}" ade="${ade}" css="heading pivot" />
 
     <div class="accordion-items" id="${parentId}"><%----%>
 
@@ -62,7 +63,7 @@
 
             <mercury:nl />
             <article class="accordion ${cssWrapper}"><%----%>
-                ${'<h'}${itemHsize} class="acco-header"${'>'}
+                ${'<h'}${itemHsize} class="acco-header pivot"${'>'}
                     <a class="acco-toggle ${open ? '':'collapsed'}"<%--
                     --%>data-toggle="collapse" <%--
                     --%>data-target="#${itemId}" <%--
@@ -71,7 +72,7 @@
                     </a><%----%>
                 ${'</h'}${itemHsize}${'>'}
 
-                <div id="${itemId}" class="acco-body collapse ${open ? 'show' : ''}" data-parent="#${parentId}"><%----%>
+                <div id="${itemId}" class="acco-body collapse ${open ? 'show' : ''}"${multipleOpen ? '' : ' data-parent=\"#'.concat(parentId).concat('\"')}><%----%>
 
                         <mercury:container
                             title="${msg}"
@@ -91,6 +92,8 @@
 
 </div><%----%>
 <mercury:nl />
+
+</mercury:setting-defaults>
 
 </cms:bundle>
 </cms:formatter>

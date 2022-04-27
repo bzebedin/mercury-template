@@ -18,6 +18,9 @@
 <%@ attribute name="title" type="java.lang.String" required="false"
     description="Text used in the image 'alt' and 'title' attributes."%>
 
+<%@ attribute name="alt" type="java.lang.String" required="false"
+    description="Text used in the image 'alt'attribute." %>
+
 <%@ attribute name="setTitle" type="java.lang.Boolean" required="false"
     description="If 'true' a 'title' attribute is added to the generated image tag.
     If 'false' the image will have only an 'alt' but no 'title' attribute.
@@ -76,6 +79,7 @@
 <%@ variable name-given="imageTitleCopyright" declare="true" %>
 <%@ variable name-given="imageWidth" declare="true" %>
 <%@ variable name-given="imageHeight" declare="true" %>
+<%@ variable name-given="imageOrientation" declare="true" %>
 
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -121,7 +125,7 @@
         <mercury:image-srcset
             imagebean="${imageBean}"
             sizes="${sizes}"
-            alt="${imageTitle}"
+            alt="${empty alt ? imageTitle : alt}"
             title="${setTitle ? (showCopyright ? imageTitle : imageTitleCopyright) : null}"
             copyright="${showCopyright ? imageCopyrightHtml : null}"
             cssImage="${empty effectWrapper ? '' : 'animated '}${cssImage}"

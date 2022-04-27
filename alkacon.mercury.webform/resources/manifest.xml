@@ -13,7 +13,7 @@
 		<import-site>/</import-site>
 		<export-mode name="reduced"/>
 		<description><![CDATA[A configurable form module for the Mercury template.]]></description>
-		<version>12.0.0</version>
+		<version>13.0.0</version>
 		<autoincrement>true</autoincrement>
 		<authorname><![CDATA[Alkacon Software GmbH & Co. KG]]></authorname>
 		<authoremail/>
@@ -21,7 +21,7 @@
 		<userinstalled/>
 		<dateinstalled/>
 		<dependencies>
-			<dependency name="alkacon.mercury.template" version="12.0.0"/>
+			<dependency name="alkacon.mercury.template" version="13.0.0"/>
 		</dependencies>
 		<exportpoints>
 			<exportpoint uri="/system/modules/alkacon.mercury.webform/classes/" destination="WEB-INF/classes/"/>
@@ -549,7 +549,7 @@
 			<properties>
 				<property>
 					<name>Title</name>
-					<value><![CDATA[Exports submission data of webforms]]></value>
+					<value><![CDATA[Exports submission data of webforms in CSV format]]></value>
 				</property>
 				<property>
 					<name>cache</name>
@@ -558,6 +558,27 @@
 				<property>
 					<name>content-encoding</name>
 					<value><![CDATA[utf-8]]></value>
+				</property>
+				<property type="shared">
+					<name>export</name>
+					<value><![CDATA[false]]></value>
+				</property>
+			</properties>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.webform/elements/formdata.xlsx</source>
+			<destination>system/modules/alkacon.mercury.webform/elements/formdata.xlsx</destination>
+			<type>jsp</type>
+			<uuidstructure>0e296ce8-2dbc-11ec-835c-0242ac11002b</uuidstructure>
+			<uuidresource>0e296ce9-2dbc-11ec-835c-0242ac11002b</uuidresource>
+			<datecreated>Fri, 15 Oct 2021 13:30:25 GMT</datecreated>
+			<flags>0</flags>
+			<properties>
+				<property>
+					<name>Title</name>
+					<value><![CDATA[Exports submission data of webforms in Excel format]]></value>
 				</property>
 				<property type="shared">
 					<name>export</name>
@@ -902,6 +923,66 @@
 			<uuidstructure>93aacf91-b396-490c-a7ee-c5ecfc4c1874</uuidstructure>
 			<uuidresource>16de37dc-68a4-4a91-a588-9b73919e5d05</uuidresource>
 			<datecreated>Tue, 08 Jan 2019 12:44:45 GMT</datecreated>
+			<flags>0</flags>
+			<properties/>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-add.xsd</source>
+			<destination>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-add.xsd</destination>
+			<type>plain</type>
+			<uuidstructure>f3bc54a7-3706-11ec-bad8-0242ac11002b</uuidstructure>
+			<uuidresource>f3bc54a8-3706-11ec-bad8-0242ac11002b</uuidresource>
+			<datecreated>Wed, 27 Oct 2021 09:19:14 GMT</datecreated>
+			<flags>0</flags>
+			<properties/>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-config.xsd</source>
+			<destination>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-config.xsd</destination>
+			<type>plain</type>
+			<uuidstructure>b0f0ee53-3700-11ec-bad8-0242ac11002b</uuidstructure>
+			<uuidresource>b0f0ee54-3700-11ec-bad8-0242ac11002b</uuidresource>
+			<datecreated>Wed, 27 Oct 2021 08:34:24 GMT</datecreated>
+			<flags>0</flags>
+			<properties/>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-ignore.xsd</source>
+			<destination>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-ignore.xsd</destination>
+			<type>plain</type>
+			<uuidstructure>d8323ceb-30ce-11ec-a039-0242ac11002b</uuidstructure>
+			<uuidresource>d8323cec-30ce-11ec-a039-0242ac11002b</uuidresource>
+			<datecreated>Tue, 19 Oct 2021 11:22:29 GMT</datecreated>
+			<flags>0</flags>
+			<properties/>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-rename.xsd</source>
+			<destination>system/modules/alkacon.mercury.webform/schemas/nested/dbexport-rename.xsd</destination>
+			<type>plain</type>
+			<uuidstructure>d2d67c33-30d2-11ec-a039-0242ac11002b</uuidstructure>
+			<uuidresource>d2d67c34-30d2-11ec-a039-0242ac11002b</uuidresource>
+			<datecreated>Tue, 19 Oct 2021 11:50:58 GMT</datecreated>
+			<flags>0</flags>
+			<properties/>
+			<relations/>
+			<accesscontrol/>
+		</file>
+		<file>
+			<source>system/modules/alkacon.mercury.webform/schemas/nested/dbexport.xsd</source>
+			<destination>system/modules/alkacon.mercury.webform/schemas/nested/dbexport.xsd</destination>
+			<type>plain</type>
+			<uuidstructure>205a99ef-30cd-11ec-a039-0242ac11002b</uuidstructure>
+			<uuidresource>205a99f0-30cd-11ec-a039-0242ac11002b</uuidresource>
+			<datecreated>Tue, 19 Oct 2021 11:10:11 GMT</datecreated>
 			<flags>0</flags>
 			<properties/>
 			<relations/>

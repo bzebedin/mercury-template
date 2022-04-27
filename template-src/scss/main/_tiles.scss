@@ -207,20 +207,10 @@ $sq-heights-xl:    () !default;
             margin: #{$m}px;
         }
 
-
         &.row-square {
-            margin: #{$m * -1}px;
-        }
-    }
-}
-
-
-@include media-breakpoint-down(sm) {
-    @each $m in $sq-margins  {
-        .square-col.square-sm-12.square-m-#{$m} .content {
-            height: calc(100% - #{$grid-gutter-width});
-            width:  calc(100% - #{$grid-gutter-width});
-            margin: $grid-gutter-width-half;
+            margin-left: -#{$m}px;
+            margin-right: -#{$m}px;
+            padding-bottom: #{$grid-gutter-width - (2px * $m)};
         }
     }
 }
@@ -378,6 +368,9 @@ $sq-margin: 20px;
         &.square-md-6 {
             padding-bottom: calc-square-height(container-useable-width(md), $sq-margin, $ratio16-9, 6) !important;
         }
+        &.square-md-4 {
+            padding-bottom: calc-square-height(container-useable-width(md), $sq-margin, $ratio16-9, 4) !important;
+        }
     }
 }
 
@@ -399,9 +392,16 @@ $sq-margin: 20px;
         &.square-lg-12 {
             padding-bottom: calc-square-height(container-useable-width(lg), $sq-margin, $ratio16-9, 12) !important;
         }
+        &.square-lg-8 {
+            padding-bottom: calc-square-height(container-useable-width(lg), $sq-margin, $ratio16-9, 4) * 2 !important;
+        }
         &.square-md-6,
         &.square-lg-6 {
             padding-bottom: calc-square-height(container-useable-width(lg), $sq-margin, $ratio16-9, 6) !important;
+        }
+        &.square-md-4,
+        &.square-lg-4 {
+            padding-bottom: calc-square-height(container-useable-width(lg), $sq-margin, $ratio16-9, 4) !important;
         }
     }
 }
@@ -472,6 +472,8 @@ $sq-margin: 20px;
         display: table;
         height: 100%;
         width: 100%;
+        margin-bottom: 0;
+        color: inherit;
     }
 
     .table-cell {
@@ -502,11 +504,21 @@ $sq-margin: 20px;
             margin: $default-margin-small;
         }
 
-        h1, h2, h3, h4, div.body {
+        h1, h2, h3, h4, div.body, a.piece-text-link {
             color: $square-overlay-text-color;
             text-shadow: $square-overlay-text-shadow;
         }
     }
+}
+
+.tile-col.element .copyright,
+.tile-col.freefloat .copyright,
+.square-col .square-copyright {
+    // selector must not be named 'image-copyright' here, otherwise there will be problems for image flipping tiles
+    @include image-copyright;
+    color: $square-overlay-text-color;
+    text-shadow: $square-overlay-text-shadow;
+    background-color: transparent;
 }
 
 .tile-col,
@@ -546,13 +558,6 @@ $sq-margin: 20px;
         div.teaser-date + h2 {
             margin-top: $default-margin-verysmall;
         }
-    }
-    .copyright {
-        // selector must not be named 'image-copyright' here, otherwise there will be problems for image flipping tiles
-        @include image-copyright;
-        color: $square-overlay-text-color;
-        text-shadow: $square-overlay-text-shadow;
-        background-color: transparent;
     }
     a:hover {
         text-decoration: none;

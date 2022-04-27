@@ -27,10 +27,10 @@
       <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[disqusSite.disqus]]></IncludeName>
+      <IncludeName><![CDATA[disqusSite.comments]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[clickToLoad.disqus]]></IncludeName>
+      <IncludeName><![CDATA[clickToLoad.comments]]></IncludeName>
     </Setting>
   </FunctionConfig>
 </FunctionConfigs>

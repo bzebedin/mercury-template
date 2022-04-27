@@ -77,30 +77,30 @@
     <c:set var="bannerHtml">
         <div class="banner"><%----%>
             <div class="container"><%----%>
-                <div class="title">${value.Title}</div><%----%>
+                <div class="title" tabindex="0">${value.Title}</div><%----%>
                 <div class="message"><%----%>
                     <div>${value.PolicyText}</div><%----%>
                 </div><%----%>
-                <div class="selection">
+                <form class="selection"><%----%>
                     <div class="options"><%----%>
                         <label for="use-technical"><%----%>
                             <input id="use-technical" type="checkbox" checked disabled><i></i><%----%>
                             <span><fmt:message key="msg.page.privacypolicy.toggle.label.technical" /></span><%----%>
                         </label><%----%>
                         <label for="use-external"><%----%>
-                            <input id="use-external" type="checkbox"><i></i><%----%>
+                            <input id="use-external" type="checkbox" tabindex="0"><i></i><%----%>
                             <span><fmt:message key="msg.page.privacypolicy.toggle.label.external" /></span><%----%>
                         </label><%----%>
                         <label for="use-statistical"><%----%>
-                            <input id="use-statistical" type="checkbox"><i></i><%----%>
+                            <input id="use-statistical" type="checkbox" tabindex="0"><i></i><%----%>
                             <span><fmt:message key="msg.page.privacypolicy.toggle.label.statistical" /></span><%----%>
                         </label><%----%>
                     </div><%----%>
                     <div class="buttons"><%----%>
-                        <a class="btn btn-save">${value.SaveButtonText.isSet ? value.SaveButtonText : btnSaveDef}</a><%----%>
-                        <a class="btn btn-accept">${value.AcceptAllButtonText.isSet ? value.AcceptAllButtonText : btnAcceptDef}</a><%----%>
+                        <button class="btn btn-save" type="submit" tabindex="0">${value.SaveButtonText.isSet ? value.SaveButtonText : btnSaveDef}</button><%----%>
+                        <button class="btn btn-accept" type="submit" tabindex="0">${value.AcceptAllButtonText.isSet ? value.AcceptAllButtonText : btnAcceptDef}</button><%----%>
                     </div><%----%>
-                </div><%----%>
+                </form><%----%>
                 <c:if test="${hasLinks and value.ShowLinks.useDefault('true').toBoolean}">
                     <div class="links"><%----%>
                         <ul><%----%>

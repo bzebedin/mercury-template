@@ -18,6 +18,7 @@
  */
 
 import tinycolor from 'tinycolor2';
+import { MarkerClusterer } from "@googlemaps/markerclusterer";
 
 // the global objects that must be passed to this module
 var jQ;
@@ -42,6 +43,67 @@ var m_googleGeocoder = null;
 
 // check if the API has already been loaded
 var m_googleApiLoaded = false;
+
+function getPuempel(color) {
+
+    var shade = "" + tinycolor(color).darken(20);
+    return {
+        path: 'M0-37.06c-5.53 0-10 4.15-10 9.26 0 7.4 8 9.26 10 27.8 2-18.54 10-20.4 10-27.8 0-5.1-4.47-9.26-10-9.26zm.08 7a2.9 2.9 0 0 1 2.9 2.9 2.9 2.9 0 0 1-2.9 2.9 2.9 2.9 0 0 1-2.9-2.9 2.9 2.9 0 0 1 2.9-2.9z',
+        scale: 1,
+        fillOpacity: 1,
+        fillColor: color,
+        strokeColor: shade,
+        strokeWeight: 1
+    };
+}
+
+function getFeatureGraphic() {
+
+    const color = Mercury.getThemeJSON("map-color[0]", "#ffffff");
+    return getPuempel(color);
+}
+
+function getCenterPointGraphic() {
+
+    const color1 = Mercury.getThemeJSON("map-center", "#000000");
+    const color2 = tinycolor(color1).darken(20);
+    return {
+        path: "M2,8a6,6 0 1,0 12,0a6,6 0 1,0 -12,0",
+        scale: 1,
+        fillColor: color1.toString(),
+        fillOpacity: 1,
+        strokeWeight: 1,
+        strokeColor: color2.toString(),
+        strokeOpacity: 1
+    }
+}
+
+function getClusterGraphic() {
+
+    return {
+        render: function({count, position}, stats) {
+            const color = Mercury.getThemeJSON("map-cluster", "#999999");
+            const perceivedColor = tinycolor(color);
+            const strokeColor = tinycolor(color).darken(20);
+            const textColor = perceivedColor.isLight() ? tinycolor(color).darken(70) : tinycolor(color).lighten(70);
+            const svg = window.btoa(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" stroke="${strokeColor}" stroke-width="2" fill="${color}"/></svg>`);
+            return new google.maps.Marker({
+                position,
+                icon: {
+                    url: `data:image/svg+xml;base64,${svg}`,
+                    scaledSize: new google.maps.Size(60, 60)
+                },
+                label: {
+                    text: String(count),
+                    color: textColor.toString(),
+                    fontSize: "14px",
+                    fontWeight: "normal"
+                },
+                zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
+            });
+        }
+    }
+}
 
 function showInfo(mapId, infoId) {
 
@@ -153,25 +215,12 @@ function loadGoogleApi() {
             addLibs = "&libraries=places"
         }
         if (DEBUG) console.info("GoogleMap API key: " + (mapKey == '' ? '(undefined)' : mapKey));
-        jQ.loadScript("https://maps.google.com/maps/api/js?callback=GoogleMap.initGoogleMaps&language=" + locale + addLibs + mapKey, {}, DEBUG);
+        let response = jQ.loadScript("https://maps.google.com/maps/api/js?callback=GoogleMap.initGoogleMaps&language=" + locale + addLibs + mapKey, {}, DEBUG);
         m_googleApiLoaded = true;
+        return response;
     } else {
         initGoogleMaps();
     }
-}
-
-
-function getPuempel(color) {
-
-    var shade = "" + tinycolor(color).darken(20);
-    return {
-        path: 'M0-37.06c-5.53 0-10 4.15-10 9.26 0 7.4 8 9.26 10 27.8 2-18.54 10-20.4 10-27.8 0-5.1-4.47-9.26-10-9.26zm.08 7a2.9 2.9 0 0 1 2.9 2.9 2.9 2.9 0 0 1-2.9 2.9 2.9 2.9 0 0 1-2.9-2.9 2.9 2.9 0 0 1 2.9-2.9z',
-        scale: 1,
-        fillOpacity: 1,
-        fillColor: color,
-        strokeColor: shade,
-        strokeWeight: 1
-    };
 }
 
 /****** Exported functions ******/
@@ -214,8 +263,12 @@ function showSingleMap(mapData){
                 google.maps.MapTypeId.TERRAIN
             )
         },
-        center: new google.maps.LatLng(mapData.centerLat, mapData.centerLng)
+        center: new google.maps.LatLng(mapData.centerLat, mapData.centerLng),
+        maxZoom: 18
     }
+
+    var $typeParent = jQ("#" + mapData.id).closest("*[class*='type-map']");
+    $typeParent.addClass("visible");
 
     // create the map
     var map = new google.maps.Map(document.getElementById(mapId), mapOptions);
@@ -236,7 +289,10 @@ function showSingleMap(mapData){
 
             var point = mapData.markers[p];
             var group = point.group;
-            if (typeof groups[group] === "undefined" ) {
+            if (group === "centerpoint") {
+                if (DEBUG) console.info("GoogleMap new center point added.");
+                groups[group] = getCenterPointGraphic();
+            } else if (typeof groups[group] === "undefined" ) {
                 // Array? Object?
                 // see http://stackoverflow.com/questions/9526860/why-does-a-string-index-in-a-javascript-array-not-increase-the-length-size
                 var color = Mercury.getThemeJSON("map-color[" + groupsFound++ + "]", "#ffffff");
@@ -275,9 +331,11 @@ function showSingleMap(mapData){
 
             // attach event listener that shows info window to marker
             // see http://you.arenot.me/2010/06/29/google-maps-api-v3-0-multiple-markers-multiple-infowindows/
-            marker.addListener('click', function() {
-                showInfo(this.mapId, this.index);
-            });
+            if (group !== "centerpoint") {
+                marker.addListener('click', function() {
+                    showInfo(this.mapId, this.index);
+                });
+            }
         }
     }
 
@@ -289,6 +347,92 @@ function showSingleMap(mapData){
         'infoWindows': infoWindows
     };
     m_maps[mapId] = map;
+}
+
+export function showGeoJson(mapId, geoJson) {
+
+    if (DEBUG) console.info("Google update markers for map with id: " + mapId);
+    let map;
+    try {
+        map = m_maps[mapId].map;
+    } catch (e) {
+        // map data may already be loaded but not the map
+    }
+
+    if (!map) { // no cookie consent yet
+        return;
+    }
+    const features = geoJson.features || [];
+    const markers = [];
+    const boundsNorthEast = {lat: null, lng: null};
+    const boundSouthWest = {lat: null, lng: null};
+    let checkBounds = function(coordinates) {
+        let lat = coordinates[1];
+        let lng = coordinates[0];
+        if (boundsNorthEast.lat === null || boundsNorthEast.lat < lat) {
+            boundsNorthEast.lat = lat;
+        }
+        if (boundsNorthEast.lng === null || boundsNorthEast.lng < lng) {
+            boundsNorthEast.lng = lng;
+        }
+        if (boundSouthWest.lat === null || boundSouthWest.lat > lat) {
+            boundSouthWest.lat = lat;
+        }
+        if (boundSouthWest.lng === null || boundSouthWest.lng > lng) {
+            boundSouthWest.lng = lng;
+        }
+    }
+    let centerPoint;
+    for (let md of m_mapData) {
+        if (md.id === mapId && md.markers && md.markers.length > 0) {
+            centerPoint = md;
+        }
+    }
+    if (centerPoint) {
+        checkBounds([map.getCenter().lng(), map.getCenter().lat()]); // bounding box includes the center point
+    }
+    const infoWindows = new Map();
+    for (let i = 0; i < features.length; i++) {
+        const feature = features[i];
+        const coordinates = feature.geometry.coordinates;
+        checkBounds(coordinates);
+        const info = feature.properties.info;
+        const marker = new google.maps.Marker({
+            position: new google.maps.LatLng(coordinates[1], coordinates[0]),
+            map: map,
+            icon: getFeatureGraphic(),
+            zIndex: i
+        });
+        markers.push(marker);
+        const infoWindow = new google.maps.InfoWindow({
+            content: info,
+            marker: marker,
+            zIndex: i
+        });
+        const key = coordinates.join(",");
+        if (!infoWindows.has(key)) {
+            infoWindows.set(key, [infoWindow]);
+        } else {
+            let contents = infoWindow.getContent();
+            contents += infoWindows.get(key)[infoWindows.get(key).length - 1].getContent();
+            infoWindow.setContent(contents);
+            infoWindows.get(key).push(infoWindow);
+        }
+        marker.addListener("click", function(event) {
+            if (m_maps[mapId].infoWindow) {
+                m_maps[mapId].infoWindow.close();
+            }
+            infoWindow.open(map, marker);
+            m_maps[mapId].infoWindow = infoWindow;
+        });
+    }
+    const clusterer = new MarkerClusterer({markers: markers, map: map, renderer: getClusterGraphic()});
+    if (boundsNorthEast.lat) { // catch no center point and no features
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(boundsNorthEast);
+        bounds.extend(boundSouthWest);
+        map.fitBounds(bounds);
+    }
 }
 
 export function initGoogleMaps() {
@@ -366,7 +510,7 @@ export function init(jQuery, debug) {
                 });
 
                 // load the Google map API
-                loadGoogleApi();
+                return loadGoogleApi();
 
             } else {
                 if (DEBUG) console.info("External cookies not accepted by the user - Google maps are disabled!");

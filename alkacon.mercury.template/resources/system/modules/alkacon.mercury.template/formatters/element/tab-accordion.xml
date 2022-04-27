@@ -31,6 +31,12 @@
       <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
     </Setting>
     <Setting>
+      <IncludeName><![CDATA[cssWrapper2.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper3.default]]></IncludeName>
+    </Setting>
+    <Setting>
       <IncludeName><![CDATA[hsize.element.2]]></IncludeName>
     </Setting>
     <Setting>
@@ -38,6 +44,9 @@
     </Setting>
     <Setting>
       <IncludeName><![CDATA[firstOpen.true]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[multipleOpen.false]]></IncludeName>
     </Setting>
   </NewFormatter>
 </NewFormatters>

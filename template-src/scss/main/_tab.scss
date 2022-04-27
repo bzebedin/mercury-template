@@ -126,9 +126,10 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     margin-bottom: $accordion-margin;
-    box-shadow: $panel-shadow;
+    box-shadow: $accordion-panel-shadow;
     border: $accordion-border;
     @include round-corners($accordion-border-radius, true);
 
@@ -213,6 +214,15 @@
                 transition: transform 0.33s;
             }
         }
+    }
+}
+
+.box .accordion .acco-header > a:not(.btn):not(.uncolored)  {
+    // in a box the heading color must not be changed becasue the panel will generate the background
+    color: $accordion-header-color;
+    &:focus,
+    &:hover {
+        color: get-text-color($accordion-header-bg-hover);
     }
 }
 

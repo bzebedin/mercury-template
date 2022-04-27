@@ -70,7 +70,7 @@ $font-weight-bolder:                $font-weight-bold !default; // used in Boost
 
 $font-weight-base:                  $font-weight-normal !default;
 $font-weight-headings:              $font-weight-bold !default;
-$font-weight-intro-headings:        $font-weight-bold !default;
+$font-weight-intro-headings:        $font-weight-headings !default;
 
 $font-weight-base:                  get-font-weight($font-family-base, $font-weight-base);
 $font-weight-headings:              get-font-weight($font-family-headings, $font-weight-headings);
@@ -173,6 +173,9 @@ $h4-font-size:                      $h3-font-size-mobile !default;
 $h4-font-size-mobile:               round($font-size-headings * 8) * 0.1 !default;
 $h5-font-size:                      $h4-font-size !default;
 $h6-font-size:                      $h4-font-size !default;
+
+$lead-font-size:                    $h3-font-size !default;
+$lead-font-size-mobile:             round($lead-font-size * 9) * 0.1 !default;
 
 
 // Controls the lightness threshold where the text is switched
@@ -312,6 +315,7 @@ $piece-btn-lg-padding:              $btn-lg-padding !default;
 $piece-text-margin:                 $default-margin-small !default;
 $piece-text-to-link-margin:         $piece-text-margin !default;
 $piece-visual-last-top-margin:      $piece-text-margin !default;
+$piece-desktop-breakpoint:          md !default;
 
 $use-hyphens:                       true !default; // enable hyphenation / word breaks (not all browsers support this)
 $piece-hyphens:                     $use-hyphens !default; // enable hyphenation / word breaks specially in piece
@@ -339,6 +343,7 @@ $nav-head-border:                   1px solid $nav-border !default; // border be
 $nav-setting-fixheader:             true !default; // Valid: true, false, upscroll
 $nav-bg-active-mobile:              $nav-bg-active !default; // the current page in navigation background color in mobile menu
 $nav-bg-hover-mobile:               $nav-bg-hover !default; // hover background of the nav menu entries for mobile
+$nav-text-mobile:                   $nav-text !default; // color of mobile navigation links
 $nav-text-hover-mobile:             $nav-text-hover !default; // hover text color for mobile navigation
 $nav-text-active-mobile:            $nav-text-active !default; // the current page in navigation text color in mobile
 $nav-font-size:                     14px !default; // font size of dropdown entries and side navigation
@@ -444,6 +449,7 @@ $fh-meta-bg-color:                  none !default; // background color of the me
 $fh-meta-color:                     check-text-color($fh-meta-bg-color, $nav-header-text, $fh-header-bg-color) !default; // font color for meta / service links
 $fh-meta-hover-color:               check-text-color($fh-meta-bg-color, $nav-header-text-hover, $fh-header-bg-color) !default; // font hover color for meta / service links
 $fh-meta-font-size:                 $font-size-sm !default; // font size for meta / service links
+$fh-meta-text-transform:            uppercase !default; // text transformation for meta / service links
 $fh-title-font-size:                $h4-font-size !default; // font size for title in header
 $fh-title-bg-color:                 none !default; // background color of the title
 $fh-title-color:                    check-text-color($fh-title-bg-color, $nav-header-text, $fh-header-bg-color) !default; // background color of the title
@@ -451,6 +457,8 @@ $fh-nav-bg-color:                   none !default; // background color of the fi
 $fh-nav-header-padding-increase:    12px !default; // additional space to add between the first level nav items in LG, XL
 $fh-ac-bg-color:                    none !default; // color of additional container
 $fh-logo-image-bg:                  none !default; // background color for the logo image in the header
+$fh-grid-gutter-width:              $grid-gutter-width !default; // grid gutter to use in the header
+$fh-grid-gutter-width-half:         $fh-grid-gutter-width * 0.5 !default; // half grid gutter to use in the header
 
 
 // Burger header
@@ -476,12 +484,13 @@ $bh-header-padding-small:           round($bh-header-padding * 50) * 0.01 !defau
 $bh-header-padding-verysmall:       round($bh-header-padding * 25) * 0.01 !default; // used mostly for sticky burger header
 $bh-nav-mobile-toggle-top:          $grid-gutter-width !default; // top position for floating burger menu icon
 $bh-nav-mobile-logo-max-width:      350px !default; // max size of logo in menu
+$bh-header-padding-meta:            $bh-header-padding-verysmall !default; // padding for meta link bar
 
 // The "nav-toggle" button - this is the "burger" button to show / hide the mobile navigation
 
 $nav-toggle-bg:                     $main-theme !default; // color of toggle button
 $nav-toggle-bg-hover:               $main-theme-hover !default; // hover color of toggle button
-$nav-toggle-bg-active:              $main-theme !default; // color of toggle button if activated
+$nav-toggle-bg-active:              $nav-toggle-bg !default; // color of toggle button if activated
 $nav-toggle-text:                   $white !default; // color of text in toggle button
 $nav-toggle-size:                   40px !default; // height of toggle button
 $nav-toggle-size-xs:                30px !default; // on smaller screens the button size is reduced further
@@ -500,6 +509,7 @@ $nav-breadcrumb-padding:            $default-margin-verysmall 0 0 0 !default; //
 $nav-breadcrumb-text-color:         check-text-color($nav-breadcrumb-bg-color, $nav-header-text) !default; // text color of breadcrumbs
 $nav-breadcrumb-text-hover-color:   check-text-color($nav-breadcrumb-bg-color, $nav-header-text-hover) !default; // hover color of breadcrumb links
 $nav-breadcrumb-font-size:          $font-size-sm !default; // font size for the breadcrumbs
+$nav-breadcrumb-image-size:         round($nav-breadcrumb-font-size * 80) * 0.01 !default; // image height / width for the breadcrumbs
 $nav-breadcrumb-separator:          "\f0da" !default; // separator char between breadcrumbs
 $nav-breadcrumb-separator-color:    conditional-value($nav-breadcrumb-bg-color == none, $grey, $nav-breadcrumb-text-color) !default; // color of breadcrumbs separator
 $nav-breadcrumb-separator-font:     ForkAwesome !default; // font-family for breadcrumbs separator
@@ -553,6 +563,9 @@ $list-side-adjust:                  true !default; // make side lists less "prom
 $list-side-color:                   $grey-light !default; // color of pagination in side lists and small pagination
 $list-side-headings-color:          $text-dark !default; // color of headings in side lists
 $list-side-intro-color:             $list-side-headings-color !default; // color of intro line in side lists
+$list-filter-background:            $btn-default !default;
+$list-filter-hover:                 $btn-default-hover !default;
+$list-filter-color:                 get-text-color($list-filter-background) !default;
 
 $pagination-text-color:             $text-dark !default;
 $pagination-text-active-color:      $text-light !default;
@@ -587,12 +600,14 @@ $dl-list-highlight-color:           $highlight-color !default; // highlight back
 
 // Event calendar sheet
 
+$calendar-sheet-width:              165px !default;
 $calendar-sheet-barcolor:           $main-theme !default;
 $calendar-sheet-bgcolor:            $grey-lighter !default;
 $calendar-sheet-border:             $grey-light !default;
 $calendar-sheet-border-radius:      $default-border-radius !default;
 $calendar-sheet-margin:             10% !default;
 $calendar-sheet-colors:             $bg-colors !default;
+$calendar-sheet-bar-height:         15px  !default;
 
 
 // Contacts
@@ -626,7 +641,7 @@ $accordion-margin:                  $default-margin-verysmall !default;
 $accordion-toggle-arrows:           true !default;
 $accordion-border-radius:           $default-border-radius !default;
 $accordion-colors:                  $tab-colors !default;
-
+$accordion-panel-shadow:            $panel-shadow !default;
 
 // Slider
 
@@ -635,6 +650,7 @@ $slider-caption-border-radius:      $default-border-radius !default;
 $slider-caption-padding:            $default-margin-verysmall 0 !default;
 $slider-text-shadow:                1px 1px 1px rgba(#333, .5) !default;
 $logo-slider-paddings:              (5, 10, 15, 20) !default;
+$slider-background-opacity:         0.75 !default;
 
 
 // Media
@@ -704,6 +720,9 @@ $map-text-color:                    $body-color !default;
 $map-text-size:                     1.4rem !default;
 $map-header-size:                   1.8rem !default;
 $map-label-color:                   $main-theme !default;
+$map-center-color:                  $main-theme !default;
+$map-cluster-color:                 $main-theme-hover !default;
+$map-hide-buttons-if-not-visible:   false !default;
 
 
 // Map colors (for marker groups)
@@ -842,6 +861,9 @@ $tooltip-border-radius:             $default-border-radius !default;
 
 // Link sequence
 $ls-margin-left:                    2.5rem !default;
+$ls-margin:                         $default-margin !default;
+$ls-margin-small:                   round($ls-margin * 50) * 0.01 !default;
+$ls-margin-verysmall:               round($ls-margin * 25) * 0.01 !default;
 
 
 // Animations
@@ -928,4 +950,3 @@ $list-tile-spacers:                 (0, 2, 5, 10, 15) !default;
 // Start of theme JSON with main colors
 $themeJSON: '"main-theme":"#{$main-theme}"';
 $themeJSON: append-json($themeJSON, "main-theme-hover", $main-theme-hover);
-$themeJSON: append-json($themeJSON, "sass-version", mercury-#{unique-id()});

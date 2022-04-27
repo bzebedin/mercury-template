@@ -15,7 +15,8 @@
     <Match>
       <Types>
         <ContainerType><![CDATA[element]]></ContainerType>
-        <ContainerType><![CDATA[section]]></ContainerType>
+        <ContainerType><![CDATA[content-section]]></ContainerType>
+        <ContainerType><![CDATA[iconbox]]></ContainerType>
       </Types>
     </Match>
     <AutoEnabled>false</AutoEnabled>
@@ -29,6 +30,12 @@
     </IncludeSettings>
     <Setting>
       <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper2.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper3.default]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[hsize.element.3]]></IncludeName>

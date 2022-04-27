@@ -61,7 +61,8 @@
 @if $nav-hyphens {
     .type-linksequence {
         hyphens: auto;
-        overflow-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 }
 
@@ -99,14 +100,14 @@
         li:not(:last-child) {
             &::after {
                 content: "|";
-                margin: 0 $default-margin-small;
+                margin: 0 $ls-margin-small;
             }
         }
     }
 
     &.no-icon {
         li:not(:last-child) {
-            margin-right: $default-margin;
+            margin-right: $ls-margin;
         }
     }
 
@@ -115,11 +116,11 @@
         li {
             &::before {
                 float: none;
-                padding-right: $default-margin-verysmall;
+                padding-right: $ls-margin-verysmall;
             }
             + li {
                 &::before {
-                    padding-left: $default-margin-small + $default-margin-verysmall;
+                    padding-left: $ls-margin-small + $ls-margin-verysmall;
                 }
             }
         }
@@ -142,4 +143,8 @@
             @extend %ls-icon-line;
         }
     }
+}
+
+.ls-icon + span {
+    margin-left: $ls-margin-verysmall;
 }

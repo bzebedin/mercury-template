@@ -23,6 +23,11 @@
 <%@ attribute name="css" type="java.lang.String" required="false"
     description="Optional CSS classes to attach to the heading tag." %>
 
+<%@ attribute name="tabindex" type="java.lang.Boolean" required="false"
+    description="Force adding 'tabindex=0' attribute to the generated markup
+    If not set, use default 'true' for h1, h2 and h3, 'false' for all other sizes.
+    If 'false' is set explicitly, supress genertion of tabindex attribute even for h1, h2 and h3." %>
+
 <%@ attribute name="attr" type="java.lang.String" required="false"
     description="Optional HTML attributes to attach to the heading tag." %>
 
@@ -38,6 +43,13 @@
     description="Enables advanced direct edit for the generated heading.
     Default is 'false' if not provided." %>
 
+<%@ attribute name="addId" type="java.lang.Boolean" required="false"
+    description="Adds an automatically generated ID attribute for the heading, for use in anchor links.
+    The ID attribute will be generated from the provided text, which will be translated according to the configured file name translation rules.
+    The result will also be all lower case.
+    This requires that the 'text' attribute is provided, if only 'markupText' is provided no ID can be generated.
+    Default is 'false' if not provided." %>
+
 <%@ attribute name="test" type="java.lang.Boolean" required="false"
     description="The heading markup will only be generated if this evaluates to 'true'." %>
 
@@ -51,6 +63,7 @@
 <c:if test="${(level > 0) and (level <= 7) and (empty test or test)}">
 
     <c:set var="escapeXml" value="${empty escapeXml ? true : escapeXml}" />
+    <c:set var="addTabindex" value="${empty tabindex ? ((level > 0) and (level <=3)) : tabindex}" />
 
     <c:if test="${(not empty markupText) or (not empty text)}">
         <c:choose>
@@ -63,6 +76,8 @@
         </c:choose>
 
         <c:if test="${not empty css}">${' '}class="${css}"</c:if>
+        <c:if test="${addId and not empty text}">${' id=\"'}<mercury:translate-name name="${text}" />${'\"'}</c:if>
+        <c:if test="${addTabindex}">${' '}tabindex="0"</c:if>
         <c:if test="${not empty attr}">${' '}${attr}</c:if>
         <c:if test="${ade and cms:isWrapper(text) }">${' '}${text.rdfaAttr}</c:if>
         ${'>'}

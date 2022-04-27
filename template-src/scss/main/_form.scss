@@ -508,6 +508,11 @@
         }
         .note-error {
             color: $form-error-text-color;
+            &::before {
+                @include awesome-icons();
+                content: "\f071";
+                margin-right: 10px;
+            }
         }
     }
 
@@ -682,6 +687,20 @@
     // no background color set
     &.no-bg {
         background-color: inherit;
+    }
+}
+
+
+// keyboard navigation outline
+
+html.keyboard-nav {
+    .styled-form {
+        .radio,
+        .checkbox {
+            input:focus + i {
+                @include focus-outline;
+            }
+        }
     }
 }
 

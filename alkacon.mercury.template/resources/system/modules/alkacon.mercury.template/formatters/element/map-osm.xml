@@ -5,10 +5,11 @@
     <NiceName><![CDATA[%(key.type.m-map.formatter.osm)]]></NiceName>
     <Type><![CDATA[m-map]]></Type>
     <Key><![CDATA[m/element/map-osm]]></Key>
+    <KeyAlias><![CDATA[m/contact/map-osm]]></KeyAlias>
     <Jsp>
       <link type="WEAK">
-        <target><![CDATA[/system/modules/alkacon.mercury.template/formatters/element/map-osm.jsp]]></target>
-        <uuid>5935f24a-a918-436b-8bd1-c7f440860da3</uuid>
+        <target><![CDATA[/system/modules/alkacon.mercury.template/formatters/element/map.jsp]]></target>
+        <uuid>cca8d42a-827a-11ec-90e1-0242ac11002b</uuid>
       </link>
     </Jsp>
     <Rank><![CDATA[2000]]></Rank>
@@ -21,15 +22,15 @@
     <AutoEnabled>false</AutoEnabled>
     <SearchContent>true</SearchContent>
     <StrictContainers>true</StrictContainers>
-    <AllowsSettingsInEditor>false</AllowsSettingsInEditor>
-    <HeadIncludeCss>
-      <CssLink>
+    <Plugin>
+      <Group><![CDATA[css]]></Group>
+      <Target>
         <link internal="true" type="WEAK">
           <target><![CDATA[/system/modules/alkacon.mercury.template/osmviewer/map.css]]></target>
           <uuid>bb1e189e-24ab-11e9-bcf4-0242ac11002b</uuid>
         </link>
-      </CssLink>
-    </HeadIncludeCss>
+      </Target>
+    </Plugin>
     <IncludeSettings>
       <link type="WEAK">
         <target><![CDATA[/system/modules/alkacon.mercury.template/configuration/shared-settings.xml]]></target>
@@ -37,7 +38,16 @@
       </link>
     </IncludeSettings>
     <Setting>
+      <IncludeName><![CDATA[mapProvider.osm]]></IncludeName>
+    </Setting>
+    <Setting>
       <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper2.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper3.default]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[hsize.element.2]]></IncludeName>
@@ -57,6 +67,9 @@
     </Setting>
     <Setting>
       <IncludeName><![CDATA[showGroupButtons.true]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[mapProvider.osm]]></IncludeName>
     </Setting>
   </NewFormatter>
 </NewFormatters>

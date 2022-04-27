@@ -20,11 +20,10 @@
 <fmt:setLocale value="${cms.locale}" />
 <cms:bundle basename="alkacon.mercury.template.messages">
 
-<c:set var="setting"                value="${cms.element.setting}" />
-<c:set var="cssWrapper"             value="${setting.cssWrapper}" />
+<mercury:setting-defaults>
+
 <c:set var="keyPieceLayout"         value="${setting.keyPieceLayout.toInteger}" />
 <c:set var="pieceLayout"            value="${setting.pieceLayout.toInteger}" />
-<c:set var="visualEffect"           value="${setting.effect.toString}" />
 <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
 <c:set var="imageRatio"             value="${setting.imageRatio}" />
 <c:set var="containerType"          value="${setting.containerType.useDefault('element').toString}" />
@@ -54,18 +53,19 @@
 <c:set var="showAuthor"             value="${author.isSet and setting.showAuthor.toBoolean}" />
 <c:set var="showDate"               value="${not empty date}" />
 <c:set var="showOverlay"            value="${keyPieceLayout == 50}" />
-<c:set var="keyPieceLayout"         value="${showOverlay ? 0 : keyPieceLayout}" />
 <c:set var="ade"                    value="${cms.isEditMode}" />
 
 <mercury:nl />
-<div class="detail-page type-article layout-${setting.keyPieceLayout.toInteger}${' '}${cssWrapper}"><%----%>
+<div class="detail-page type-article layout-${keyPieceLayout}${setCssWrapper123}"><%----%>
 <mercury:nl />
 
+<c:set var="keyPieceLayout"         value="${showOverlay ? 0 : keyPieceLayout}" />
+
 <mercury:piece
-    cssWrapper="detail-visual"
+    cssWrapper="detail-visual${setCssWrapperKeyPiece}"
     pieceLayout="${keyPieceLayout}"
     allowEmptyBodyColumn="${true}"
-    sizeDesktop="${keyPieceLayout > 1 ? 6 : 12}"
+    sizeDesktop="${(keyPieceLayout < 2 || keyPieceLayout == 10) ? 12 : 6}"
     sizeMobile="${12}">
 
     <jsp:attribute name="heading">
@@ -79,7 +79,7 @@
         <mercury:key-visual-piece
             image="${image}"
             showOverlay="${showOverlay}"
-            effect="${visualEffect}"
+            effect="${setEffect}"
             imageRatio="${imageRatio}"
             showImageSubtitle="${showImageSubtitle}"
             showImageZoom="${showImageZoom}"
@@ -121,6 +121,7 @@
     <div class="detail-content"><%----%>
         <c:forEach var="paragraph" items="${paragraphsContent}" varStatus="status">
             <mercury:section-piece
+                cssWrapper="${setCssWrapperParagraphs}"
                 pieceLayout="${pieceLayout}"
                 heading="${paragraph.value.Caption}"
                 image="${(status.first and not value.Image.value.Image.isSet) ? null : paragraph.value.Image}"
@@ -147,6 +148,8 @@
 <mercury:nl />
 
 </mercury:paragraph-split>
+
+</mercury:setting-defaults>
 
 </cms:bundle>
 </cms:formatter>

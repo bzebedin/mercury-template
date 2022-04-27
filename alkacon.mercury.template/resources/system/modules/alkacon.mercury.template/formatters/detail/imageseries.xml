@@ -11,7 +11,7 @@
         <uuid>89904c3a-7fe2-4ac0-a553-1723c00a45e8</uuid>
       </link>
     </Jsp>
-    <Rank><![CDATA[3000]]></Rank>
+    <Rank><![CDATA[45000]]></Rank>
     <Match>
       <Types>
         <ContainerType><![CDATA[imageseries]]></ContainerType>
@@ -30,6 +30,18 @@
     </IncludeSettings>
     <Setting>
       <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper2.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper3.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapperKeyPiece.detail]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapperParagraphs.detail]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[imageSeriesCss.default]]></IncludeName>
@@ -65,7 +77,10 @@
       <IncludeName><![CDATA[showImageSubtitle.true]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[showImageCopyright.default]]></IncludeName>
+      <IncludeName><![CDATA[showImageSeriesZoomCopyright.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[showImageSeriesListCopyright.default]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[autoLoad.false]]></IncludeName>

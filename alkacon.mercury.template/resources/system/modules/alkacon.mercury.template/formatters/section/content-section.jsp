@@ -13,10 +13,8 @@
 <mercury:init-messages>
 <cms:formatter var="content" val="value">
 
-<c:set var="setting"            value="${cms.element.setting}" />
-<c:set var="cssWrapper"         value="${setting.cssWrapper.isSet ? ' '.concat(setting.cssWrapper.toString) : null}" />
-<c:set var="effect"             value="${setting.effect.isSetNotNone ? ' '.concat(setting.effect.toString) : null}" />
-<c:set var="cssVisibility"      value="${setting.cssVisibility.toString ne 'always' ? ' '.concat(setting.cssVisibility.toString) : null}" />
+<mercury:setting-defaults>
+
 <c:set var="pieceLayout"        value="${setting.pieceLayout.toInteger}" />
 <c:set var="sizeDesktop"        value="${setting.visualOption.toInteger}" />
 <c:set var="sizeMobile"         value="${setting.sizeMobile.isSetNotNone ? setting.sizeMobile.toInteger : null}" />
@@ -32,12 +30,15 @@
 <c:set var="headingOption"      value="${setting.headingOption.toString}" />
 <c:set var="textOption"         value="${setting.textOption.toString}" />
 
+<c:set var="addHeadingId"       value="${cms.sitemapConfig.attribute['template.section.add.heading.id'].toBoolean}" />
+
 <mercury:section-piece
-    cssWrapper="element type-section${cssWrapper}${effect}${cssVisibility}"
+    cssWrapper="element type-section${setCssWrapperAll}"
     pieceLayout="${pieceLayout < 11 ? pieceLayout : 4}"
     sizeDesktop="${sizeDesktop}"
     sizeMobile="${sizeMobile}"
     heading="${value.Title}"
+    addHeadingId="${addHeadingId}"
     image="${value.Image}"
     text="${value.Text}"
     link="${value.Link}"
@@ -53,6 +54,8 @@
     ade="${cms.isEditMode}"
     emptyWarning="${true}"
 />
+
+</mercury:setting-defaults>
 
 </cms:formatter>
 </mercury:init-messages>

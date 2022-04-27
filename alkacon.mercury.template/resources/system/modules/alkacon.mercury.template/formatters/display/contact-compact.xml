@@ -17,7 +17,7 @@
         <ContainerType><![CDATA[contact]]></ContainerType>
       </Types>
     </Match>
-    <Display><![CDATA[teaser-compact]]></Display>
+    <Display><![CDATA[teaser-compact contact-teaser]]></Display>
     <AutoEnabled>false</AutoEnabled>
     <SearchContent>true</SearchContent>
     <StrictContainers>true</StrictContainers>
@@ -37,13 +37,13 @@
       <IncludeName><![CDATA[hsize.listTeaser]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[linkOption.contact.listTeaser]]></IncludeName>
+      <IncludeName><![CDATA[linkTarget.contact]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[imageRatio.default]]></IncludeName>
+      <IncludeName><![CDATA[linkOption.listTeaser]]></IncludeName>
     </Setting>
     <Setting>
-      <IncludeName><![CDATA[effect.default]]></IncludeName>
+      <IncludeName><![CDATA[buttonText.contact]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[labels.contact]]></IncludeName>
@@ -59,6 +59,9 @@
     </Setting>
     <Setting>
       <IncludeName><![CDATA[showOrganization.contact]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[showAddInfo.contact]]></IncludeName>
     </Setting>
     <Setting>
       <IncludeName><![CDATA[showDescription.contact]]></IncludeName>

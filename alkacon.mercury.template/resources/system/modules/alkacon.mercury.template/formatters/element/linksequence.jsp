@@ -16,9 +16,9 @@
 <fmt:setLocale value="${cms.locale}" />
 <cms:bundle basename="alkacon.mercury.template.messages">
 
-<c:set var="setting"                value="${cms.element.setting}" />
-<c:set var="cssWrapper"             value="${setting.cssWrapper.toString}" />
-<c:set var="addCssWrapper"          value="${setting.addCssWrapper.isSetNotNone ? setting.addCssWrapper.toString : null}" />
+<mercury:setting-defaults>
+
+<c:set var="addCssWrapper"          value="${setting.addCssWrapper.isSetNotNone ? ' '.concat(setting.addCssWrapper.toString) : null}" />
 <c:set var="hsize"                  value="${setting.hsize.toInteger}" />
 <c:set var="iconClass"              value="${setting.iconClass.useDefault('caret-right').toString}" />
 <c:set var="linksequenceType"       value="${setting.linksequenceType.toString}" />
@@ -57,7 +57,7 @@
 </c:choose>
 
 <mercury:nl />
-<div class="element type-linksequence ${linksequenceType}${' '}${listBulletStyle}${' '}${cssWrapper}${' '}${addCssWrapper}"><%----%>
+<div class="element type-linksequence pivot ${linksequenceType}${' '}${listBulletStyle}${addCssWrapper}${setCssWrapperAll}"><%----%>
 <mercury:nl />
 
     <mercury:heading level="${hsize}" text="${value.Title}" css="heading" ade="${ade}" />
@@ -70,14 +70,8 @@
         <c:when test="${not emptyLinkSequence}">
             <ul ${ulWrapper}><%----%>
                 <c:forEach var="link" items="${content.valueList.LinkEntry}" varStatus="status">
-                    <c:set var="linkText" value="${link.value.Text}" />
-                    <c:if test="${fn:startsWith(linkText, 'icon:')}">
-                        <c:set var="linkText"><span class="fa fa-${fn:substringAfter(linkText, 'icon:')}"></span></c:set>
-                    </c:if>
                     <li ${liWrapper}><%----%>
-                        <mercury:link link="${link}" css="${aWrapper}">
-                            <span class="ls-item">${linkText}</span><%----%>
-                        </mercury:link>
+                        <mercury:link-icon link="${link}" css="${aWrapper}" addSpan="ls-item" />
                     </li><%----%>
                 </c:forEach>
             </ul><%----%>
@@ -89,6 +83,8 @@
 
 </div><%----%>
 <mercury:nl />
+
+</mercury:setting-defaults>
 
 </cms:bundle>
 </cms:formatter>

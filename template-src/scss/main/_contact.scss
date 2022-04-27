@@ -22,7 +22,8 @@
 .type-contact {
 
     @if $use-hyphens {
-        overflow-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: break-word;
         hyphens: auto;
     }
 
@@ -90,10 +91,25 @@
 
     .tablerow {
         display: table-row;
+        hyphens: none;
+        overflow-wrap: normal;
+        word-break: normal;
 
         > span {
             padding-right: $default-margin-verysmall;
             display: table-cell;
+
+            &.icon-label {
+                white-space: nowrap;
+            }
+        }
+
+        &.website,
+        &.mail {
+            a {
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
         }
     }
 

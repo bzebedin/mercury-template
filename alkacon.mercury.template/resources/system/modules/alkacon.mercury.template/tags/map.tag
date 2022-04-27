@@ -35,6 +35,9 @@
     description="If set, the map is generated as sub element of another element, e.g. from a POI.
     In this case the a surrounding div is added required for JS map initialization." %>
 
+<%@ attribute name="disableEditModePlaceholder" type="java.lang.Boolean" required="false"
+    description="If set, disables the map placeholder in edit mode." %>
+
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -74,6 +77,7 @@
 <c:set var="ratio" value="${empty ratio ? '16-9' : ratio}" />
 <c:set var="showRoute" value="${showRoute and not isOsm}" />
 <c:set var="type" value="${isOsm ? null : type}" />
+<c:set var="disableEditModePlaceholder" value="${disableEditModePlaceholder eq true ? true : false}" />
 
 <%-- Set zoom level --%>
 <c:choose>
@@ -168,7 +172,7 @@ ${'<'}div class="${subelementWrapper} type-map map-${provider}"${'>'}
     ${'<'}div id="${id}" class="mapwindow placeholder${noApiKey ? ' error' : ''}" <%--
     --%>data-map='${mapData.compact}'<%--
     --%><mercury:data-external-cookies message="${cookieMessage}" test="${not noApiKey}" /><%--
-    --%><c:if test="${cms.isEditMode}">
+    --%><c:if test="${cms.isEditMode and not disableEditModePlaceholder}">
             <fmt:setLocale value="${cms.workplaceLocale}" />
             <cms:bundle basename="alkacon.mercury.template.messages">
                 <c:choose>

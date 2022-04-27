@@ -31,6 +31,12 @@
     }
 }
 
+.element > .subelement:last-child {
+    // do not add a margin bottom in a subelement that is the last child in an element
+    // because here the margins would add up in case display:flex is used
+    margin-bottom: 0;
+}
+
 // Hyphenation for generic element headings
 .element:not(.piece) {
     // piece already has handling for hyphens
@@ -47,7 +53,7 @@
     }
     &.only-text,
     &.phb:not(.phl) {
-        // if a text-only piece element fowllows a text-only pieve element, reduce top margin
+        // if a text-only piece element fowllows a text-only piece element, reduce top margin
         // goal: make text from 2nd element apperar as if it belongs to first element
         + .element.piece.type-section:not(.box) {
             &.only-text {

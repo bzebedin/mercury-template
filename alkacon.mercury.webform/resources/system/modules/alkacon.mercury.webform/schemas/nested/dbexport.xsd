@@ -1,0 +1,57 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="opencms://opencms-xmlcontent.xsd"/>
+    <xsd:include schemaLocation="opencms://system/modules/alkacon.mercury.webform/schemas/nested/dbexport-config.xsd"/>
+    <xsd:include schemaLocation="opencms://system/modules/alkacon.mercury.webform/schemas/nested/dbexport-add.xsd"/>
+    <xsd:include schemaLocation="opencms://system/modules/alkacon.mercury.webform/schemas/nested/dbexport-ignore.xsd"/>
+    <xsd:include schemaLocation="opencms://system/modules/alkacon.mercury.webform/schemas/nested/dbexport-rename.xsd"/>
+
+    <xsd:element name="WebFormDatabaseExportData" type="OpenCmsWebFormDatabaseExportData"/>
+
+    <xsd:complexType name="OpenCmsWebFormDatabaseExportData">
+        <xsd:sequence>
+            <xsd:element name="WebFormDatabaseExport" type="OpenCmsWebFormDatabaseExport" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="OpenCmsWebFormDatabaseExport">
+        <xsd:sequence>
+            <xsd:element name="ConfigField" type="OpenCmsWebFormDatabaseExportConfig"/>
+            <xsd:element name="AddField" type="OpenCmsWebFormDatabaseExportAdd" minOccurs="0"/>
+            <xsd:element name="IgnoreField" type="OpenCmsWebFormDatabaseExportIgnore" minOccurs="0"/>
+            <xsd:element name="RenameField" type="OpenCmsWebFormDatabaseExportRename" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="language" type="OpenCmsLocale" use="optional"/>
+    </xsd:complexType>
+
+    <xsd:annotation>
+        <xsd:appinfo>
+            <resourcebundle name="alkacon.mercury.webform.messages"/>
+            <FieldSettings>
+                <Setting>
+                    <PropertyName>ConfigField</PropertyName>
+                    <DisplayName><![CDATA[%(key.msg.label.form.WebFormDatabaseExport.ConfigField)]]></DisplayName>
+                    <Visibility><![CDATA[ROLE.ADMINISTRATOR]]></Visibility>
+                </Setting>
+                <Setting>
+                    <PropertyName>AddField</PropertyName>
+                    <DisplayName><![CDATA[%(key.msg.label.form.WebFormDatabaseExport.AddField)]]></DisplayName>
+                    <Visibility><![CDATA[ROLE.ADMINISTRATOR]]></Visibility>
+                </Setting>
+                <Setting>
+                    <PropertyName>IgnoreField</PropertyName>
+                    <DisplayName><![CDATA[%(key.msg.label.form.WebFormDatabaseExport.IgnoreField)]]></DisplayName>
+                    <Description><![CDATA[%(key.msg.label.form.WebFormDatabaseExport.IgnoreField.help)]]></Description>
+                    <Visibility><![CDATA[ROLE.ADMINISTRATOR]]></Visibility>
+                </Setting>
+                <Setting>
+                    <PropertyName>RenameField</PropertyName>
+                    <DisplayName><![CDATA[%(key.msg.label.form.WebFormDatabaseExport.RenameField)]]></DisplayName>
+                    <Description><![CDATA[%(key.msg.label.form.WebFormDatabaseExport.RenameField.help)]]></Description>
+                    <Visibility><![CDATA[ROLE.ADMINISTRATOR]]></Visibility>
+                </Setting>
+            </FieldSettings>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+</xsd:schema>

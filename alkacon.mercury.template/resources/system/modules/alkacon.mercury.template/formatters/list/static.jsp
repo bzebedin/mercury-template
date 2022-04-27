@@ -33,7 +33,7 @@
 
     <c:if test="${isCompatible}">
 
-        <mercury:heading level="${wrappedSettings.listHsize.toInteger}" text="${value.Title}" css="heading" />
+        <mercury:heading level="${wrappedSettings.listHsize.toInteger}" text="${value.Title}" css="heading pivot" />
 
         <c:set var="listWrapper" value="${settings.listWrapper}${' '}${settings.requiredListWrapper}" />
         <c:set var="listTag" value="${wrappedSettings.listTag.isSet ? wrappedSettings.listTag : 'ul' }" />
@@ -58,9 +58,9 @@
 
             <%-- ####### Boxes to create new entries in case of empty result ######## --%>
             <c:if test="${cms.isEditMode and (search.numFound == 0)}">
-                <c:forEach var="type" items="${content.valueList.TypesToCollect}">
-                    <c:set var="createType">${fn:substringBefore(type.stringValue, ':')}</c:set>
-                    <mercury:list-messages type="${createType}" defaultCats="${content.value.Category}" />
+                <mercury:list-types types="${content.valueList.TypesToCollect}" var="types" uploadFolder="${cms.getBinaryUploadFolder(content)}" />
+                <c:forEach var="createType" items="${types}">
+                    <mercury:list-messages type="${createType}" defaultCats="${content.value.Category}"  uploadFolder="${cms.getBinaryUploadFolder(content)}"/>
                 </c:forEach>
             </c:if>
 
