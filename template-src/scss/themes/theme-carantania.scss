@@ -1,0 +1,158 @@
+/**
+ * This program is part of the OpenCms Mercury Template.
+ *
+ * Copyright (c) Alkacon Software GmbH & Co. KG (http://www.alkacon.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**********
+ * Theme file: theme-carantania.scss
+ */
+$carantania-dark-blue: #03018C;
+$carantania-footer-blue: #2175ad;
+$carantania-light-blue: #9EC2FF;
+$carantania-middle-blue: #82A8FF;
+$carantania-text-blue: #1A5784;
+$carantania-bg-blue: rgb(214, 224, 255);
+
+$carantania-grey-dark: #999999;
+$carantania-grey-darker: #333333;
+
+$grey:                          #a8adb4 !default;
+$grey-lighter:                  #eeeef0 !default;
+$grey-light:                    #dddddf !default;
+$grey-dark:                     darken($grey, 15%) !default;
+$grey-darker:                   darken($grey, 30%) !default;
+
+$carantania-footer-grey: darken($grey, 30%) !default;
+
+
+// Main theme colors
+$body-bg:                       $grey-lighter !default;
+$main-theme:                    $carantania-dark-blue;
+$main-theme-hover:              $carantania-light-blue;
+
+$default-border-radius:         3px;
+$btn-border-radius:             2px;
+
+$focus-outline-color:           rgba(77,144,255,.5);
+
+$font-family-headings:          "Open Sans";
+$font-family-base:              "Montserrat";
+
+$font-weight-base:              300 !default;
+$font-weight-bold:              600 !default;
+$font-weight-headings:          $font-weight-bold !default;
+$font-size-base:                1.6rem !default;
+$font-size-headings:            2.2rem !default;
+$font-style-headings:           normal !default;
+
+$line-height-base:              1.4 !default;
+$line-height-headings:          1.25 !default;
+$text-dark:                     $carantania-dark-blue !default;
+$headings-color:                $carantania-dark-blue !default;
+$headings-margin-bottom:        1.5rem !default;
+
+$white:                         #fff !default;
+$foot-top-bg-color:             $carantania-dark-blue !default;
+$foot-sub-bg-color:             $grey-lighter !default;
+$foot-main-bg-color:            $main-theme !default;
+
+$nav-head-bg:                   $white !default; // color of the header background container
+$nav-text:                      $carantania-text-blue !default;
+$nav-header-text-active: rgba(3, 1, 140, 0.9) !default; // the "active page in navigation" text color
+$nav-header-text-hover: rgba(3, 1, 140, 0.75) !default; // the hover text color for the header nav items
+
+$nav-header-font-family:        $font-family-headings !default;
+$nav-breadcrumb-padding:        5px 0 !default;
+$nav-menu-font-weight:          300 !default;
+$nav-menu-entry-border-bottom:  none !default;
+$nav-menu-border:               solid 1px $main-theme;
+$nav-side-border-radius:        0 !default;
+$nav-side-font-weight:          400 !default;
+$fh-ac-bg-color:                $main-theme !default;
+
+$social-links-bg:               $grey-light !default;
+$social-links-color:            $text-dark !default;
+$social-links-size:             1.5rem !default;
+
+$btn-default:                   $grey-light !default;
+$btn-default-hover:             $main-theme !default;
+
+
+$blue:                          #144382 !default;
+$blue-light:                    #2197db !default;
+$blue-dark:                     darken($blue, 10%) !default;
+
+$red:                           #b31b34 !default;
+$red-light:                     #ff264a !default;
+$red-dark:                      darken($red, 9%) !default;
+
+$orange:                        #ffa826 !default;
+$orange-light:                  adjust-hue($orange, 10deg) !default;
+
+$cyan:                          #1bb39a !default;
+$yellow:                        #ffd900 !default;
+$green:                         #00af33 !default;
+
+$blue-cyan:                     mix($blue, $cyan) !default;
+$violet:                        mix($blue, $red) !default;
+$brown:                         mix($blue, $orange) !default;
+$red-orange:                    mix($red, $orange) !default;
+$red-cyan:                      mix($red, $cyan) !default;
+
+// Large array of colors to be used in backgrounds
+
+$bg-colors:
+(
+// name            // bg-color      // highlight-color
+(grey-darker,      $grey-darker,   $main-theme),
+(grey-dark,        $grey-dark,     $main-theme),
+(grey,             $grey,          $main-theme),
+(grey-light,       $grey-light,    $main-theme),
+(grey-lighter,     $grey-lighter,  $main-theme),
+(violet,           $violet,        $red),
+(green,            $green,         $orange),
+(yellow,           $yellow,        $red-orange),
+(cyan,             $cyan,          $blue-cyan),
+(blue-dark,        $blue-dark,     $blue-light),
+(blue,             $blue,          $blue-light),
+(blue-light,       $blue-light,    $blue),
+(orange-dark,      $red-orange,    $orange),
+(orange,           $orange,        $orange-light),
+(red-dark,         $red-dark,      $red-light),
+(red,              $red,           $red-light),
+(white,            $white,         $main-theme),
+(default,          $main-theme,    $main-theme-hover),
+(c-dark-blue,      $carantania-dark-blue, $main-theme-hover),
+(c-light-blue,     $carantania-light-blue, $main-theme),
+(c-middle-blue,    $carantania-middle-blue, $main-theme),
+(c-bg-blue,        $carantania-bg-blue, $main-theme)
+) !default;
+
+
+// Import the other files
+@import './demo-defaults';
+
+$teaser-btn-color:              $grey-light;
+
+$nav-header-show-arrows:        true;
+$nav-mobile-show-box:           true;
+$nav-mobile-position:           right;
+$nav-mobile-side-content-move:  true;
+
+$nav-header-ver-padding:        5px !default;
+
+@import '../imports';

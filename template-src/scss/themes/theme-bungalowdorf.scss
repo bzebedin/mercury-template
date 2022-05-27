@@ -18,16 +18,31 @@
  */
 
 /**********
- * Theme file: theme-red.scss
+ * Theme file: theme-carantania.scss
  */
-$k30-dark-green:                #222D16;
-$k30-light-green:               #8EA16D;
+$carantania-dark-blue: #03018C;
+$carantania-footer-blue: #2175ad;
+$carantania-light-blue: #9EC2FF;
+$carantania-middle-blue: #82A8FF;
+$carantania-text-blue: #1A5784;
+$carantania-bg-blue: rgb(214, 224, 255);
+
+$carantania-grey-dark: #999999;
+$carantania-grey-darker: #333333;
+
+$grey:                          #a8adb4 !default;
+$grey-lighter:                  #eeeef0 !default;
+$grey-light:                    #dddddf !default;
+$grey-dark:                     darken($grey, 15%) !default;
+$grey-darker:                   darken($grey, 30%) !default;
+
+$carantania-footer-grey: darken($grey, 30%) !default;
 
 
 // Main theme colors
-$body-bg:                       $k30-light-green !default;
-$main-theme:                    $k30-dark-green;
-$main-theme-hover:              $k30-light-green;
+$body-bg:                       $carantania-bg-blue !default;
+$main-theme:                    $carantania-dark-blue;
+$main-theme-hover:              $carantania-light-blue;
 
 $default-border-radius:         3px;
 $btn-border-radius:             2px;
@@ -46,13 +61,19 @@ $font-style-headings:           normal !default;
 
 $line-height-base:              1.4 !default;
 $line-height-headings:          1.25 !default;
-$text-dark:                     #555 !default;
-$headings-color:                #222 !default;
+$text-dark:                     $carantania-grey-darker !default;
+$headings-color:                $carantania-grey-darker !default;
 $headings-margin-bottom:        1.5rem !default;
 
-$nav-head-bg:                   $k30-dark-green !default; // color of the header background container
-$nav-header-text-active:        rgba(255,255,255,.90) !default; // the "active page in navigation" text color
-$nav-header-text-hover:         rgba(255,255,255,.75) !default; // the hover text color for the header nav items
+$white:                         #fff !default;
+$foot-top-bg-color:             $grey-darker !default;
+$foot-sub-bg-color:             $grey-lighter !default;
+$foot-main-bg-color:            $main-theme !default;
+
+$nav-head-bg:                   $white !default; // color of the header background container
+$nav-text:                      $carantania-text-blue !default;
+$nav-header-text-active: rgba(3, 1, 140, 0.9) !default; // the "active page in navigation" text color
+$nav-header-text-hover: rgba(3, 1, 140, 0.75) !default; // the hover text color for the header nav items
 
 $nav-header-font-family:        $font-family-headings !default;
 $nav-breadcrumb-padding:        5px 0 !default;
@@ -62,13 +83,6 @@ $nav-menu-border:               solid 1px $main-theme;
 $nav-side-border-radius:        0 !default;
 $nav-side-font-weight:          400 !default;
 $fh-ac-bg-color:                $main-theme !default;
-
-$white:                         #fff !default;
-$grey-light:                    #ddd !default;
-$grey-lighter:                  #f7f7f7 !default;
-$foot-top-bg-color:             $k30-dark-green !default;
-$foot-sub-bg-color:             $grey-lighter !default;
-$foot-main-bg-color:            $main-theme !default;
 
 $social-links-bg:               $grey-light !default;
 $social-links-color:            $text-dark !default;
