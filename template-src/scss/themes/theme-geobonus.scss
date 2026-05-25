@@ -1,0 +1,111 @@
+/**
+ * This program is part of the OpenCms Mercury Template.
+ *
+ * Copyright (c) Alkacon Software GmbH & Co. KG (http://www.alkacon.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**********
+ * Theme file: theme-geobonus.scss
+ *
+ * GeoBonus brand theme — based on the homepage concept
+ * (see geobonus konzept/geobonus_homepage_konzept.pdf).
+ * Visual style: flat, data-first, no shadows, teal primary,
+ * coral accents, color-coded Bundesländer.
+ */
+
+// --- Main theme colors ------------------------------------------------------
+
+$main-theme:                    #1D9E75 !default; // Teal Primary
+$main-theme-hover:              #17835F !default; // darker teal, accessible on white
+$main-theme-additional:         #D85A30 !default; // Coral accent
+
+$default-border-radius:         8px !default;
+$btn-border-radius:             6px !default;
+
+$focus-outline-color:           rgba(29, 158, 117, 0.5) !default;
+
+// --- Typography -------------------------------------------------------------
+// Concept §8: System-Sans (Inter / Helvetica), 400 body, 500 headings.
+// Mercury resolves font-family via get-font-family() against $fonts-preloaded,
+// so the value must be a *single* registered font name. "DM Sans" is shipped
+// by Mercury, geometric-humanist, near-identical metrics to Inter, and gives
+// us the 400/500/600 weights the concept needs.
+//
+// To use real Inter, add it via $fonts-preloaded-custom in a project-level
+// SCSS that is imported before _font-definitions.scss, e.g.:
+//   $fonts-preloaded-custom: (
+//       "Inter": (join("Inter", $font-family-sans-serif),
+//                 (300: (normal), 400: (normal), 500: (normal), 600: (normal), 700: (normal)))
+//   );
+
+$font-family-headings:          "DM Sans" !default;
+$font-family-base:              "DM Sans" !default;
+
+$font-weight-base:              400 !default;
+$font-weight-bold:              600 !default;
+$font-weight-headings:          500 !default;
+
+$font-size-base:                1.6rem !default;   // ~16px body
+$font-size-headings:            2.2rem !default;   // ~22px H1
+$font-style-headings:           normal !default;
+
+$line-height-base:              1.65 !default;     // concept: 1.6–1.7
+$headings-line-height:          1.25 !default;
+$touch-targets-min-line-height: 24px !default;
+
+$text-dark:                     #1A1A19 !default;  // Ink
+$headings-color:                #1A1A19 !default;
+$headings-margin-bottom:        1.5rem !default;
+
+// --- Navigation -------------------------------------------------------------
+
+$nav-header-font-family:        $font-family-headings !default;
+$nav-breadcrumb-padding:        8px 0 !default;
+$nav-menu-font-weight:          500 !default;
+$nav-menu-entry-border-bottom:  none !default;
+$nav-menu-border:               solid 1px $main-theme !default;
+$nav-side-border-radius:        6px !default;
+$nav-side-font-weight:          500 !default;
+$fh-ac-bg-color:                $main-theme !default;
+
+$nav-header-show-arrows:        true !default;
+$nav-mobile-show-box:           true !default;
+$nav-mobile-position:           right !default;
+$nav-mobile-side-content-move:  true !default;
+
+$nav-header-ver-padding:        8px !default;
+
+// --- Footer + surfaces ------------------------------------------------------
+
+$white:                         #fff !default;
+$grey-light:                    #C8C7C2 !default;
+$grey-lighter:                  #ECECE8 !default;
+$foot-sub-bg-color:             $grey-lighter !default;
+$foot-main-bg-color:            #1A1A19 !default;
+
+// --- Social + buttons -------------------------------------------------------
+
+$social-links-bg:               $grey-light !default;
+$social-links-color:            $text-dark !default;
+$social-links-size:             1.5rem !default;
+
+$btn-bg:                        $main-theme !default;        // CTA filled in Teal Primary
+$btn-hover-bg:                  $main-theme-hover !default;
+
+// --- Pull in palette, helpers and Mercury base ------------------------------
+
+@import './geobonus-defaults';
+@import '../imports';

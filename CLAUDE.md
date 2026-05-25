@@ -53,6 +53,26 @@ Vite mode reads env vars (or `./vite.env.js`): `OPENCMS_SERVER` and `OPENCMS_VIT
 
 Build uses the `org.opencms:opencms-gradle-plugin:3.+`. JARs sitting in any `lib*/` folder (e.g. `alkacon.mercury.template/lib/{cssparser,sac}.jar`) are added to module deps automatically. `gradle.properties` pins `opencms_version=master`.
 
+## OpenCms WebDAV access
+
+The development OpenCms instance is reachable per WebDAV — useful for one-off deploys of built theme assets (`build/npm/3_minified/theme-*.css`, `build/npm/js/mercury.js`) when `OCMOUNT` is not configured, or for inspecting/patching VFS resources directly.
+
+- **Base URL:** `http://workplace.mapexplorer.com:8180/webdav`
+- **User:** `claude`
+- **Password:** lives in `~/IdeaProjects/olmap/opencms/.env.local` (also referenced from `audio-map-app/.env.local`) — never commit it.
+- **Deploy targets for this repo:**
+  - CSS → `/webdav/system/modules/alkacon.mercury.theme/css/theme-<name>.min.css`
+  - JS  → `/webdav/system/modules/alkacon.mercury.theme/js/mercury.js`
+
+Ready-made conflict-aware helper scripts live in `~/IdeaProjects/olmap/opencms/`:
+
+- `pull.sh <vfs-path>` — fetches a VFS file, stores ETag/mtime in `.cms-meta/`
+- `push.sh <vfs-path>` — LOCK + PUT + UNLOCK with ETag conflict check against the last pulled state
+- `diff.sh <vfs-path>` — local vs. remote diff
+- `ls.sh <vfs-path>` — PROPFIND listing
+
+Use these instead of raw `curl` so the resource is properly locked during upload and a conflict against a remotely-edited file is detected.
+
 ## Architecture notes
 
 - **Two parallel build systems.** Gradle handles Java compilation, JUnit, and OpenCms module packaging. npm/Vite/Webpack handle the static frontend assets that live in `alkacon.mercury.theme`. They do not invoke each other — running `bindist` does not rebuild CSS/JS, and `npm run dist` does not touch Java. Rebuild whichever side you changed.

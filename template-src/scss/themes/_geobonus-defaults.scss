@@ -1,0 +1,268 @@
+// This program is part of the OpenCms Mercury Template.
+//
+// Copyright (c) Alkacon Software GmbH & Co. KG (http://www.alkacon.com)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// =========================================================================
+// GeoBonus — design system defaults
+// Reference: geobonus konzept/geobonus_homepage_konzept.pdf, section 8.
+// =========================================================================
+
+// --- Brand primary palette --------------------------------------------------
+
+$gb-teal:                       #1D9E75 !default; // Teal Primary
+$gb-teal-hover:                 #17835F !default; // darker teal for hover
+$gb-teal-light:                 #E1F5EE !default; // background tint (= Tirol)
+$gb-teal-dark:                  #085041 !default; // foreground on light teal
+
+$gb-blue:                       #185FA5 !default;
+$gb-coral:                      #D85A30 !default;
+$gb-purple:                     #534AB7 !default;
+$gb-amber:                      #BA7517 !default;
+$gb-ink:                        #1A1A19 !default;
+$gb-gray:                       #5F5E5A !default;
+
+// --- Bundesland color families (BG / Text) ----------------------------------
+
+$gb-bl-wien-bg:                 #FBEAF0 !default;
+$gb-bl-wien-fg:                 #72243E !default;
+
+$gb-bl-noe-bg:                  #E6F1FB !default;
+$gb-bl-noe-fg:                  #0C447C !default;
+
+$gb-bl-ooe-bg:                  #EAF3DE !default;
+$gb-bl-ooe-fg:                  #27500A !default;
+
+$gb-bl-sbg-bg:                  #FAEEDA !default;
+$gb-bl-sbg-fg:                  #633806 !default;
+
+$gb-bl-tir-bg:                  #E1F5EE !default;
+$gb-bl-tir-fg:                  #085041 !default;
+
+$gb-bl-vbg-bg:                  #EEEDFE !default;
+$gb-bl-vbg-fg:                  #3C3489 !default;
+
+$gb-bl-stmk-bg:                 #FAECE7 !default;
+$gb-bl-stmk-fg:                 #712B13 !default;
+
+$gb-bl-ktn-bg:                  #FCEBEB !default;
+$gb-bl-ktn-fg:                  #791F1F !default;
+
+$gb-bl-bgld-bg:                 #F1EFE8 !default;
+$gb-bl-bgld-fg:                 #444441 !default;
+
+// --- Basic colors -----------------------------------------------------------
+
+$white:                         #fff !default;
+$black:                         #000 !default;
+
+$text-light:                    $white !default;
+$text-dark:                     $gb-ink !default;
+
+$grey-darker:                   #2E2E2C !default;
+$grey-dark:                     #4A4945 !default;
+$grey:                          $gb-gray !default;
+$grey-light:                    #C8C7C2 !default;
+$grey-lighter:                  #ECECE8 !default;
+$grey-lightest:                 #F6F6F3 !default;
+
+// Reuse standard semantic color names (used across many Mercury partials).
+$blue:                          $gb-blue !default;
+$blue-light:                    lighten($gb-blue, 18%) !default;
+$blue-lighter:                  lighten($gb-blue, 42%) !default;
+$blue-dark:                     darken($gb-blue, 10%) !default;
+$blue-darker:                   darken($gb-blue, 18%) !default;
+
+$red:                           $gb-coral !default;
+$red-light:                     lighten($gb-coral, 10%) !default;
+$red-lighter:                   lighten($gb-coral, 30%) !default;
+$red-dark:                      darken($gb-coral, 8%) !default;
+$red-darker:                    darken($gb-coral, 16%) !default;
+
+$orange:                        $gb-amber !default;
+$orange-light:                  lighten($gb-amber, 10%) !default;
+$orange-lighter:                lighten($gb-amber, 25%) !default;
+$orange-dark:                   darken($gb-amber, 8%) !default;
+$orange-darker:                 darken($gb-amber, 16%) !default;
+
+$cyan:                          $gb-teal !default;
+$yellow:                        #E6B800 !default;
+$green:                         $gb-teal !default;
+$green-light:                   lighten($gb-teal, 18%) !default;
+
+$violet:                        $gb-purple !default;
+$brown:                         mix($gb-blue, $gb-amber) !default;
+$blue-cyan:                     mix($gb-blue, $gb-teal) !default;
+$red-orange:                    mix($gb-coral, $gb-amber) !default;
+$red-cyan:                      mix($gb-coral, $gb-teal) !default;
+
+// --- Nav colors -------------------------------------------------------------
+
+$nav-text:                      $gb-ink !default;
+$nav-breadcrumb-bg:             $grey-lightest !default;
+
+// --- Footer colors ----------------------------------------------------------
+
+$foot-top-bg-color:             $gb-ink !default;
+$foot-top-text-color:           $grey-lighter !default;
+$foot-top-header-color:         $white !default;
+$foot-top-link-color:           $white !default;
+$foot-top-link-hover-color:     $gb-teal !default;
+
+$foot-sub-bg-color:             $grey-lightest !default;
+$foot-sub-text-color:           $gb-gray !default;
+$foot-sub-link-color:           $gb-ink !default;
+$foot-sub-link-hover-color:     $gb-teal-hover !default;
+$foot-main-bg-color:            $gb-ink !default;
+
+// --- Theme color palette (for background helpers, badges, pins) -------------
+
+$theme-colors:
+(
+    (grey-darker,       $grey-darker),
+    (grey-dark,         $grey-dark),
+    (grey,              $grey),
+    (grey-light,        $grey-light),
+    (grey-lighter,      $grey-lighter),
+    (ink,               $gb-ink),
+    (teal,              $gb-teal),
+    (teal-light,        $gb-teal-light),
+    (teal-dark,         $gb-teal-dark),
+    (blue,              $gb-blue),
+    (coral,             $gb-coral),
+    (purple,            $gb-purple),
+    (amber,             $gb-amber),
+    (yellow,            $yellow),
+    (green,             $green),
+    (cyan,              $cyan),
+    (orange,            $orange),
+    (red,               $red),
+    (violet,            $violet),
+    (white,             $white),
+    // Bundesland tints
+    (bl-wien,           $gb-bl-wien-bg),
+    (bl-noe,            $gb-bl-noe-bg),
+    (bl-ooe,            $gb-bl-ooe-bg),
+    (bl-sbg,            $gb-bl-sbg-bg),
+    (bl-tir,            $gb-bl-tir-bg),
+    (bl-vbg,            $gb-bl-vbg-bg),
+    (bl-stmk,           $gb-bl-stmk-bg),
+    (bl-ktn,            $gb-bl-ktn-bg),
+    (bl-bgld,           $gb-bl-bgld-bg),
+    (default,           $main-theme)
+) !default;
+
+// --- Link colors ------------------------------------------------------------
+
+$link-colors:
+(
+    (black,             $black,         $grey-darker),
+    (grey,              $grey,          $grey-light),
+    (white,             $white,         $grey-lighter),
+    (light,             $text-light,    $grey-lighter),
+    (dark,              $text-dark,     $grey),
+    (theme,             $main-theme,    $main-theme-hover),
+    (coral,             $gb-coral,      darken($gb-coral, 8%)),
+    (blue,              $gb-blue,       darken($gb-blue, 8%)),
+    (default,           default,        default)
+) !default;
+
+// --- Map marker colors ------------------------------------------------------
+
+$map-colors: (
+    $gb-teal,
+    $gb-coral,
+    $gb-blue,
+    $gb-purple,
+    $gb-amber,
+    $gb-bl-wien-fg,
+    $gb-bl-noe-fg,
+    $gb-bl-ooe-fg,
+    $gb-ink,
+    $white
+) !default;
+
+// --- Tile + square layout settings ------------------------------------------
+
+$sq-heights-sm:                 ((0o5, 0.5), (2, 2)) !default;
+$sq-heights-md:                 ((0o5, 0.5), (1, 1), (1o5, 1.5), (2, 2)) !default;
+$sq-heights-lg:                 ((0o5, 0.5), (1, 1), (1o5, 1.5), (2, 2)) !default;
+$sq-heights-xl:                 ((0o25, 0.25), (0o5, 0.5), (1, 1), (1o5, 1.5), (2, 2)) !default;
+
+$ti-cols:                       ((6, 6), (4, 4), (3, 3), (2o4, 2.4), (2, 2), (1o5, 1.5)) !default;
+
+// Spaces used for margins and paddings
+$margins-paddings:              (0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100) !default;
+
+// Generic font sizes and line heights
+$font-sizes:                    (6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 36, 48, 72) !default;
+$line-heights:                  (5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20) !default;
+
+// Generic borders — flat style: rely on 1px hairlines, no shadows.
+$border-default-color:          $grey-light !default;
+$border-sizes:                  (1, 2) !default;
+$border-radiuses:               ((0, 0px), (2, 2px), (4, 4px), (6, 6px), (8, 8px), (12, 12px), (20, 20px), (25p, 25%), (50p, 50%)) !default;
+$border-positions:              (bottom, top, left, right) !default;
+$border-styles:                 (solid, dotted, dashed, hidden) !default;
+
+// --- GeoBonus-specific helpers ----------------------------------------------
+
+// Hero accent shape behind the homepage hero (teal polygon from the concept).
+.geobonus-hero-accent {
+    background: $gb-teal;
+    color: $white;
+}
+
+// Embed snippet box: monospace, dark bg, green text (per concept §8 typography).
+.geobonus-embed-snippet {
+    background: $gb-ink;
+    color: $gb-teal;
+    font-family: "SFMono-Regular";
+    font-size: 1.4rem;
+    line-height: 1.5;
+    padding: 16px 20px;
+    border-radius: 8px;
+}
+
+// Bundesland badge helper — apply with .geobonus-bl-badge.geobonus-bl-wien etc.
+.geobonus-bl-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+@each $key, $bg, $fg in (
+    (wien,  $gb-bl-wien-bg,  $gb-bl-wien-fg),
+    (noe,   $gb-bl-noe-bg,   $gb-bl-noe-fg),
+    (ooe,   $gb-bl-ooe-bg,   $gb-bl-ooe-fg),
+    (sbg,   $gb-bl-sbg-bg,   $gb-bl-sbg-fg),
+    (tir,   $gb-bl-tir-bg,   $gb-bl-tir-fg),
+    (vbg,   $gb-bl-vbg-bg,   $gb-bl-vbg-fg),
+    (stmk,  $gb-bl-stmk-bg,  $gb-bl-stmk-fg),
+    (ktn,   $gb-bl-ktn-bg,   $gb-bl-ktn-fg),
+    (bgld,  $gb-bl-bgld-bg,  $gb-bl-bgld-fg)
+) {
+    .geobonus-bl-#{$key} {
+        background-color: $bg;
+        color: $fg;
+    }
+}
