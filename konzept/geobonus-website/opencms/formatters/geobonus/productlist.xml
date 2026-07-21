@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<NewFormatters xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="opencms://system/modules/org.opencms.ade.config/schemas/formatters/new_formatter.xsd">
+  <NewFormatter language="en">
+    <NiceName><![CDATA[%(key.type.m-gb-productlist.formatter)]]></NiceName>
+    <Type><![CDATA[m-gb-productlist]]></Type>
+    <Key><![CDATA[m/geobonus/productlist]]></Key>
+    <Jsp>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/com.mapexplorer/formatters/geobonus/geobonus-productlist.jsp]]></target>
+        <uuid>64d5acf1-0010-4e8c-9e81-cb8e95497fa3</uuid>
+      </link>
+    </Jsp>
+    <Rank><![CDATA[20000]]></Rank>
+    <Match>
+      <Types>
+        <ContainerType><![CDATA[element]]></ContainerType>
+        <ContainerType><![CDATA[m-element]]></ContainerType>
+        <ContainerType><![CDATA[gb-productlist]]></ContainerType>
+      </Types>
+    </Match>
+    <AutoEnabled>true</AutoEnabled>
+    <SearchContent>true</SearchContent>
+    <StrictContainers>false</StrictContainers>
+    <IncludeSettings>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/configuration/shared-settings.xml]]></target>
+        <uuid>d0acba29-0a62-4e0a-91c2-287ef4948c50</uuid>
+      </link>
+    </IncludeSettings>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssVisibility.default]]></IncludeName>
+    </Setting>
+  </NewFormatter>
+</NewFormatters>

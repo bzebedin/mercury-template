@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<NewFormatters xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="opencms://system/modules/org.opencms.ade.config/schemas/formatters/new_formatter.xsd">
+  <NewFormatter language="en">
+    <NiceName><![CDATA[%(key.type.m-gb-showcase.formatter)]]></NiceName>
+    <Type><![CDATA[m-gb-showcase]]></Type>
+    <Key><![CDATA[m/geobonus/showcase]]></Key>
+    <Jsp>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/com.mapexplorer/formatters/geobonus/geobonus-showcase.jsp]]></target>
+        <uuid>bd7f2b82-002a-415a-a719-f4ec8da9ff0e</uuid>
+      </link>
+    </Jsp>
+    <Rank><![CDATA[20000]]></Rank>
+    <Match>
+      <Types>
+        <ContainerType><![CDATA[element]]></ContainerType>
+        <ContainerType><![CDATA[m-element]]></ContainerType>
+        <ContainerType><![CDATA[gb-showcase]]></ContainerType>
+      </Types>
+    </Match>
+    <AutoEnabled>true</AutoEnabled>
+    <SearchContent>true</SearchContent>
+    <StrictContainers>false</StrictContainers>
+    <IncludeSettings>
+      <link type="WEAK">
+        <target><![CDATA[/system/modules/alkacon.mercury.template/configuration/shared-settings.xml]]></target>
+        <uuid>7ed99b03-7426-4c83-ba5c-6b60a07fe4a1</uuid>
+      </link>
+    </IncludeSettings>
+    <Setting>
+      <IncludeName><![CDATA[cssWrapper.default]]></IncludeName>
+    </Setting>
+    <Setting>
+      <IncludeName><![CDATA[cssVisibility.default]]></IncludeName>
+    </Setting>
+  </NewFormatter>
+</NewFormatters>

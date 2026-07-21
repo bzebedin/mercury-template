@@ -1,0 +1,108 @@
+/**
+ * This program is part of the OpenCms Mercury Template.
+ *
+ * Copyright (c) Alkacon Software GmbH & Co. KG (http://www.alkacon.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**********
+ * Theme file: theme-geobonus-homepage.scss
+ *
+ * GeoBonus homepage theme — the new editorial/premium GeoBonus website design
+ * (Phase 1 of konzept/geobonus-website/HANDOVER-PROMPTS.md).
+ *
+ * This theme carries the full GeoBonus design system ported 1:1 from the static
+ * reference site (design-referenz/). It is a SEPARATE theme from theme-geobonus
+ * (which stays the stock look for the rest of the site) — see [[geobonus-theme-split]].
+ *
+ * Fonts (Fraunces / General Sans / IBM Plex Mono / Alex Brush) are loaded in the
+ * template <head> via <link> — see STATUS-geobonus-homepage.md. Fallbacks are baked
+ * into the tokens, so the layout degrades gracefully if the webfonts are absent.
+ */
+
+// --- Map Mercury brand variables to the GeoBonus palette --------------------
+// Keeps stock Mercury components (editor chrome, fallback formatters) coherent
+// with the GeoBonus look. The homepage design layer below wins via source order.
+
+$main-theme:                    #087A0C !default; // green-deep (text-safe logo green)
+$main-theme-hover:              #00C805 !default; // raw logo green (surfaces/accents)
+$main-theme-additional:         #3191D6 !default; // blue
+
+$default-border-radius:         8px !default;
+$btn-border-radius:             8px !default;
+
+$focus-outline-color:           rgba(19, 32, 24, 0.6) !default;
+
+$font-family-headings:          "DM Sans" !default; // Mercury-registered stand-in for Fraunces
+$font-family-base:              "DM Sans" !default; // Mercury-registered stand-in for General Sans
+$font-weight-headings:          500 !default;
+
+$text-dark:                     #132018 !default; // ink
+$headings-color:                #132018 !default;
+
+$white:                         #FFFFFF !default;
+$grey-lighter:                  #F0F1EA !default; // paper-alt
+$foot-main-bg-color:            #132018 !default;
+
+$btn-bg:                        #132018 !default; // primary button = ink
+$btn-hover-bg:                  #087A0C !default;
+
+// --- Pull in palette, helpers and Mercury base ------------------------------
+
+@import './geobonus-defaults';
+@import '../imports';
+
+// --- GeoBonus homepage design system (imported LAST so it wins) -------------
+
+@import './geobonus-homepage-design';
+
+// --- OpenCms edit mode: keep fixed chrome below the workplace toolbar --------
+// In edit mode <html> gets .opencms-page-editor + padding-top:52px, but our
+// position:fixed header/panel ignore that padding and hide behind the toolbar.
+
+.opencms-page-editor {
+    // In the ADE editor the scroll-state JS can't drive the window scroll, so the
+    // header's .scrolled toggle is unreliable. Pin it to the transparent/white
+    // hero state (matching the top of the live page) and keep it centered.
+    .site-header,
+    .site-header.scrolled {
+        top: $opencms-toolbar-height;
+        background: transparent;
+        border-bottom-color: transparent;
+        display: flex;
+        align-items: center;
+    }
+    .site-header .nav-link,
+    .site-header.scrolled .nav-link,
+    .site-header .header-cta,
+    .site-header .menu-toggle { color: #fff; }
+    .site-header .nav-link::after { background: currentColor; }
+
+    .mobile-panel { top: $opencms-toolbar-height; }
+    .modal-overlay { z-index: 100; } // stay below the OpenCms toolbar while editing
+
+    // Make the (empty) nav drop zone big enough to drag a menu element into.
+    .nav-slot {
+        display: flex;
+        align-items: center;
+        min-width: 300px;
+        min-height: 44px;
+    }
+    .nav-slot > .oc-container,
+    .nav-slot [class*="oc-container"] { width: 100%; min-height: 44px; }
+}
+
+// Outside edit mode the slot must not add any spacing.
+.nav-slot { display: contents; }

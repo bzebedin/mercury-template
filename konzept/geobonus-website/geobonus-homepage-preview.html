@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="de" class="is-loading">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoBonus – Dein Land, neu vernetzt</title>
+<meta name="description" content="GeoBonus entwickelt seit über 25 Jahren Karten für Gemeinden, Regionen und Betriebe – gedruckt und digital.">
+<link rel="icon" href="/system/modules/com.mapexplorer/resources/img/geobonus-homepage/geobonus-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/system/modules/com.mapexplorer/css/theme-geobonus-homepage.min.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<div class="page-loader" id="pageLoader" role="status" aria-live="polite" aria-label="Seite wird geladen">
+  <div class="loader-inner">
+    <svg class="loader-pin" viewBox="0 0 120 120" aria-hidden="true">
+      <defs>
+        <linearGradient id="pinGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#00C805"/>
+          <stop offset="1" stop-color="#3191D6"/>
+        </linearGradient>
+      </defs>
+      <path class="pin-stroke" d="M60 22 C47.3 22 37 32.3 37 45 C37 62.5 60 94 60 94 C60 94 83 62.5 83 45 C83 32.3 72.7 22 60 22 Z"/>
+      <circle class="pin-dot" cx="60" cy="45" r="8"/>
+    </svg>
+    <img class="loader-logo" src="/system/modules/com.mapexplorer/resources/img/geobonus-homepage/geobonus-logo.png" alt="GeoBonus">
+    <div class="loader-bar"><span></span></div>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <a class="brand" href="#" aria-label="GeoBonus Startseite">
+    <img src="/system/modules/com.mapexplorer/resources/img/geobonus-homepage/geobonus-logo.png" alt="GeoBonus">
+  </a>
+
+  <nav class="nav-group" aria-label="Hauptnavigation">
+    <a class="nav-link" href="#produkte">Produkte</a>
+    <a class="nav-link" href="#">Mein Standort</a>
+    <a class="nav-link" href="#">Digitale Gemeinde</a>
+    <a class="nav-link" href="#">Über uns</a>
+    <a class="nav-link" href="#">Kontakt</a>
+  </nav>
+
+  <div class="header-actions">
+    <a class="header-cta" href="#" data-action="projekt">Projekt anfragen</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilePanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <a class="nav-link" href="#produkte">Produkte</a>
+  <a class="nav-link" href="#">Mein Standort</a>
+  <a class="nav-link" href="#">Digitale Gemeinde</a>
+  <a class="nav-link" href="#">Über uns</a>
+  <a class="nav-link" href="#">Kontakt</a>
+  <a class="btn btn-primary" href="#" data-action="projekt">Projekt anfragen</a>
+</div>
+
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Formular schließen" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div id="modalFormWrap">
+      <span class="eyebrow modal-eyebrow"><span class="dot"></span>GeoBonus · Kontakt</span>
+      <h2 id="modalTitle">Projekt anfragen</h2>
+      <p class="modal-sub">Erzählen Sie uns von Ihrem Vorhaben – wir melden uns zeitnah.</p>
+
+      <form id="projectForm" novalidate>
+        <div class="field">
+          <label for="pf-name">Ansprechpartner</label>
+          <input type="text" id="pf-name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="pf-email">E-Mail</label>
+            <input type="email" id="pf-email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="pf-phone">Telefon</label>
+            <input type="tel" id="pf-phone" name="telefon" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-org" id="pf-org-label">Gemeinde</label>
+          <input type="text" id="pf-org" name="organisation" autocomplete="organization">
+        </div>
+
+        <fieldset>
+          <legend>Ich interessiere mich als</legend>
+          <div class="segmented">
+            <label class="segment">
+              <input type="radio" name="type" value="gemeinde" checked>
+              <span>Gemeinde</span>
+            </label>
+            <label class="segment">
+              <input type="radio" name="type" value="betrieb">
+              <span>Betrieb</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="interest-group" id="interestGemeinde">
+          <span class="group-label">Interessensbereich (Mehrfachauswahl möglich)</span>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Digitale Gemeindekarte"> Digitale Gemeindekarte</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Gemeindekarte/Ortskarte/Regionskarte Print"> Gemeindekarte/Ortskarte/Regionskarte (Print)</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Schautafel"> Schautafel</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="3D Panorama"> 3D Panorama</label>
+        </div>
+
+        <div class="interest-group" id="interestBetrieb" hidden>
+          <span class="group-label">Interessensbereich</span>
+          <div class="segmented segmented--single">
+            <label class="segment">
+              <input type="radio" name="betrieb_interesse" value="Mein Standort" checked>
+              <span>Mein Standort</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-message">Nachricht (optional)</label>
+          <textarea id="pf-message" name="nachricht" rows="3" placeholder="Teilen Sie uns mehr Details mit"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary modal-submit">
+          Anfrage senden
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="modal-note">Beim Absenden öffnet sich Ihr E-Mail-Programm mit einem vorausgefüllten Entwurf an unser Team.</p>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+      <h3>Fast geschafft</h3>
+      <p>Ihr E-Mail-Programm hat sich mit einem vorausgefüllten Entwurf geöffnet. Senden Sie die Nachricht ab, und wir melden uns bei Ihnen.</p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <section class="hero" aria-label="Willkommen">
+    <div class="hero-bg" id="heroBg">
+      <img src="/system/modules/com.mapexplorer/resources/img/geobonus-homepage/europe-globe.jpg" alt="Mitteleuropa aus dem Orbit betrachtet – Landmassen, Gewässer und Wolken über dem Kontinent" loading="eager">
+    </div>
+    <div class="hero-scrim"></div>
+    <div class="hero-fade"></div>
+
+    <div class="wrap hero-content">
+      <div class="hero-eyebrow-row">
+        <span class="eyebrow eyebrow--fade"><span class="dot"></span>GeoBonus · Europa</span>
+        <span class="hero-coords">47.7° N · 13.4° E</span>
+      </div>
+
+      <h1>
+        <span class="line"><span style="animation-delay:.24s">Dein Land,</span></span>
+        <span class="line"><em><span style="animation-delay:.34s">neu&nbsp;vernetzt</span></em></span>
+      </h1>
+
+      <p class="sub">Seit 25&nbsp;Jahren entwickeln wir Karten, die Menschen, Gemeinden, regionale Betriebe und Infrastruktur miteinander verbinden</p>
+
+      <div class="cta-row">
+        <a class="btn btn-accent" href="#" data-action="entdecken">
+          Österreich entdecken
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="products-section" id="produkte" aria-label="Produktübersicht">
+    <div class="wrap">
+      <div class="products-head" data-reveal>
+        <span class="eyebrow"><span class="dot"></span>Kartographie – präzise bis ins Detail</span>
+        <h2>Produktübersicht</h2>
+        <p class="products-claim" id="productsClaim"><span class="fade-text">Ihre Gemeinde verdient die beste Karte</span></p>
+      </div>
+
+      <div class="products-list" data-reveal>
+        <a class="product-row product-row--digital" href="#">
+          <span class="product-tag"><span class="dot"></span>Digital</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Digitale Gemeinde</span>
+            <span class="product-row-desc">Die Gemeinde digital entdecken – überall und jederzeit verfügbar.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </a>
+
+        <a class="product-row product-row--digital" href="#">
+          <span class="product-tag"><span class="dot"></span>Digital</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Mein Standort</span>
+            <span class="product-row-desc">Machen Sie Ihren Standort digital erlebbar und bieten Sie Ihren Kunden alle wichtigen Infos auf einen Blick.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </a>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Regionskarte</span>
+            <span class="product-row-desc">Mehrere Gemeinden auf einer Karte – die gesamte Region übersichtlich dargestellt.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Gemeindekarte</span>
+            <span class="product-row-desc">Unsere Gemeindekarten basieren auf Daten höchster Qualität und bilden die gesamte Gemeinde &amp; Infrastruktur übersichtlich, präzise und vollständig ab.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Schautafel</span>
+            <span class="product-row-desc">Wetterfeste Schautafeln für den Außenbereich – informativ, langlebig und mit echtem Mehrwert.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">3D Panorama</span>
+            <span class="product-row-desc">Täler, Berge und ganze Regionen eindrucksvoll erlebbar gemacht.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-legal" aria-label="Rechtliches">
+    <a href="#">AGB</a>
+    <span class="footer-dot">·</span>
+    <a href="#">Impressum</a>
+    <span class="footer-dot">·</span>
+    <a href="https://www.geobonus.at/datenschutz-einstellungen/">Datenschutz Einstellungen</a>
+  </nav>
+  <div class="footer-bottom">
+    <span>© <span id="copyYear">2026</span> GeoBonus by MapExplorer Information Systems GmbH</span>
+  </div>
+</footer>
+
+<script src="/system/modules/com.mapexplorer/resources/js/geobonus-homepage.js" defer></script>
+
+<div style="position:fixed;left:12px;bottom:12px;z-index:9999;font:12px/1 monospace;background:#132018;color:#fff;padding:8px 12px;border-radius:8px;opacity:.85">GeoBonus Homepage — Theme-Preview (theme-geobonus-homepage)</div></body>
+</html>

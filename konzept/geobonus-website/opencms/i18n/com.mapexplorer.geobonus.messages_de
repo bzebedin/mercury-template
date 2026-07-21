@@ -1,0 +1,75 @@
+# GeoBonus homepage content types — German labels
+# Bundle: com.mapexplorer.geobonus.messages (referenced by the geobonus-*.xsd schemas)
+
+# --- shared labels ---
+label.gb.Eyebrow=Eyebrow (Kicker)
+label.gb.Title=Titel
+label.gb.Subtitle=Untertitel
+label.gb.Cta=Button / Call-to-Action
+label.gb.Cta.help=Link mit Beschriftung; erster Button wird als Akzent (grün), ein zweiter als Ghost-Button dargestellt.
+
+# --- Hero ---
+type.m-gb-hero.name=GeoBonus Hero
+type.m-gb-hero.title=Dein Land, neu vernetzt
+type.m-gb-hero.formatter=GeoBonus Hero
+label.gb.Hero.Image=Hintergrundbild
+label.gb.Hero.Image.help=Großflächiges Hero-Hintergrundbild (z. B. Globe/Satellit).
+label.gb.Hero.Coords=Koordinaten-Text
+label.gb.Hero.Coords.help=Optionaler Mono-Text neben dem Eyebrow, z. B. „47.7° N · 13.4° E“.
+label.gb.Hero.TitleAccent=Titel-Akzent (kursiv/grün)
+label.gb.Hero.TitleAccent.help=Zweiter Teil der Überschrift, kursiv in Logo-Grün dargestellt.
+
+# --- Produktliste ---
+type.m-gb-productlist.name=GeoBonus Produktliste
+type.m-gb-productlist.title=Produktübersicht
+type.m-gb-productlist.formatter=GeoBonus Produktliste
+label.gb.ProductList.Claim=Claim
+label.gb.ProductList.Claim.help=Kurzer Claim unter dem Titel, im Grün→Blau-Verlauf dargestellt.
+label.gb.Product=Produktzeile
+label.gb.Product.help=Eine Produktzeile (Tag, Name, Beschreibung, optionaler Link).
+label.gb.Product.Variant=Variante
+label.gb.Product.Variant.digital=Digital
+label.gb.Product.Variant.print=Print
+label.gb.Product.Name=Name
+label.gb.Product.Description=Beschreibung
+label.gb.Product.Link.help=Optionaler Link – macht die ganze Zeile klickbar.
+
+# --- Bundesland-Grid ---
+type.m-gb-stategrid.name=GeoBonus Bundesland-Grid
+type.m-gb-stategrid.title=Bundesland wählen
+type.m-gb-stategrid.formatter=GeoBonus Bundesland-Grid
+label.gb.Tile=Kachel
+label.gb.Tile.help=Eine Bundesland-Kachel (Name, Status, optionaler Link).
+label.gb.Tile.Name=Name
+label.gb.Tile.Status=Status
+label.gb.Tile.Status.live=Live
+label.gb.Tile.Status.pending=In Vorbereitung
+label.gb.Tile.Note=Notiz (klein)
+
+# --- Referenzen ---
+type.m-gb-references.name=GeoBonus Referenzen
+type.m-gb-references.title=Referenzen
+type.m-gb-references.formatter=GeoBonus Referenzen
+label.gb.References.Intro=Einleitung
+label.gb.Reference=Referenz
+label.gb.Reference.help=Eine Referenz (Titel, Untertitel, Anzahl, optionaler Link).
+label.gb.Reference.Title=Titel
+label.gb.Reference.Subtitle=Untertitel
+label.gb.Reference.Count=Anzahl / Badge
+label.gb.Reference.Count.help=Kleiner Zähler/Badge rechts, z. B. „128 Gemeinden“.
+
+# --- Showcase ---
+type.m-gb-showcase.name=GeoBonus Showcase
+type.m-gb-showcase.title=Mein Standort
+type.m-gb-showcase.formatter=GeoBonus Showcase
+# (Image/Text/Cta nutzen Mercury-Standardlabels)
+
+# --- Rechtstext ---
+type.m-gb-legal.name=GeoBonus Rechtstext
+type.m-gb-legal.title=Rechtstext
+type.m-gb-legal.formatter=GeoBonus Rechtstext
+label.gb.Legal.Intro=Einleitung
+label.gb.Legal.Section=Abschnitt
+label.gb.Legal.Section.help=Ein nummerierter Abschnitt (Überschrift + Text).
+label.gb.Legal.Section.Heading=Überschrift
+label.gb.Legal.Section.Body=Text

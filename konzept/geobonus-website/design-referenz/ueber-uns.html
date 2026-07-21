@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Über uns – GeoBonus</title>
+<meta name="description" content="Die Mapexplorer Information Systems GmbH entwickelt seit 1999 Karten- und Informationslösungen für Gemeinden, Regionen und Unternehmen – zu 100 % made in Austria.">
+<link rel="icon" href="assets/geobonus-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Alex+Brush&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ============================================================
+     Über uns — the page reads as one signed statement.
+     Statement → rule → 7/5 split with a small heading left and the
+     body copy pushed right. Spacing is deliberately tight: with the
+     photo gone, generous bands would just read as empty.
+     ============================================================ */
+
+  .page-head{
+    padding:calc(var(--header-h) + clamp(30px,4vw,58px)) 0 0;
+  }
+  .page-head h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(52px,9vw,124px);
+    line-height:.92;
+    letter-spacing:-.025em;
+  }
+
+  .rule{
+    border:none;
+    border-top:1px solid var(--line-strong);
+    margin:clamp(18px,2.2vw,30px) 0 0;
+  }
+
+  .band{ padding:clamp(30px,4vw,56px) 0; }
+  .band--tight{ padding-top:clamp(18px,2.4vw,30px); }
+  .band--alt{ background:var(--paper-alt); border-top:1px solid var(--line); }
+
+  /* The opening line — present, not shouting */
+  .statement{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(23px,3.2vw,42px);
+    line-height:1.22;
+    letter-spacing:-.012em;
+    max-width:30ch;
+  }
+
+  .band-title{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(28px,4.4vw,58px);
+    line-height:1.08;
+    letter-spacing:-.015em;
+  }
+
+  /* ============ Austria ============
+     A red fade, muted rather than flag-bright, running the same 100deg as the
+     green→blue fade elsewhere so it reads as part of the same system. Both ends
+     clear 4.5:1 on --paper-alt. box-decoration-break gives each wrapped line its
+     own fade instead of stretching one across the block. */
+  .fade-austria{ color:#8F2231; }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .fade-austria{
+      display:inline;
+      -webkit-box-decoration-break:clone;
+              box-decoration-break:clone;
+      background-image:linear-gradient(100deg, #7E1D2A 0%, #7E1D2A 38%, #B33240 100%);
+      -webkit-background-clip:text;
+              background-clip:text;
+      color:transparent;
+    }
+  }
+
+  /* 7/5 split: small heading left, large body copy right */
+  .split{
+    display:grid;
+    grid-template-columns:7fr 5fr;
+    gap:clamp(26px,4vw,64px);
+    align-items:start;
+    margin-top:clamp(22px,2.8vw,40px);
+  }
+  .split-lead{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(20px,2.6vw,32px);
+    line-height:1.26;
+    letter-spacing:-.008em;
+    max-width:17ch;
+  }
+
+  .prose{ max-width:44ch; }
+  .prose p{
+    font-size:clamp(16.5px,1.4vw,21px);
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+  .prose p + p{ margin-top:1em; }
+
+  /* ============ The signoff ============ */
+  .signoff-close{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-style:italic;
+    font-size:clamp(20px,2.7vw,34px);
+    line-height:1.3;
+    letter-spacing:-.008em;
+    max-width:26ch;
+  }
+
+  .sign{ margin-top:clamp(24px,3vw,42px); }
+
+  /* Keep the ink upright and untransformed: the writing animation measures each
+     letter's position, and a rotated element reports an axis-aligned box. */
+  .sign-ink{
+    display:inline-block;
+    font-family:var(--font-script);
+    font-size:clamp(30px,3.6vw,46px);
+    line-height:1;
+    color:var(--ink);
+    /* no horizontal padding: the reveal is measured against this box */
+    padding:.14em 0 .2em;
+  }
+  /* Gated on .js so the name is simply there without it. */
+  .js .sign-ink{
+    -webkit-mask-image:linear-gradient(90deg, #000 86%, rgba(0,0,0,0) 100%);
+            mask-image:linear-gradient(90deg, #000 86%, rgba(0,0,0,0) 100%);
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    -webkit-mask-position:left center; mask-position:left center;
+    -webkit-mask-size:0% 100%; mask-size:0% 100%;
+  }
+  /* Safety net: if the scripted animation never runs, the name still appears. */
+  .js .sign.is-written .sign-ink{
+    -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  }
+
+  .sign-role{
+    font-size:clamp(11px,.95vw,12.5px);
+    font-weight:500;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-top:8px;
+  }
+  .js .sign-role{ opacity:0; }
+  .js .sign.is-writing .sign-role,
+  .js .sign.is-written .sign-role{ animation:roleIn .6s var(--ease) forwards; }
+  @keyframes roleIn{ from{ opacity:0; transform:translateY(5px); } to{ opacity:1; transform:translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce){
+    .js .sign-ink{ -webkit-mask-size:100% 100%; mask-size:100% 100%; }
+    .js .sign-role{ opacity:1; animation:none; }
+  }
+
+  @media (max-width:900px){
+    .split{ grid-template-columns:1fr; gap:clamp(20px,4vw,32px); }
+    .statement, .split-lead, .signoff-close{ max-width:none; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header site-header--solid" id="siteHeader">
+  <a class="brand" href="index.html" aria-label="GeoBonus Startseite">
+    <img src="assets/geobonus-logo.png" alt="GeoBonus">
+  </a>
+
+  <nav class="nav-group" aria-label="Hauptnavigation">
+    <a class="nav-link" href="index.html#produkte">Produkte</a>
+    <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+    <a class="nav-link" href="oesterreich.html#referenzen">Digitale Gemeinde</a>
+    <a class="nav-link" href="ueber-uns.html" aria-current="page">Über uns</a>
+    <a class="nav-link" href="kontakt.html">Kontakt</a>
+  </nav>
+
+  <div class="header-actions">
+    <a class="header-cta" href="#" data-action="projekt">Projekt anfragen</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilePanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <a class="nav-link" href="index.html#produkte">Produkte</a>
+  <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+  <a class="nav-link" href="oesterreich.html#referenzen">Digitale Gemeinde</a>
+  <a class="nav-link" href="ueber-uns.html">Über uns</a>
+  <a class="nav-link" href="kontakt.html">Kontakt</a>
+  <a class="btn btn-primary" href="#" data-action="projekt">Projekt anfragen</a>
+</div>
+
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Formular schließen" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div id="modalFormWrap">
+      <span class="eyebrow modal-eyebrow"><span class="dot"></span>GeoBonus · Kontakt</span>
+      <h2 id="modalTitle">Projekt anfragen</h2>
+      <p class="modal-sub">Erzählen Sie uns von Ihrem Vorhaben – wir melden uns zeitnah.</p>
+
+      <form id="projectForm" novalidate>
+        <div class="field">
+          <label for="pf-name">Ansprechpartner</label>
+          <input type="text" id="pf-name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="pf-email">E-Mail</label>
+            <input type="email" id="pf-email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="pf-phone">Telefon</label>
+            <input type="tel" id="pf-phone" name="telefon" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-org" id="pf-org-label">Gemeinde</label>
+          <input type="text" id="pf-org" name="organisation" autocomplete="organization">
+        </div>
+
+        <fieldset>
+          <legend>Ich interessiere mich als</legend>
+          <div class="segmented">
+            <label class="segment">
+              <input type="radio" name="type" value="gemeinde" checked>
+              <span>Gemeinde</span>
+            </label>
+            <label class="segment">
+              <input type="radio" name="type" value="betrieb">
+              <span>Betrieb</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="interest-group" id="interestGemeinde">
+          <span class="group-label">Interessensbereich (Mehrfachauswahl möglich)</span>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Digitale Gemeindekarte"> Digitale Gemeindekarte</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Gemeindekarte/Ortskarte/Regionskarte Print"> Gemeindekarte/Ortskarte/Regionskarte (Print)</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Schautafel"> Schautafel</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="3D Panorama"> 3D Panorama</label>
+        </div>
+
+        <div class="interest-group" id="interestBetrieb" hidden>
+          <span class="group-label">Interessensbereich</span>
+          <div class="segmented segmented--single">
+            <label class="segment">
+              <input type="radio" name="betrieb_interesse" value="Mein Standort" checked>
+              <span>Mein Standort</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-message">Nachricht (optional)</label>
+          <textarea id="pf-message" name="nachricht" rows="3" placeholder="Teilen Sie uns mehr Details mit"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary modal-submit">
+          Anfrage senden
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="modal-note">Beim Absenden öffnet sich Ihr E-Mail-Programm mit einem vorausgefüllten Entwurf an unser Team.</p>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+      <h3>Fast geschafft</h3>
+      <p>Ihr E-Mail-Programm hat sich mit einem vorausgefüllten Entwurf geöffnet. Senden Sie die Nachricht ab, und wir melden uns bei Ihnen.</p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <section class="page-head" aria-labelledby="pageTitle">
+    <div class="wrap">
+      <h1 id="pageTitle" data-enter style="--enter-i:0">Über uns</h1>
+    </div>
+  </section>
+
+  <section class="band band--tight">
+    <div class="wrap">
+      <p class="statement" data-enter style="--enter-i:1">
+        Die Mapexplorer Information Systems GmbH entwickelt seit 1999 Karten- und Informationslösungen für Gemeinden, Regionen und Unternehmen.
+      </p>
+      <hr class="rule">
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="karten-title">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <h2 class="split-lead" id="karten-title" data-reveal>
+            Unsere Karten verbinden Menschen, Gemeinden, regionale Betriebe und Infrastrukturen.
+          </h2>
+        </div>
+
+        <div class="prose" data-reveal>
+          <p>Geografische Informationen werden strukturiert aufbereitet, präzise verortet und übersichtlich dargestellt.</p>
+          <p>Mit GeoBonus stellen wir Gemeinden und Regionen eine Plattform zur Verfügung, auf der relevante geografische und regionale Informationen zentral gebündelt und einfach zugänglich gemacht werden. Der Schwerpunkt liegt auf hoher Datenqualität, geografischer Lagerichtigkeit und einer benutzerfreundlichen Darstellung.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--alt" aria-labelledby="austria-title">
+    <div class="wrap">
+      <h2 class="band-title" id="austria-title" data-reveal><span class="fade-austria">100 % made in Austria</span></h2>
+      <hr class="rule">
+
+      <div class="split">
+        <div>
+          <p class="split-lead" data-reveal>
+            Entwicklung, Kartografie, Datenaufbereitung, Druck und Fertigung erfolgen zu 100 % in Österreich.
+          </p>
+        </div>
+
+        <div class="prose" data-reveal>
+          <p>Dadurch sichern wir nicht nur unsere heimischen Arbeitsplätze, sondern auch kurze Abstimmungswege, verlässliche Qualitätsstandards und eine kontinuierliche Betreuung unserer Kunden.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-label="Grundlage unserer Arbeit">
+    <div class="wrap">
+      <p class="signoff-close" data-reveal>
+        Die Verbindung aus langjähriger Erfahrung, fundiertem geografischem Know-how und laufender technischer Weiterentwicklung bildet die Grundlage unserer Arbeit.
+      </p>
+
+      <div class="sign" data-signature>
+        <span class="sign-ink">Gerald Lientschnig</span>
+        <p class="sign-role"><span class="sr-only">Gerald Lientschnig, </span>Geschäftsführer / CEO</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-legal" aria-label="Rechtliches">
+    <a href="agb.html">AGB</a>
+    <span class="footer-dot">·</span>
+    <a href="impressum.html">Impressum</a>
+    <span class="footer-dot">·</span>
+    <a href="https://www.geobonus.at/datenschutz-einstellungen/">Datenschutz Einstellungen</a>
+  </nav>
+  <div class="footer-bottom">
+    <span>© <span id="copyYear">2026</span> GeoBonus by MapExplorer Information Systems GmbH</span>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+<script>
+/* ============================================================
+   The signature writes itself, letter by letter, once in view.
+
+   Each letter gets its own beat, so the reveal advances by the width the
+   letter actually occupies rather than a constant sweep — that irregularity
+   is what reads as a hand rather than a wipe. Spaces cost an extra beat:
+   the pen lifts between the names.
+   ============================================================ */
+(function(){
+  var sign = document.querySelector('[data-signature]');
+  if (!sign) return;
+  var ink = sign.querySelector('.sign-ink');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function done(){ sign.classList.add('is-written'); }
+
+  /* Where each character ends, as a % of the ink box. Only valid while the ink
+     is untransformed — getBoundingClientRect on a rotated or scaled element is
+     axis-aligned and would skew every offset. */
+  function letterStops(){
+    var node = ink.firstChild;
+    if (!node || node.nodeType !== 3 || !document.createRange) return null;
+    var text = node.nodeValue;
+    var box = ink.getBoundingClientRect();
+    var range = document.createRange();
+    var stops = [];
+    for (var i = 1; i <= text.length; i++){
+      range.setStart(node, 0);
+      range.setEnd(node, i);
+      var r = range.getBoundingClientRect();
+      var pct = box.width ? ((r.right - box.left) / box.width) * 100 : 0;
+      stops.push(Math.max(0, Math.min(100, pct)));
+    }
+    return { text: text, stops: stops };
+  }
+
+  function write(){
+    if (reduce || !ink.animate){ done(); return; }
+
+    var m = letterStops();
+    if (!m || !m.stops.length){ done(); return; }
+    m.stops[m.stops.length - 1] = 100;   // let the final tail land
+
+    var beats = [];
+    for (var i = 0; i < m.text.length; i++) beats.push(m.text.charAt(i) === ' ' ? 2.1 : 1);
+    var total = 0;
+    for (var b = 0; b < beats.length; b++) total += beats[b];
+
+    var frames = [{ maskSize: '0% 100%', webkitMaskSize: '0% 100%', offset: 0 }];
+    var acc = 0;
+    for (var j = 0; j < m.stops.length; j++){
+      acc += beats[j];
+      var size = m.stops[j].toFixed(2) + '% 100%';
+      frames.push({
+        maskSize: size,
+        webkitMaskSize: size,
+        offset: Math.min(1, acc / total)
+      });
+    }
+
+    var duration = 72 * total + 260;
+    try {
+      ink.animate(frames, { duration: duration, easing: 'linear', fill: 'forwards' });
+      sign.classList.add('is-writing');
+      window.setTimeout(done, duration + 400);   // safety net
+    } catch (e) {
+      done();
+    }
+  }
+
+  function start(){
+    // Measure only once the script face is real, or every offset is wrong.
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(write);
+    else window.setTimeout(write, 250);
+  }
+
+  if (!('IntersectionObserver' in window)){ start(); return; }
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting){
+        obs.unobserve(entry.target);
+        start();
+      }
+    });
+  }, { threshold: 0.45 });
+  obs.observe(sign);
+})();
+</script>
+
+</body>
+</html>

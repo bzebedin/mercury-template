@@ -1,0 +1,67 @@
+# GeoBonus homepage content types — English labels
+# Bundle: com.mapexplorer.geobonus.messages
+
+label.gb.Eyebrow=Eyebrow (kicker)
+label.gb.Title=Title
+label.gb.Subtitle=Subtitle
+label.gb.Cta=Button / call to action
+label.gb.Cta.help=Link with a label; the first button renders as accent (green), a second as ghost button.
+
+type.m-gb-hero.name=GeoBonus Hero
+type.m-gb-hero.title=Your country, newly connected
+type.m-gb-hero.formatter=GeoBonus Hero
+label.gb.Hero.Image=Background image
+label.gb.Hero.Image.help=Large hero background image (e.g. globe/satellite).
+label.gb.Hero.Coords=Coordinates text
+label.gb.Hero.Coords.help=Optional mono text next to the eyebrow, e.g. "47.7° N · 13.4° E".
+label.gb.Hero.TitleAccent=Title accent (italic/green)
+label.gb.Hero.TitleAccent.help=Second part of the heading, shown italic in logo green.
+
+type.m-gb-productlist.name=GeoBonus product list
+type.m-gb-productlist.title=Product overview
+type.m-gb-productlist.formatter=GeoBonus product list
+label.gb.ProductList.Claim=Claim
+label.gb.ProductList.Claim.help=Short claim under the title, rendered in the green-to-blue fade.
+label.gb.Product=Product row
+label.gb.Product.help=A product row (tag, name, description, optional link).
+label.gb.Product.Variant=Variant
+label.gb.Product.Variant.digital=Digital
+label.gb.Product.Variant.print=Print
+label.gb.Product.Name=Name
+label.gb.Product.Description=Description
+label.gb.Product.Link.help=Optional link – makes the whole row clickable.
+
+type.m-gb-stategrid.name=GeoBonus state grid
+type.m-gb-stategrid.title=Choose a state
+type.m-gb-stategrid.formatter=GeoBonus state grid
+label.gb.Tile=Tile
+label.gb.Tile.help=A state tile (name, status, optional link).
+label.gb.Tile.Name=Name
+label.gb.Tile.Status=Status
+label.gb.Tile.Status.live=Live
+label.gb.Tile.Status.pending=In preparation
+label.gb.Tile.Note=Note (small)
+
+type.m-gb-references.name=GeoBonus references
+type.m-gb-references.title=References
+type.m-gb-references.formatter=GeoBonus references
+label.gb.References.Intro=Intro
+label.gb.Reference=Reference
+label.gb.Reference.help=A reference (title, subtitle, count, optional link).
+label.gb.Reference.Title=Title
+label.gb.Reference.Subtitle=Subtitle
+label.gb.Reference.Count=Count / badge
+label.gb.Reference.Count.help=Small counter/badge on the right, e.g. "128 municipalities".
+
+type.m-gb-showcase.name=GeoBonus showcase
+type.m-gb-showcase.title=My location
+type.m-gb-showcase.formatter=GeoBonus showcase
+
+type.m-gb-legal.name=GeoBonus legal text
+type.m-gb-legal.title=Legal text
+type.m-gb-legal.formatter=GeoBonus legal text
+label.gb.Legal.Intro=Intro
+label.gb.Legal.Section=Section
+label.gb.Legal.Section.help=A numbered section (heading + text).
+label.gb.Legal.Section.Heading=Heading
+label.gb.Legal.Section.Body=Body

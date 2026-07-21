@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="de" class="is-loading">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoBonus – Dein Land, neu vernetzt</title>
+<meta name="description" content="GeoBonus entwickelt seit über 25 Jahren Karten für Gemeinden, Regionen und Betriebe – gedruckt und digital.">
+<link rel="icon" href="assets/geobonus-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* --green is the exact green of the GeoBonus logo (sampled: #00C805) */
+    --green:#00C805;
+    --green-deep:#087A0C;   /* logo hue, darkened to 5.3:1 on paper for text */
+    --blue:#3191D6;
+    --blue-deep:#1E6FA8;
+
+    --paper:#FAFAF7;
+    --paper-alt:#F0F1EA;
+    --surface:#FFFFFF;
+
+    --ink:#132018;
+    --ink-soft:#54615A;
+    --ink-faint:#5F6E67;
+
+    --line:#E2E3D9;
+    --line-strong:#CCCFC2;
+
+    --hero-dark:#0A1C15;
+
+    /* Green→blue fade for the kicker text. Both ends are the logo colours pulled
+       down to text weight — the raw logo green only reaches 2.2:1 on paper and
+       would be unreadable. This ramp never drops below 4.7:1 anywhere. */
+    --fade:linear-gradient(100deg, #087A0C 0%, #087A0C 42%, #1E6FA8 100%);
+    /* Same fade for dark surfaces, where the raw logo colours are the readable end */
+    --fade-dark:linear-gradient(100deg, #00C805 0%, #00C805 42%, #7CC6F2 100%);
+
+    --font-display:'Fraunces', ui-serif, Georgia, serif;
+    --font-body:'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+    --header-h:76px;
+    --container:1240px;
+
+    --ease:cubic-bezier(.19,1,.22,1);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html.is-loading{ overflow:hidden; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  body{
+    font-family:var(--font-body);
+    background:var(--paper);
+    color:var(--ink);
+    overflow-x:hidden;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; }
+  img{ max-width:100%; display:block; }
+
+  ::selection{ background:var(--green); color:#062210; }
+
+  :focus-visible{
+    outline:2px solid var(--ink);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  .wrap{
+    max-width:var(--container);
+    margin:0 auto;
+    padding-left:clamp(20px,4vw,56px);
+    padding-right:clamp(20px,4vw,56px);
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .eyebrow .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--green);
+    flex:none;
+  }
+  /* Text filled with the logo's green→blue fade.
+     Falls back to flat green: background-clip:text with a transparent colour
+     would render nothing at all where it isn't supported. */
+  .fade-text{ color:var(--green-deep); }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .fade-text{
+      display:inline;
+      -webkit-box-decoration-break:clone;
+              box-decoration-break:clone;
+      background-image:var(--fade);
+      -webkit-background-clip:text;
+              background-clip:text;
+      color:transparent;
+    }
+  }
+
+  /* Same fade on a kicker. The dot keeps its own background — background-clip
+     only clips this element's. */
+  .eyebrow--fade{ color:var(--green-deep); }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .eyebrow--fade{
+      background-image:var(--fade);
+      -webkit-background-clip:text;
+              background-clip:text;
+      color:transparent;
+    }
+    .hero .eyebrow--fade{ background-image:var(--fade-dark); }
+  }
+  .hero .eyebrow--fade{ color:var(--green); }
+
+  /* ============ Page loader ============ */
+  .page-loader{
+    position:fixed; inset:0; z-index:1000;
+    background:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  .page-loader.is-hidden{ opacity:0; visibility:hidden; }
+  .loader-inner{ display:flex; flex-direction:column; align-items:center; gap:22px; }
+  .loader-pin{ width:54px; height:54px; }
+  .pin-stroke{
+    fill:none; stroke:url(#pinGrad); stroke-width:5;
+    stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:232; stroke-dashoffset:232;
+    animation:pinDraw 1.25s var(--ease) forwards;
+  }
+  @keyframes pinDraw{ to{ stroke-dashoffset:0; } }
+  .pin-dot{ fill:url(#pinGrad); opacity:0; animation:pinDot .5s ease forwards; animation-delay:.95s; }
+  @keyframes pinDot{ to{ opacity:1; } }
+  .loader-logo{ height:30px; width:auto; opacity:0; transform:translateY(6px); animation:loaderLogo .7s var(--ease) forwards; animation-delay:.15s; }
+  @keyframes loaderLogo{ to{ opacity:1; transform:translateY(0); } }
+  .loader-bar{ width:172px; height:2px; background:var(--line); border-radius:2px; overflow:hidden; }
+  .loader-bar span{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--green),var(--blue)); border-radius:2px; animation:loaderFill 1.7s var(--ease) forwards; }
+  @keyframes loaderFill{ 0%{ width:0; } 70%{ width:82%; } 100%{ width:100%; } }
+
+  /* ============ Skip link ============ */
+  .skip-link{
+    position:absolute; left:-999px; top:0;
+    background:var(--ink); color:var(--paper);
+    padding:12px 20px; border-radius:0 0 8px 0; z-index:1001;
+    font-weight:500; font-size:14px;
+  }
+  .skip-link:focus{ left:0; }
+
+  /* ============ Header ============ */
+  .site-header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    height:var(--header-h);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 clamp(20px,4vw,56px);
+    background:transparent;
+    border-bottom:1px solid transparent;
+    transition:background .4s var(--ease), border-color .4s var(--ease);
+  }
+  .site-header.scrolled{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+
+  .brand{ display:flex; align-items:center; }
+  .brand img{ height:26px; width:auto; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.35)); transition:filter .4s ease; }
+  .site-header.scrolled .brand img{ filter:none; }
+
+  .nav-group{ display:flex; align-items:center; gap:clamp(18px,2vw,30px); }
+
+  .nav-link{
+    position:relative;
+    display:inline-flex; align-items:center;
+    padding:8px 1px;
+    color:#fff;
+    font-size:13.5px; font-weight:500; letter-spacing:.06em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    transition:color .4s var(--ease);
+  }
+  .site-header.scrolled .nav-link{ color:var(--ink); }
+  .nav-link::after{
+    content:'';
+    position:absolute; left:0; right:0; bottom:4px;
+    height:1px;
+    background:currentColor;
+    transform:scaleX(0);
+    transform-origin:right;
+    transition:transform .45s var(--ease);
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after{
+    transform:scaleX(1);
+    transform-origin:left;
+  }
+
+  .header-actions{ display:flex; align-items:center; gap:28px; }
+
+  .header-cta{
+    display:inline-flex; align-items:center;
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:13px; font-weight:600; letter-spacing:.01em;
+    min-height:38px;
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.4);
+    transition:background .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .header-cta:hover{ background:rgba(255,255,255,0.14); }
+  .site-header.scrolled .header-cta{ color:var(--ink); border-color:var(--line-strong); }
+  .site-header.scrolled .header-cta:hover{ background:var(--surface); border-color:var(--ink); }
+
+  .menu-toggle{
+    display:none;
+    width:44px; height:44px; border-radius:50%;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.4);
+    align-items:center; justify-content:center;
+    flex:none;
+    color:#fff;
+    transition:background .2s ease, border-color .25s ease, color .25s ease;
+  }
+  .menu-toggle:hover{ background:rgba(255,255,255,0.12); }
+  .site-header.scrolled .menu-toggle{ color:var(--ink); border-color:var(--line-strong); }
+  .site-header.scrolled .menu-toggle:hover{ background:var(--paper-alt); }
+  .menu-toggle svg{ width:18px; height:18px; }
+
+  /* ============ Buttons ============ */
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 24px;
+    border-radius:8px;
+    font-size:14.5px; font-weight:600; letter-spacing:.01em;
+    white-space:nowrap;
+    min-height:44px;
+    transition:background .25s ease, color .25s ease, border-color .25s ease, transform .2s ease;
+  }
+  .btn svg{ width:16px; height:16px; transition:transform .3s var(--ease); }
+  .btn:hover svg{ transform:translateX(3px); }
+
+  .btn-accent{
+    background:var(--green);
+    color:#08210F;
+    border:1px solid var(--green);
+  }
+  .btn-accent:hover{ background:#00E006; border-color:#00E006; transform:translateY(-1px); }
+
+  .btn-primary{
+    background:var(--ink);
+    color:var(--paper);
+    border:1px solid var(--ink);
+  }
+  .btn-primary:hover{ background:var(--green-deep); border-color:var(--green-deep); }
+
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line-strong);
+  }
+  .btn-ghost:hover{ background:var(--surface); border-color:var(--ink); }
+
+  /* Ghost button on the dark hero */
+  .hero .btn-ghost{
+    color:#fff;
+    border-color:rgba(255,255,255,0.42);
+  }
+  .hero .btn-ghost:hover{ background:rgba(255,255,255,0.12); border-color:#fff; }
+
+  /* ============ Mobile nav panel ============ */
+  .mobile-panel{
+    position:fixed; inset:0; z-index:99;
+    background:var(--paper);
+    display:flex; flex-direction:column; align-items:flex-start;
+    justify-content:center; gap:22px;
+    padding:0 32px;
+    transform:translateY(-8px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .mobile-panel.open{
+    opacity:1; transform:translateY(0);
+    pointer-events:auto;
+  }
+  .mobile-panel .nav-link{
+    color:var(--ink);
+    font-size:26px; font-family:var(--font-display); text-transform:none;
+    letter-spacing:0; font-weight:500;
+  }
+  .mobile-panel .btn{ margin-top:12px; }
+
+  /* ============ Modal ============ */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(10,28,21,0.5);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .modal-card{
+    background:var(--surface);
+    border-radius:16px;
+    width:100%; max-width:560px;
+    max-height:88vh;
+    overflow-y:auto;
+    padding:clamp(28px,4vw,44px);
+    position:relative;
+    box-shadow:0 30px 80px rgba(10,28,21,0.28);
+    transform:translateY(14px) scale(.98);
+    transition:transform .35s var(--ease);
+  }
+  .modal-overlay.open .modal-card{ transform:translateY(0) scale(1); }
+
+  .modal-close{
+    position:absolute; top:20px; right:20px;
+    width:40px; height:40px; border-radius:50%;
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink);
+    transition:background .2s ease;
+  }
+  .modal-close:hover{ background:var(--line); }
+  .modal-close svg{ width:16px; height:16px; }
+
+  .modal-eyebrow{ margin-bottom:14px; }
+  #modalTitle{
+    font-family:var(--font-display);
+    font-size:clamp(26px,3vw,32px);
+    font-weight:500;
+    margin-bottom:10px;
+  }
+  .modal-sub{ color:var(--ink-soft); font-size:15px; line-height:1.55; margin-bottom:28px; max-width:46ch; }
+
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .field{ margin-bottom:18px; }
+  .field label{
+    display:block; font-size:12.5px; font-weight:600; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:7px;
+  }
+  .field input, .field textarea{
+    width:100%;
+    font-family:inherit; font-size:15.5px; color:var(--ink);
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    min-height:46px;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .field textarea{ min-height:auto; resize:vertical; }
+  .field input:focus, .field textarea:focus{
+    background:var(--surface);
+    border-color:var(--ink);
+    outline:none;
+  }
+
+  fieldset{ border:none; margin:0 0 18px; padding:0; }
+  legend{ font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:9px; padding:0; }
+
+  .segmented{ display:flex; gap:8px; }
+  .segmented--single{ max-width:220px; }
+  .segment{
+    flex:1; text-align:center;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 14px;
+    font-size:14px; font-weight:500;
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease, color .2s ease;
+    position:relative;
+  }
+  .segment input{ position:absolute; opacity:0; inset:0; cursor:pointer; margin:0; }
+  .segment:has(input:checked){ border-color:var(--ink); background:var(--ink); color:var(--paper); }
+  .segment:has(input:focus-visible){ outline:2px solid var(--ink); outline-offset:2px; }
+
+  .interest-group{ margin-bottom:18px; }
+  .group-label{ display:block; font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:10px; }
+  .check-row{
+    display:flex; align-items:center; gap:10px;
+    font-size:14.5px; padding:12px 0;
+    min-height:44px;
+    cursor:pointer;
+  }
+  .check-row input{ width:18px; height:18px; accent-color:var(--ink); flex:none; }
+
+  .modal-submit{ width:100%; justify-content:center; margin-top:6px; }
+  .modal-note{ font-size:12.5px; color:var(--ink-faint); margin-top:12px; line-height:1.5; }
+
+  .modal-success{ display:none; text-align:center; padding:20px 0; }
+  .modal-success.show{ display:block; }
+  .modal-success svg{ width:52px; height:52px; color:var(--green-deep); margin:0 auto 20px; }
+  .modal-success h3{ font-family:var(--font-display); font-size:24px; font-weight:500; margin-bottom:10px; }
+  .modal-success p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:38ch; margin:0 auto; }
+
+  /* ============ Hero (satellite background) ============ */
+  .hero{
+    position:relative;
+    min-height:92vh;
+    display:flex; align-items:center;
+    overflow:hidden;
+  }
+  .hero-bg{ position:absolute; inset:0; z-index:0; will-change:transform; }
+  .hero-bg img{
+    width:100%; height:100%;
+    object-fit:cover; object-position:center 34%;
+    transform:scale(1.05);
+    animation:kenburns 26s ease-in-out infinite alternate;
+  }
+  @keyframes kenburns{ from{ transform:scale(1.05); } to{ transform:scale(1.13); } }
+
+  .hero-scrim{
+    position:absolute; inset:0; z-index:1;
+    background:
+      linear-gradient(103deg, rgba(8,26,19,0.86) 0%, rgba(8,26,19,0.58) 42%, rgba(8,26,19,0.22) 72%, rgba(8,26,19,0.30) 100%);
+  }
+  .hero-fade{
+    position:absolute; left:0; right:0; bottom:0; z-index:2;
+    height:190px;
+    background:linear-gradient(180deg, rgba(240,241,234,0) 0%, var(--paper-alt) 100%);
+    pointer-events:none;
+  }
+
+  .hero-content{ position:relative; z-index:3; padding-top:var(--header-h); width:100%; }
+
+  .hero-eyebrow-row{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    margin-bottom:26px;
+    opacity:0; transform:translateY(10px);
+    animation:rise .7s var(--ease) forwards; animation-delay:.15s;
+  }
+  /* :not() so this never wins over .eyebrow--fade's transparent fill below —
+     both selectors are (0,2,0) and this one comes later in the file. */
+  .hero-eyebrow-row .eyebrow:not(.eyebrow--fade){ color:rgba(255,255,255,0.82); }
+  .hero-coords{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.06em; color:rgba(255,255,255,0.5); }
+
+  .hero h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(48px,7.6vw,96px);
+    line-height:.98;
+    letter-spacing:-.01em;
+    color:#fff;
+    margin-bottom:26px;
+    text-shadow:0 2px 30px rgba(0,0,0,0.28);
+  }
+  .hero h1 em{ font-style:italic; font-weight:500; color:var(--green); }
+  .hero h1 .line{ display:block; overflow:hidden; }
+  .hero h1 .line span{
+    display:inline-block;
+    opacity:0; transform:translateY(100%);
+    animation:rise .85s var(--ease) forwards;
+  }
+
+  .hero .sub{
+    font-size:clamp(16.5px,1.6vw,19px);
+    line-height:1.6;
+    color:rgba(255,255,255,0.88);
+    max-width:48ch;
+    margin-bottom:36px;
+    text-shadow:0 1px 16px rgba(0,0,0,0.3);
+    opacity:0; transform:translateY(10px);
+    animation:rise .7s var(--ease) forwards; animation-delay:.62s;
+  }
+
+  .hero .cta-row{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    opacity:0; transform:translateY(10px);
+    animation:rise .7s var(--ease) forwards; animation-delay:.74s;
+  }
+
+  @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+
+  /* ============ Products ============ */
+  .products-section{
+    background:var(--paper-alt);
+    padding:clamp(64px,9vw,112px) 0 clamp(72px,10vw,120px);
+  }
+
+  .products-head{
+    margin-bottom:clamp(40px,5vw,60px);
+    opacity:0; transform:translateY(16px);
+    transition:opacity .7s var(--ease), transform .7s var(--ease);
+  }
+  .products-head.in-view{ opacity:1; transform:translateY(0); }
+  .products-head .eyebrow{ margin-bottom:16px; }
+  .products-head h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(44px,7vw,84px);
+    line-height:1;
+    letter-spacing:-.015em;
+  }
+  .products-claim{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(19px,2.2vw,26px);
+    line-height:1.35;
+    margin-top:14px;
+    color:var(--ink);
+  }
+
+  .products-list{ border-top:1px solid var(--line-strong); }
+
+  .product-row{
+    display:flex; align-items:center; gap:22px;
+    padding:24px 4px 24px 16px;
+    margin-left:-16px;
+    border-bottom:1px solid var(--line-strong);
+    border-left:2px solid transparent;
+    text-align:left;
+    opacity:0; transform:translateY(14px);
+    transition:opacity .6s var(--ease), transform .6s var(--ease),
+               border-color .3s ease, background .3s ease, padding-left .3s ease;
+  }
+  .products-list.in-view .product-row{ opacity:1; transform:translateY(0); }
+  .products-list.in-view .product-row:nth-child(1){ transition-delay:.04s; }
+  .products-list.in-view .product-row:nth-child(2){ transition-delay:.10s; }
+  .products-list.in-view .product-row:nth-child(3){ transition-delay:.16s; }
+  .products-list.in-view .product-row:nth-child(4){ transition-delay:.22s; }
+  .products-list.in-view .product-row:nth-child(5){ transition-delay:.28s; }
+  .products-list.in-view .product-row:nth-child(6){ transition-delay:.34s; }
+
+  .product-row:hover{ background:rgba(255,255,255,0.55); padding-left:26px; }
+  .product-row--print:hover{ border-left-color:var(--green); }
+  .product-row--digital:hover{ border-left-color:var(--blue); }
+
+  .product-tag{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--font-mono);
+    font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:6px 11px;
+    flex:none;
+    width:82px;
+    justify-content:center;
+  }
+  .product-tag .dot{ width:6px; height:6px; border-radius:50%; flex:none; }
+  .product-row--print .product-tag .dot{ background:var(--green); }
+  .product-row--digital .product-tag .dot{ background:var(--blue); }
+
+  .product-row-main{ flex:1; min-width:0; }
+  .product-row-name{
+    font-family:var(--font-display);
+    font-size:clamp(20px,2.2vw,26px);
+    font-weight:500;
+    display:block;
+  }
+  .product-row-desc{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    line-height:1.5;
+    margin-top:5px;
+    max-width:60ch;
+  }
+
+  .product-row-arrow{
+    flex:none;
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .3s var(--ease), border-color .3s ease, background .3s ease, color .3s ease;
+  }
+  .product-row-arrow svg{ width:15px; height:15px; }
+  .product-row:hover .product-row-arrow{
+    transform:rotate(45deg);
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper);
+  }
+
+  /* ============ Footer ============ */
+  .site-footer{
+    padding:40px clamp(20px,4vw,56px) 48px;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:16px;
+    border-top:1px solid var(--line);
+  }
+  .footer-legal{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .footer-legal a{ font-size:13px; color:var(--ink-soft); transition:color .2s ease; }
+  .footer-legal a:hover{ color:var(--ink); }
+  .footer-dot{ color:var(--line-strong); }
+  .footer-bottom{ font-size:13px; color:var(--ink-faint); }
+
+  /* ============ Responsive ============ */
+  /* 1080px, not 900: five nav items plus the CTA stop fitting before then. */
+  @media (max-width:1080px){
+    .nav-group{ display:none; }
+    .header-actions .header-cta{ display:none; }
+    .menu-toggle{ display:flex; }
+  }
+  @media (max-width:640px){
+    .field-row{ grid-template-columns:1fr; }
+    .product-row{ flex-wrap:wrap; gap:14px; }
+    .product-row-arrow{ order:2; }
+    .product-row-main{ order:3; flex-basis:100%; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<div class="page-loader" id="pageLoader" role="status" aria-live="polite" aria-label="Seite wird geladen">
+  <div class="loader-inner">
+    <svg class="loader-pin" viewBox="0 0 120 120" aria-hidden="true">
+      <defs>
+        <linearGradient id="pinGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#00C805"/>
+          <stop offset="1" stop-color="#3191D6"/>
+        </linearGradient>
+      </defs>
+      <path class="pin-stroke" d="M60 22 C47.3 22 37 32.3 37 45 C37 62.5 60 94 60 94 C60 94 83 62.5 83 45 C83 32.3 72.7 22 60 22 Z"/>
+      <circle class="pin-dot" cx="60" cy="45" r="8"/>
+    </svg>
+    <img class="loader-logo" src="assets/geobonus-logo.png" alt="GeoBonus">
+    <div class="loader-bar"><span></span></div>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <a class="brand" href="#" aria-label="GeoBonus Startseite">
+    <img src="assets/geobonus-logo.png" alt="GeoBonus">
+  </a>
+
+  <nav class="nav-group" aria-label="Hauptnavigation">
+    <a class="nav-link" href="#produkte">Produkte</a>
+    <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+    <a class="nav-link" href="oesterreich.html#referenzen">Digitale Gemeinde</a>
+    <a class="nav-link" href="ueber-uns.html">Über uns</a>
+    <a class="nav-link" href="kontakt.html">Kontakt</a>
+  </nav>
+
+  <div class="header-actions">
+    <a class="header-cta" href="#" data-action="projekt">Projekt anfragen</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilePanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <a class="nav-link" href="#produkte">Produkte</a>
+  <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+  <a class="nav-link" href="oesterreich.html#referenzen">Digitale Gemeinde</a>
+  <a class="nav-link" href="ueber-uns.html">Über uns</a>
+  <a class="nav-link" href="kontakt.html">Kontakt</a>
+  <a class="btn btn-primary" href="#" data-action="projekt">Projekt anfragen</a>
+</div>
+
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Formular schließen" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div id="modalFormWrap">
+      <span class="eyebrow modal-eyebrow"><span class="dot"></span>GeoBonus · Kontakt</span>
+      <h2 id="modalTitle">Projekt anfragen</h2>
+      <p class="modal-sub">Erzählen Sie uns von Ihrem Vorhaben – wir melden uns zeitnah.</p>
+
+      <form id="projectForm" novalidate>
+        <div class="field">
+          <label for="pf-name">Ansprechpartner</label>
+          <input type="text" id="pf-name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="pf-email">E-Mail</label>
+            <input type="email" id="pf-email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="pf-phone">Telefon</label>
+            <input type="tel" id="pf-phone" name="telefon" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-org" id="pf-org-label">Gemeinde</label>
+          <input type="text" id="pf-org" name="organisation" autocomplete="organization">
+        </div>
+
+        <fieldset>
+          <legend>Ich interessiere mich als</legend>
+          <div class="segmented">
+            <label class="segment">
+              <input type="radio" name="type" value="gemeinde" checked>
+              <span>Gemeinde</span>
+            </label>
+            <label class="segment">
+              <input type="radio" name="type" value="betrieb">
+              <span>Betrieb</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="interest-group" id="interestGemeinde">
+          <span class="group-label">Interessensbereich (Mehrfachauswahl möglich)</span>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Digitale Gemeindekarte"> Digitale Gemeindekarte</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Gemeindekarte/Ortskarte/Regionskarte Print"> Gemeindekarte/Ortskarte/Regionskarte (Print)</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Schautafel"> Schautafel</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="3D Panorama"> 3D Panorama</label>
+        </div>
+
+        <div class="interest-group" id="interestBetrieb" hidden>
+          <span class="group-label">Interessensbereich</span>
+          <div class="segmented segmented--single">
+            <label class="segment">
+              <input type="radio" name="betrieb_interesse" value="Mein Standort" checked>
+              <span>Mein Standort</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-message">Nachricht (optional)</label>
+          <textarea id="pf-message" name="nachricht" rows="3" placeholder="Teilen Sie uns mehr Details mit"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary modal-submit">
+          Anfrage senden
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="modal-note">Beim Absenden öffnet sich Ihr E-Mail-Programm mit einem vorausgefüllten Entwurf an unser Team.</p>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+      <h3>Fast geschafft</h3>
+      <p>Ihr E-Mail-Programm hat sich mit einem vorausgefüllten Entwurf geöffnet. Senden Sie die Nachricht ab, und wir melden uns bei Ihnen.</p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <section class="hero" aria-label="Willkommen">
+    <div class="hero-bg" id="heroBg">
+      <img src="assets/europe-globe.jpg" alt="Mitteleuropa aus dem Orbit betrachtet – Landmassen, Gewässer und Wolken über dem Kontinent" loading="eager">
+    </div>
+    <div class="hero-scrim"></div>
+    <div class="hero-fade"></div>
+
+    <div class="wrap hero-content">
+      <div class="hero-eyebrow-row">
+        <span class="eyebrow eyebrow--fade"><span class="dot"></span>GeoBonus · Europa</span>
+        <span class="hero-coords">47.7° N · 13.4° E</span>
+      </div>
+
+      <h1>
+        <span class="line"><span style="animation-delay:.24s">Dein Land,</span></span>
+        <span class="line"><em><span style="animation-delay:.34s">neu&nbsp;vernetzt</span></em></span>
+      </h1>
+
+      <p class="sub">Seit 25&nbsp;Jahren entwickeln wir Karten, die Menschen, Gemeinden, regionale Betriebe und Infrastruktur miteinander verbinden</p>
+
+      <div class="cta-row">
+        <a class="btn btn-accent" href="oesterreich.html" data-action="entdecken">
+          Österreich entdecken
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="products-section" id="produkte" aria-label="Produktübersicht">
+    <div class="wrap">
+      <div class="products-head" data-reveal>
+        <span class="eyebrow"><span class="dot"></span>Kartographie – präzise bis ins Detail</span>
+        <h2>Produktübersicht</h2>
+        <p class="products-claim" id="productsClaim"><span class="fade-text">Ihre Gemeinde verdient die beste Karte</span></p>
+      </div>
+
+      <div class="products-list" data-reveal>
+        <a class="product-row product-row--digital" href="oesterreich.html#referenzen">
+          <span class="product-tag"><span class="dot"></span>Digital</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Digitale Gemeinde</span>
+            <span class="product-row-desc">Die Gemeinde digital entdecken – überall und jederzeit verfügbar.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </a>
+
+        <a class="product-row product-row--digital" href="mein-standort.html">
+          <span class="product-tag"><span class="dot"></span>Digital</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Mein Standort</span>
+            <span class="product-row-desc">Machen Sie Ihren Standort digital erlebbar und bieten Sie Ihren Kunden alle wichtigen Infos auf einen Blick.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </a>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Regionskarte</span>
+            <span class="product-row-desc">Mehrere Gemeinden auf einer Karte – die gesamte Region übersichtlich dargestellt.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Gemeindekarte</span>
+            <span class="product-row-desc">Unsere Gemeindekarten basieren auf Daten höchster Qualität und bilden die gesamte Gemeinde &amp; Infrastruktur übersichtlich, präzise und vollständig ab.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">Schautafel</span>
+            <span class="product-row-desc">Wetterfeste Schautafeln für den Außenbereich – informativ, langlebig und mit echtem Mehrwert.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+
+        <div class="product-row product-row--print">
+          <span class="product-tag"><span class="dot"></span>Print</span>
+          <div class="product-row-main">
+            <span class="product-row-name">3D Panorama</span>
+            <span class="product-row-desc">Täler, Berge und ganze Regionen eindrucksvoll erlebbar gemacht.</span>
+          </div>
+          <span class="product-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-legal" aria-label="Rechtliches">
+    <a href="agb.html">AGB</a>
+    <span class="footer-dot">·</span>
+    <a href="impressum.html">Impressum</a>
+    <span class="footer-dot">·</span>
+    <a href="https://www.geobonus.at/datenschutz-einstellungen/">Datenschutz Einstellungen</a>
+  </nav>
+  <div class="footer-bottom">
+    <span>© <span id="copyYear">2026</span> GeoBonus by MapExplorer Information Systems GmbH</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- Page loader ---- */
+  (function(){
+    var loader = document.getElementById('pageLoader');
+    var html = document.documentElement;
+    if (!loader){ html.classList.remove('is-loading'); return; }
+
+    var MIN_MS = reduceMotion ? 200 : 1100;
+    var MAX_MS = 2200;
+    var start = Date.now();
+    var done = false;
+
+    function reveal(){
+      if (done) return;
+      done = true;
+      html.classList.remove('is-loading');
+      loader.classList.add('is-hidden');
+      loader.setAttribute('aria-hidden', 'true');
+      window.setTimeout(function(){
+        if (loader.parentNode) loader.parentNode.removeChild(loader);
+      }, 700);
+    }
+    function ready(){
+      var elapsed = Date.now() - start;
+      window.setTimeout(reveal, Math.max(MIN_MS - elapsed, 0));
+    }
+    if (document.readyState === 'complete') ready();
+    else window.addEventListener('load', ready);
+    window.setTimeout(reveal, MAX_MS);
+  })();
+
+  /* ---- Header scroll state ---- */
+  var header = document.getElementById('siteHeader');
+
+  var onScroll = function(){
+    if (window.scrollY > 8) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  };
+  document.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+
+  /* ---- Mobile nav ---- */
+  var toggle = document.getElementById('menuToggle');
+  var panel = document.getElementById('mobilePanel');
+  toggle.addEventListener('click', function(){
+    var open = panel.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  panel.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      panel.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  /* ---- Hero parallax (subtle, mouse-driven; paused when hero off-screen) ---- */
+  var heroBg = document.getElementById('heroBg');
+  var heroSection = document.querySelector('.hero');
+  if (heroBg && heroSection && !reduceMotion && window.matchMedia('(hover: hover)').matches) {
+    var tx = 0, ty = 0, cx = 0, cy = 0, rafId = null, heroVisible = true;
+    window.addEventListener('mousemove', function(e){
+      if (!heroVisible) return;
+      tx = ((e.clientX / window.innerWidth) - 0.5) * 16;
+      ty = ((e.clientY / window.innerHeight) - 0.5) * 12;
+    }, { passive:true });
+    function raf(){
+      cx += (tx - cx) * 0.045;
+      cy += (ty - cy) * 0.045;
+      heroBg.style.transform = 'translate(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px)';
+      rafId = requestAnimationFrame(raf);
+    }
+    function startRaf(){ if (rafId === null) rafId = requestAnimationFrame(raf); }
+    function stopRaf(){ if (rafId !== null){ cancelAnimationFrame(rafId); rafId = null; } }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(entries){
+        heroVisible = entries[0].isIntersecting;
+        if (heroVisible) startRaf(); else stopRaf();
+      }, { threshold: 0 }).observe(heroSection);
+    }
+    startRaf();
+  }
+
+  /* ---- Copyright year ---- */
+  var copyYearEl = document.getElementById('copyYear');
+  if (copyYearEl) copyYearEl.textContent = new Date().getFullYear();
+
+  /* ---- Scroll reveal ---- */
+  var revealEls = document.querySelectorAll('[data-reveal]');
+  if (reduceMotion) {
+    revealEls.forEach(function(el){ el.classList.add('in-view'); });
+  } else if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    revealEls.forEach(function(el){ obs.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in-view'); });
+  }
+
+  /* ---- Project inquiry modal ---- */
+  var overlay = document.getElementById('projectModalOverlay');
+  var modalClose = document.getElementById('modalClose');
+  var formWrap = document.getElementById('modalFormWrap');
+  var successView = document.getElementById('modalSuccess');
+  var form = document.getElementById('projectForm');
+  var lastFocused = null;
+
+  function openModal(){
+    lastFocused = document.activeElement;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    var firstInput = document.getElementById('pf-name');
+    if (firstInput) setTimeout(function(){ firstInput.focus(); }, 250);
+  }
+  function closeModal(){
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lastFocused) lastFocused.focus();
+  }
+
+  document.querySelectorAll('[data-action="projekt"]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      panel.classList.remove('open');
+      openModal();
+    });
+  });
+  modalClose.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  var interestGemeinde = document.getElementById('interestGemeinde');
+  var interestBetrieb = document.getElementById('interestBetrieb');
+  var orgLabel = document.getElementById('pf-org-label');
+  function syncType(){
+    var val = document.querySelector('input[name="type"]:checked').value;
+    interestGemeinde.hidden = val !== 'gemeinde';
+    interestBetrieb.hidden = val !== 'betrieb';
+    orgLabel.textContent = val === 'gemeinde' ? 'Gemeinde' : 'Firmenname';
+  }
+  document.querySelectorAll('input[name="type"]').forEach(function(r){ r.addEventListener('change', syncType); });
+  syncType();
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var data = new FormData(form);
+    var type = data.get('type');
+    var lines = [];
+    lines.push('Name: ' + (data.get('name') || ''));
+    lines.push('E-Mail: ' + (data.get('email') || ''));
+    lines.push('Telefon: ' + (data.get('telefon') || '–'));
+    if (data.get('organisation')) lines.push((type === 'gemeinde' ? 'Gemeinde' : 'Firmenname') + ': ' + data.get('organisation'));
+    lines.push('Interessiert als: ' + (type === 'gemeinde' ? 'Gemeinde' : 'Betrieb'));
+    if (type === 'gemeinde') {
+      var interessen = data.getAll('interesse');
+      lines.push('Interessensbereiche: ' + (interessen.length ? interessen.join(', ') : '–'));
+    } else {
+      lines.push('Interessensbereich: ' + (data.get('betrieb_interesse') || '–'));
+    }
+    var nachricht = data.get('nachricht');
+    if (nachricht) { lines.push(''); lines.push('Nachricht:'); lines.push(nachricht); }
+
+    var subject = 'Projektanfrage – ' + (type === 'gemeinde' ? 'Gemeinde' : 'Betrieb');
+    var mailto = 'mailto:info@geobonus.at?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+
+    formWrap.style.display = 'none';
+    successView.classList.add('show');
+    window.location.href = mailto;
+  });
+})();
+</script>
+
+</body>
+</html>

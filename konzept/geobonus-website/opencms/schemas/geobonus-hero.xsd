@@ -1,0 +1,93 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="opencms://opencms-xmlcontent.xsd" />
+    <xsd:include schemaLocation="opencms://system/modules/alkacon.mercury.template/schemas/nested/image.xsd" />
+    <xsd:include schemaLocation="opencms://system/modules/alkacon.mercury.template/schemas/nested/link.xsd" />
+
+    <xsd:element name="GbHeroData" type="OpenCmsGbHeroData" />
+
+    <xsd:complexType name="OpenCmsGbHeroData">
+        <xsd:sequence>
+            <xsd:element name="GbHero" type="OpenCmsGbHero" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="OpenCmsGbHero">
+        <xsd:sequence>
+            <xsd:element name="Image"        type="OpenCmsNestedImage" minOccurs="0" />
+            <xsd:element name="Eyebrow"      type="OpenCmsString" minOccurs="0" />
+            <xsd:element name="Coords"       type="OpenCmsString" minOccurs="0" />
+            <xsd:element name="Title"        type="OpenCmsString" />
+            <xsd:element name="TitleAccent"  type="OpenCmsString" minOccurs="0" />
+            <xsd:element name="Subtitle"     type="OpenCmsHtml" minOccurs="0" />
+            <xsd:element name="Cta"          type="OpenCmsNestedLink" minOccurs="0" maxOccurs="2" />
+            <xsd:element name="GalleryTitle" type="OpenCmsString" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="language" type="OpenCmsLocale" use="required" />
+    </xsd:complexType>
+
+    <xsd:annotation>
+        <xsd:appinfo>
+            <resourcebundles>
+                <propertybundle name="com.mapexplorer.geobonus.messages" />
+                <propertybundle name="alkacon.mercury.template.messages" />
+            </resourcebundles>
+            <searchsettings containerPageOnly="true" />
+            <FieldSettings>
+                <Setting>
+                    <PropertyName>Image</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Hero.Image)]]></DisplayName>
+                    <Description><![CDATA[%(key.label.gb.Hero.Image.help)]]></Description>
+                </Setting>
+                <Setting>
+                    <PropertyName>Eyebrow</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Eyebrow)]]></DisplayName>
+                    <Widget>string</Widget>
+                </Setting>
+                <Setting>
+                    <PropertyName>Coords</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Hero.Coords)]]></DisplayName>
+                    <Description><![CDATA[%(key.label.gb.Hero.Coords.help)]]></Description>
+                    <Widget>string</Widget>
+                </Setting>
+                <Setting>
+                    <PropertyName>Title</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Title)]]></DisplayName>
+                    <Widget>string</Widget>
+                    <WidgetConfig><![CDATA[%(attribute:stringConfigTypo)]]></WidgetConfig>
+                </Setting>
+                <Setting>
+                    <PropertyName>TitleAccent</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Hero.TitleAccent)]]></DisplayName>
+                    <Description><![CDATA[%(key.label.gb.Hero.TitleAccent.help)]]></Description>
+                    <Widget>string</Widget>
+                    <WidgetConfig><![CDATA[%(attribute:stringConfigTypo)]]></WidgetConfig>
+                </Setting>
+                <Setting>
+                    <PropertyName>Subtitle</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Subtitle)]]></DisplayName>
+                    <Widget>html</Widget>
+                    <WidgetConfig><![CDATA[%(attribute:editorConfigMinimal:%(param:editorConfigMinimal))]]></WidgetConfig>
+                </Setting>
+                <Setting>
+                    <PropertyName>Cta</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.gb.Cta)]]></DisplayName>
+                    <Description><![CDATA[%(key.label.gb.Cta.help)]]></Description>
+                </Setting>
+                <Setting>
+                    <PropertyName>GalleryTitle</PropertyName>
+                    <DisplayName><![CDATA[%(key.label.GalleryTitle)]]></DisplayName>
+                    <Widget>string</Widget>
+                    <Default><![CDATA[%(page_title)%(no_prefix:: )%(value:Title)]]></Default>
+                    <DefaultResolveMacros>false</DefaultResolveMacros>
+                    <Search>false</Search>
+                    <Visibility>ROLE.WORKPLACE_USER</Visibility>
+                    <Mapping>
+                       <MapTo>property:Title</MapTo>
+                       <UseDefault>true</UseDefault>
+                    </Mapping>
+                </Setting>
+            </FieldSettings>
+        </xsd:appinfo>
+    </xsd:annotation>
+</xsd:schema>

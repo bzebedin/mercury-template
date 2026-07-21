@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mein Standort – GeoBonus</title>
+<meta name="description" content="Machen Sie Ihren Standort digital erlebbar: alle wichtigen Informationen auf einen Blick, lagerichtig verortet und auf jedem Gerät. Ein Auszug aus unseren Referenzen.">
+<link rel="icon" href="assets/geobonus-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ============================================================
+     Mein Standort — the Referenzen glass tiles, on a chart surface.
+
+     The rest of the site is paper. This page is the map the pins sit
+     on: a mid-green ground ruled with a graticule and contour rings,
+     carrying the same frosted tiles the Bundesländer use. Same family,
+     different key.
+     ============================================================ */
+
+  .chart{
+    position:relative;
+    isolation:isolate;
+    background:linear-gradient(180deg, #F6F8F1 0%, #F0F2E9 55%, #EAEDE1 100%);
+    color:var(--ink);
+  }
+  /* Graticule + contour rings: the ruling of a real map sheet, not decoration.
+     The rings are repeating radial gradients — elevation lines, no image needed. */
+  .chart::before{
+    content:'';
+    position:absolute; inset:0; z-index:-2;
+    background-image:
+      repeating-radial-gradient(ellipse 52% 40% at 20% 24%, transparent 0 22px, rgba(19,32,24,.075) 22px 23.5px),
+      repeating-radial-gradient(ellipse 62% 46% at 86% 72%, transparent 0 28px, rgba(19,32,24,.065) 28px 29.5px),
+      repeating-radial-gradient(ellipse 44% 58% at 56% 4%, transparent 0 25px, rgba(19,32,24,.05) 25px 26.5px),
+      linear-gradient(rgba(19,32,24,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(19,32,24,.05) 1px, transparent 1px);
+    background-size:
+      auto, auto, auto,
+      clamp(54px,6vw,84px) clamp(54px,6vw,84px),
+      clamp(54px,6vw,84px) clamp(54px,6vw,84px);
+    pointer-events:none;
+  }
+  /* Colour for the glass to pick up — frosted panes need something behind them. */
+  .chart::after{
+    content:'';
+    position:absolute; inset:0; z-index:-1;
+    background:
+      radial-gradient(56% 68% at 6% 2%, rgba(0,200,5,.14), transparent 62%),
+      radial-gradient(52% 62% at 96% 98%, rgba(49,145,214,.16), transparent 64%);
+    pointer-events:none;
+  }
+
+  /* ============ Head ============ */
+  .std-head{
+    padding:calc(var(--header-h) + clamp(46px,6.5vw,88px)) 0 clamp(30px,4vw,52px);
+  }
+  .std-head .eyebrow{ margin-bottom:clamp(16px,2vw,22px); }
+  .std-head h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(46px,7.6vw,98px);
+    line-height:.95;
+    letter-spacing:-.025em;
+  }
+
+  /* ============ Referenzen ============ */
+  .examples{ padding:0 0 clamp(60px,8vw,104px); }
+  .examples h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(28px,4.2vw,54px);
+    line-height:1.04;
+    letter-spacing:-.02em;
+  }
+  .examples-rule{
+    border:none;
+    border-top:1px solid var(--line-strong);
+    margin:clamp(18px,2.4vw,28px) 0 clamp(26px,3.4vw,40px);
+  }
+
+  .group + .group{ margin-top:clamp(34px,4.5vw,60px); }
+  .group-name{
+    display:block;
+    font-family:var(--font-mono);
+    font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:clamp(12px,1.6vw,18px);
+  }
+
+  .std-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(232px, 1fr));
+    gap:clamp(9px,1.1vw,13px);
+  }
+
+  /* Liquid glass — the same frosted pane the Bundesländer use on Referenzen */
+  .spot{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    gap:12px;
+    min-height:136px;
+    padding:clamp(14px,1.5vw,17px);
+    border-radius:13px;
+    border:1px solid rgba(255,255,255,.75);
+    background:linear-gradient(150deg, rgba(255,255,255,.86) 0%, rgba(255,255,255,.56) 100%);
+    box-shadow:
+      0 4px 18px rgba(19,32,24,.07),
+      inset 0 1px 0 rgba(255,255,255,.95);
+    color:var(--ink);
+    transition:border-color .25s ease, transform .25s var(--ease), box-shadow .25s ease, background .25s ease;
+  }
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .spot{
+      -webkit-backdrop-filter:blur(14px) saturate(170%);
+              backdrop-filter:blur(14px) saturate(170%);
+      background:linear-gradient(150deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.34) 100%);
+    }
+  }
+  .spot::before{
+    content:'';
+    position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+    transform:translateX(-100%);
+    transition:transform .8s var(--ease);
+  }
+  .spot:hover::before,
+  .spot:focus-visible::before{ transform:translateX(100%); }
+  .spot:hover,
+  .spot:focus-visible{
+    transform:translateY(-2px);
+    border-color:#fff;
+    box-shadow:0 10px 26px rgba(19,32,24,.11), inset 0 1px 0 rgba(255,255,255,1);
+  }
+  .spot:focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
+
+  .spot-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+
+  .spot-pin{ display:inline-flex; flex:none; }
+  .spot-pin .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 0 rgba(0,200,5,.5);
+  }
+  .spot:hover .spot-pin .dot{ animation:ping 1.6s var(--ease) infinite; }
+  @keyframes ping{
+    0%{ box-shadow:0 0 0 0 rgba(0,200,5,.5); }
+    70%{ box-shadow:0 0 0 9px rgba(0,200,5,0); }
+    100%{ box-shadow:0 0 0 0 rgba(0,200,5,0); }
+  }
+
+  .spot-arrow{
+    flex:none;
+    width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink-soft);
+    transition:transform .35s var(--ease), background .25s ease, border-color .25s ease, color .25s ease;
+  }
+  .spot-arrow svg{ width:13px; height:13px; }
+  .spot:hover .spot-arrow{
+    transform:rotate(45deg);
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper);
+  }
+
+  .spot-name{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(17px,1.4vw,20px);
+    line-height:1.22;
+    letter-spacing:-.008em;
+    margin-top:auto;
+  }
+  /* The real path, shown as data — these are live maps, not mockups.
+     Held to one line: a wrapped URL reads as a broken string, not an address. */
+  .spot-path{
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.02em;
+    color:var(--ink-faint);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:color .25s ease;
+  }
+  .spot:hover .spot-path{ color:var(--ink-soft); }
+
+  /* ============ Closing CTA — plain paper, off the map sheet ============ */
+  .std-cta{
+    background:var(--paper);
+    padding:clamp(52px,7vw,92px) 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .std-cta h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(28px,4.4vw,54px);
+    line-height:1.06;
+    letter-spacing:-.02em;
+    max-width:20ch;
+    margin-bottom:clamp(22px,3vw,32px);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .spot:hover .spot-pin .dot{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow-ne" viewBox="0 0 24 24">
+    <path d="M7 17 17 7M7 7h10v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<header class="site-header site-header--solid" id="siteHeader">
+  <a class="brand" href="index.html" aria-label="GeoBonus Startseite">
+    <img src="assets/geobonus-logo.png" alt="GeoBonus">
+  </a>
+
+  <nav class="nav-group" aria-label="Hauptnavigation">
+    <a class="nav-link" href="index.html#produkte">Produkte</a>
+    <a class="nav-link" href="mein-standort.html" aria-current="page">Mein Standort</a>
+    <a class="nav-link" href="oesterreich.html#referenzen">Digitale Gemeinde</a>
+    <a class="nav-link" href="ueber-uns.html">Über uns</a>
+    <a class="nav-link" href="kontakt.html">Kontakt</a>
+  </nav>
+
+  <div class="header-actions">
+    <a class="header-cta" href="#" data-action="projekt">Projekt anfragen</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilePanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <a class="nav-link" href="index.html#produkte">Produkte</a>
+  <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+  <a class="nav-link" href="oesterreich.html#referenzen">Digitale Gemeinde</a>
+  <a class="nav-link" href="ueber-uns.html">Über uns</a>
+  <a class="nav-link" href="kontakt.html">Kontakt</a>
+  <a class="btn btn-primary" href="#" data-action="projekt">Projekt anfragen</a>
+</div>
+
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Formular schließen" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div id="modalFormWrap">
+      <span class="eyebrow modal-eyebrow"><span class="dot"></span>GeoBonus · Kontakt</span>
+      <h2 id="modalTitle">Projekt anfragen</h2>
+      <p class="modal-sub">Erzählen Sie uns von Ihrem Vorhaben – wir melden uns zeitnah.</p>
+
+      <form id="projectForm" novalidate>
+        <div class="field">
+          <label for="pf-name">Ansprechpartner</label>
+          <input type="text" id="pf-name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="pf-email">E-Mail</label>
+            <input type="email" id="pf-email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="pf-phone">Telefon</label>
+            <input type="tel" id="pf-phone" name="telefon" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-org" id="pf-org-label">Gemeinde</label>
+          <input type="text" id="pf-org" name="organisation" autocomplete="organization">
+        </div>
+
+        <fieldset>
+          <legend>Ich interessiere mich als</legend>
+          <div class="segmented">
+            <label class="segment">
+              <input type="radio" name="type" value="gemeinde">
+              <span>Gemeinde</span>
+            </label>
+            <label class="segment">
+              <input type="radio" name="type" value="betrieb" checked>
+              <span>Betrieb</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="interest-group" id="interestGemeinde" hidden>
+          <span class="group-label">Interessensbereich (Mehrfachauswahl möglich)</span>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Digitale Gemeindekarte"> Digitale Gemeindekarte</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Gemeindekarte/Ortskarte/Regionskarte Print"> Gemeindekarte/Ortskarte/Regionskarte (Print)</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Schautafel"> Schautafel</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="3D Panorama"> 3D Panorama</label>
+        </div>
+
+        <div class="interest-group" id="interestBetrieb">
+          <span class="group-label">Interessensbereich</span>
+          <div class="segmented segmented--single">
+            <label class="segment">
+              <input type="radio" name="betrieb_interesse" value="Mein Standort" checked>
+              <span>Mein Standort</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-message">Nachricht (optional)</label>
+          <textarea id="pf-message" name="nachricht" rows="3" placeholder="Teilen Sie uns mehr Details mit"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary modal-submit">
+          Anfrage senden
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="modal-note">Beim Absenden öffnet sich Ihr E-Mail-Programm mit einem vorausgefüllten Entwurf an unser Team.</p>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+      <h3>Fast geschafft</h3>
+      <p>Ihr E-Mail-Programm hat sich mit einem vorausgefüllten Entwurf geöffnet. Senden Sie die Nachricht ab, und wir melden uns bei Ihnen.</p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <div class="chart">
+
+    <section class="std-head" aria-labelledby="pageTitle">
+      <div class="wrap">
+        <span class="eyebrow eyebrow--fade" data-enter style="--enter-i:0"><span class="dot"></span>GeoBonus · Europa</span>
+        <h1 id="pageTitle" data-enter style="--enter-i:1">Mein Standort</h1>
+      </div>
+    </section>
+
+    <section class="examples" aria-labelledby="examplesTitle">
+      <div class="wrap">
+        <h2 id="examplesTitle" data-enter style="--enter-i:2">Auszug aus Referenzen</h2>
+        <hr class="examples-rule">
+
+        <div class="group" data-reveal>
+          <span class="group-name">Ausflugsziele &amp; Freizeit</span>
+          <div class="std-grid">
+            <a class="spot" href="https://www.geobonus.at/oesterreich/kaernten/3laendereck">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Dreiländereck</span>
+              <span class="spot-path">geobonus.at/oesterreich/kaernten/3laendereck</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/oesterreich/kaernten/malta-hochalmstrasse-koelnbreinsperre/">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Malta-Hochalmstraße – Kölnbreinsperre</span>
+              <span class="spot-path">geobonus.at/oesterreich/kaernten/malta-hochalmstrasse-koelnbreinsperre</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/oesterreich/kaernten/pyramidenkogel">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Pyramidenkogel</span>
+              <span class="spot-path">geobonus.at/oesterreich/kaernten/pyramidenkogel</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/Reptilienzoo-Happ">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Reptilienzoo Happ</span>
+              <span class="spot-path">geobonus.at/mymap/Reptilienzoo-Happ</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/oesterreich/kaernten/tierpark-rosegg">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Tierpark Rosegg</span>
+              <span class="spot-path">geobonus.at/oesterreich/kaernten/tierpark-rosegg</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/waldseilpark-pyramidenkogel">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Waldseilpark Pyramidenkogel</span>
+              <span class="spot-path">geobonus.at/mymap/waldseilpark-pyramidenkogel</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="group" data-reveal>
+          <span class="group-name">Gastronomie &amp; Übernachtung</span>
+          <div class="std-grid">
+            <a class="spot" href="https://www.geobonus.at/mymap/appartements-oswald">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Appartements Oswald</span>
+              <span class="spot-path">geobonus.at/mymap/appartements-oswald</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/karlbauer">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Berggasthof Karlbauer</span>
+              <span class="spot-path">geobonus.at/mymap/karlbauer</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/buschenschank-buchsbaum">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Buschenschank Buchsbaum</span>
+              <span class="spot-path">geobonus.at/mymap/buschenschank-buchsbaum</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/brueckler">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Camping Brückler am Keutschacher See</span>
+              <span class="spot-path">geobonus.at/mymap/brueckler</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/fkk-grosscamping-sabotnik">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">FKK Grosscamping Sabotnik</span>
+              <span class="spot-path">geobonus.at/mymap/fkk-grosscamping-sabotnik</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/gasthaus-ogris">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Gasthof Ogris</span>
+              <span class="spot-path">geobonus.at/mymap/gasthaus-ogris</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/Deutscher-Peter">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Gasthof Pension Deutscher Peter</span>
+              <span class="spot-path">geobonus.at/mymap/Deutscher-Peter</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/hotel-restaurant-weidenhof">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Hotel Restaurant Weidenhof</span>
+              <span class="spot-path">geobonus.at/mymap/hotel-restaurant-weidenhof</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/mothesbuschenschank">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Mothe’s Buschenschenke</span>
+              <span class="spot-path">geobonus.at/mymap/mothesbuschenschank</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/Pension-Landgut-Rojachhof">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Pension Landgut Rojachhof</span>
+              <span class="spot-path">geobonus.at/mymap/Pension-Landgut-Rojachhof</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/restaurant-am-kogel">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Restaurant am Kogel</span>
+              <span class="spot-path">geobonus.at/mymap/restaurant-am-kogel</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="group" data-reveal>
+          <span class="group-name">Betriebe &amp; Institutionen</span>
+          <div class="std-grid">
+            <a class="spot" href="https://www.geobonus.at/ams">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">AMS Österreich</span>
+              <span class="spot-path">geobonus.at/ams</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/bestattung_grafenstein">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Bestattung Grafenstein</span>
+              <span class="spot-path">geobonus.at/mymap/bestattung_grafenstein</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/euronova">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Euronova</span>
+              <span class="spot-path">geobonus.at/euronova</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/hedenik-dach">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Hedenik Spenglerei und Dachdeckungs GmbH</span>
+              <span class="spot-path">geobonus.at/mymap/hedenik-dach</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/piplan">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Piplan Industrieanlagen</span>
+              <span class="spot-path">geobonus.at/mymap/piplan</span>
+            </a>
+            <a class="spot" href="https://www.geobonus.at/mymap/tischlerei-jakopitsch">
+              <div class="spot-top">
+                <span class="spot-pin" aria-hidden="true"><span class="dot"></span></span>
+                <span class="spot-arrow" aria-hidden="true"><svg><use href="#i-arrow-ne"/></svg></span>
+              </div>
+              <span class="spot-name">Tischlerei Jakopitsch</span>
+              <span class="spot-path">geobonus.at/mymap/tischlerei-jakopitsch</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <section class="std-cta" aria-labelledby="ctaTitle">
+    <div class="wrap">
+      <h2 id="ctaTitle" data-reveal>Zeige was deinen Standort besonders macht!</h2>
+      <div data-reveal>
+        <a class="btn btn-primary" href="#" data-action="projekt">
+          Projekt anfragen
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-legal" aria-label="Rechtliches">
+    <a href="agb.html">AGB</a>
+    <span class="footer-dot">·</span>
+    <a href="impressum.html">Impressum</a>
+    <span class="footer-dot">·</span>
+    <a href="https://www.geobonus.at/datenschutz-einstellungen/">Datenschutz Einstellungen</a>
+  </nav>
+  <div class="footer-bottom">
+    <span>© <span id="copyYear">2026</span> GeoBonus by MapExplorer Information Systems GmbH</span>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Österreich entdecken – GeoBonus</title>
+<meta name="description" content="Alle neun Bundesländer auf einer Karte. Öffnen Sie die Gesamtkarte Ihres Bundeslands oder springen Sie direkt zu einer Gemeinde.">
+<link rel="icon" href="assets/geobonus-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* --green is the exact green of the GeoBonus logo (sampled: #00C805).
+       Everything green on this page is derived from it. */
+    --green:#00C805;
+    --green-deep:#087A0C;   /* logo hue, darkened to 5.3:1 on paper for text */
+    --blue:#3191D6;
+    --blue-deep:#1E6FA8;
+
+    --paper:#FAFAF7;
+    --paper-alt:#F0F1EA;
+    --surface:#FFFFFF;
+
+    --ink:#132018;
+    --ink-soft:#54615A;
+    --ink-faint:#5F6E67;
+
+    --line:#E2E3D9;
+    --line-strong:#CCCFC2;
+
+    --hero-dark:#0A1C15;
+
+    /* map-only tokens — the live tiles are tints of the logo green */
+    --tile:#E4E7DC;
+    --tile-edge:#C4C8B8;
+    --tile-live:#A3E9A2;        /* 35% logo green on paper */
+    --tile-live-edge:#087A0C;   /* 3.9:1 against the tile it outlines */
+    --tile-active:#00C805;      /* the logo green itself, on hover/focus */
+    --tile-active-edge:#062210;
+
+    /* Green→blue fade for the accent words. Both ends are the logo colours pulled
+       down to text weight — the raw logo green only reaches 2.2:1 on paper and
+       would be unreadable. This ramp never drops below 4.7:1 anywhere. */
+    --fade:linear-gradient(100deg, #087A0C 0%, #087A0C 42%, #1E6FA8 100%);
+
+    --font-display:'Fraunces', ui-serif, Georgia, serif;
+    --font-body:'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+    --header-h:76px;
+    --container:1240px;
+
+    --ease:cubic-bezier(.19,1,.22,1);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  body{
+    font-family:var(--font-body);
+    background:var(--paper);
+    color:var(--ink);
+    overflow-x:hidden;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; }
+  img{ max-width:100%; display:block; }
+
+  ::selection{ background:var(--green); color:#062210; }
+
+  :focus-visible{
+    outline:2px solid var(--ink);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  /* ============ Reveal ============
+     A short lift + fade as text enters the viewport. Deliberately small (10px,
+     one step) — it should register as the page settling, not as an entrance. */
+  /* Gated on .js (set by the script itself): without JavaScript nothing ever
+     adds .in-view, so the text must never start hidden. */
+  .js [data-reveal]{
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .65s var(--ease), transform .65s var(--ease);
+  }
+  .js [data-reveal].in-view{ opacity:1; transform:translateY(0); }
+  .js [data-reveal-stagger] > *{
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .js [data-reveal-stagger].in-view > *{ opacity:1; transform:translateY(0); }
+  .js [data-reveal-stagger].in-view > *:nth-child(1){ transition-delay:.04s; }
+  .js [data-reveal-stagger].in-view > *:nth-child(2){ transition-delay:.10s; }
+  .js [data-reveal-stagger].in-view > *:nth-child(3){ transition-delay:.16s; }
+  .js [data-reveal-stagger].in-view > *:nth-child(4){ transition-delay:.22s; }
+
+  @media (prefers-reduced-motion: reduce){
+    .js [data-reveal], .js [data-reveal-stagger] > *{ opacity:1; transform:none; }
+  }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px;
+    padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  .wrap{
+    max-width:var(--container);
+    margin:0 auto;
+    padding-left:clamp(20px,4vw,56px);
+    padding-right:clamp(20px,4vw,56px);
+  }
+
+  /* Falls back to flat green: background-clip:text with a transparent colour
+     would render nothing at all where it isn't supported. */
+  .fade-text{ color:var(--green-deep); }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .fade-text{
+      background-image:var(--fade);
+      -webkit-background-clip:text;
+              background-clip:text;
+      color:transparent;
+    }
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .eyebrow .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--green);
+    flex:none;
+  }
+  /* The kicker above a heading, filled with the logo's green→blue fade. Same
+     fallback as .fade-text; the dot keeps its own background because
+     background-clip only clips this element's. */
+  .eyebrow--fade{ color:var(--green-deep); }
+  @supports ((background-clip:text) or (-webkit-background-clip:text)){
+    .eyebrow--fade{
+      background-image:var(--fade);
+      -webkit-background-clip:text;
+              background-clip:text;
+      color:transparent;
+    }
+  }
+
+  /* ============ Skip link ============ */
+  .skip-link{
+    position:absolute; left:-999px; top:0;
+    background:var(--ink); color:var(--paper);
+    padding:12px 20px; border-radius:0 0 8px 0; z-index:1001;
+    font-weight:500; font-size:14px;
+  }
+  .skip-link:focus{ left:0; }
+
+  /* ============ Header (identical to index.html, solid from the start) ============ */
+  .site-header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    height:var(--header-h);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 clamp(20px,4vw,56px);
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+
+  .brand{ display:flex; align-items:center; }
+  .brand img{ height:26px; width:auto; }
+
+  .nav-group{ display:flex; align-items:center; gap:clamp(18px,2vw,30px); }
+
+  .nav-link{
+    position:relative;
+    display:inline-flex; align-items:center;
+    padding:8px 1px;
+    color:var(--ink);
+    font-size:13.5px; font-weight:500; letter-spacing:.06em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .nav-link::after{
+    content:'';
+    position:absolute; left:0; right:0; bottom:4px;
+    height:1px;
+    background:currentColor;
+    transform:scaleX(0);
+    transform-origin:right;
+    transition:transform .45s var(--ease);
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after{
+    transform:scaleX(1);
+    transform-origin:left;
+  }
+  /* The page you're on keeps its rule drawn — same hairline as the hover state,
+     not a colour of its own. */
+  .nav-link[aria-current="page"]::after{ transform:scaleX(1); transform-origin:left; }
+
+  .header-actions{ display:flex; align-items:center; gap:28px; }
+
+  .header-cta{
+    display:inline-flex; align-items:center;
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:13px; font-weight:600; letter-spacing:.01em;
+    min-height:38px;
+    color:var(--ink);
+    border:1px solid var(--line-strong);
+    transition:background .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .header-cta:hover{ background:var(--surface); border-color:var(--ink); }
+
+  .menu-toggle{
+    display:none;
+    width:44px; height:44px; border-radius:50%;
+    background:transparent;
+    border:1px solid var(--line-strong);
+    align-items:center; justify-content:center;
+    flex:none;
+    color:var(--ink);
+    transition:background .2s ease;
+  }
+  .menu-toggle:hover{ background:var(--paper-alt); }
+  .menu-toggle svg{ width:18px; height:18px; }
+
+  /* ============ Buttons ============ */
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 24px;
+    border-radius:8px;
+    font-size:14.5px; font-weight:600; letter-spacing:.01em;
+    white-space:nowrap;
+    min-height:44px;
+    transition:background .25s ease, color .25s ease, border-color .25s ease, transform .2s ease;
+  }
+  .btn svg{ width:16px; height:16px; transition:transform .3s var(--ease); }
+  .btn:hover svg{ transform:translateX(3px); }
+
+  .btn-accent{ background:var(--green); color:#08210F; border:1px solid var(--green); }
+  .btn-accent:hover{ background:#00E006; border-color:#00E006; transform:translateY(-1px); }
+
+  .btn-primary{ background:var(--ink); color:var(--paper); border:1px solid var(--ink); }
+  .btn-primary:hover{ background:var(--green-deep); border-color:var(--green-deep); }
+
+  .btn-ghost{ background:transparent; color:var(--ink); border:1px solid var(--line-strong); }
+  .btn-ghost:hover{ background:var(--surface); border-color:var(--ink); }
+
+  /* ============ Mobile nav panel ============ */
+  .mobile-panel{
+    position:fixed; inset:0; z-index:99;
+    background:var(--paper);
+    display:flex; flex-direction:column; align-items:flex-start;
+    justify-content:center; gap:22px;
+    padding:0 32px;
+    transform:translateY(-8px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .mobile-panel.open{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .mobile-panel .nav-link{
+    color:var(--ink);
+    font-size:26px; font-family:var(--font-display); text-transform:none;
+    letter-spacing:0; font-weight:500;
+  }
+  .mobile-panel .btn{ margin-top:12px; }
+
+  /* ============ Page intro ============
+     One centred column that leads into the centred map, rather than a
+     left-aligned block and a second display line competing with it.
+     The scale steps hard — 66px heading against a 25px claim — so the claim
+     reads as a caption, not as a second headline. */
+  /* The intro and the stage share a sticky scope so the title can pin over the
+     map for the whole animation, then release before the Referenzen. */
+  .stage-wrap{ position:relative; }
+
+  .intro{
+    position:sticky;
+    top:0;                     /* the padding below clears the fixed header */
+    z-index:6;
+    pointer-events:none;       /* the map underneath has to stay clickable */
+    padding-top:calc(var(--header-h) + clamp(28px,4vw,48px));
+    padding-bottom:clamp(16px,2.2vw,26px);
+    background:transparent;    /* the map scrolls up behind it */
+    text-align:center;
+  }
+  .intro .eyebrow{ margin-bottom:18px; }
+  .intro h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(42px,6.4vw,78px);
+    line-height:1;
+    letter-spacing:-.015em;
+  }
+  .intro h1 em{ font-style:italic; font-weight:500; }
+  /* scaled by scroll — on its own span so it can't collide with the reveal,
+     anchored at the top so it shrinks upward and stays pinned near the header */
+  .intro-title{
+    display:inline-block;
+    transform-origin:top center;
+    will-change:transform;
+  }
+  /* eyebrow and claim: they step aside so only the title is left up there */
+  .intro-supp{ will-change:opacity; }
+  .intro-rule{
+    width:40px; height:2px;
+    background:var(--line-strong);
+    border-radius:2px;
+    margin:clamp(20px,2.6vw,28px) auto clamp(16px,2.2vw,22px);
+  }
+  .intro-claim{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(19px,2.2vw,27px);
+    line-height:1.3;
+    width:fit-content;      /* so the gradient spans the words, not the column */
+    margin:0 auto;
+  }
+
+  /* ============ Scroll stage ============ */
+  .stage{
+    position:relative;
+    height:340vh;
+    background:linear-gradient(180deg, var(--paper) 0%, var(--paper-alt) 22%, var(--paper-alt) 78%, var(--paper) 100%);
+  }
+  .stage-sticky{
+    position:sticky; top:0;
+    height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:clamp(16px,2.4vw,28px);
+    padding:calc(var(--header-h) + 16px) clamp(16px,4vw,56px) 28px;
+    overflow:hidden;
+  }
+
+  /* graticule: a faint map grid that fades in with the zoom */
+  .stage-grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, rgba(19,32,24,.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(19,32,24,.05) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0;
+    pointer-events:none;
+    -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 50%, #000 40%, transparent 100%);
+            mask-image:radial-gradient(ellipse 70% 60% at 50% 50%, #000 40%, transparent 100%);
+  }
+
+  .scene{
+    position:relative;
+    width:100%;
+    /* Austria is 1.94:1, so on short viewports the height, not the width, is the
+       binding constraint — cap by height so the map never gets clipped. */
+    max-width:min(1120px, calc((100vh - 250px) * 1.94));
+    flex:none;
+    perspective:1500px;
+    perspective-origin:50% 46%;
+  }
+
+  .map{
+    position:relative;
+    width:100%;
+    aspect-ratio:1000 / 515;
+    transform-style:preserve-3d;
+    will-change:transform;
+    /* set by JS; these are the flat, final values */
+    transform:scale(1) rotateX(0deg);
+  }
+
+  .state{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    pointer-events:none;
+    will-change:transform, filter;
+    filter:drop-shadow(0 1px 1px rgba(19,32,24,.16));
+  }
+  .state svg{ width:100%; height:100%; display:block; overflow:visible; }
+
+  .state-shape{
+    fill:var(--tile);
+    stroke:var(--tile-edge);
+    stroke-width:1.6;
+    stroke-linejoin:round;
+    /* only the filled shape takes clicks — each state's <svg> spans the whole map */
+    pointer-events:none;
+    cursor:pointer;
+    transition:fill .25s ease, stroke .25s ease;
+  }
+  /* the map only accepts clicks once it has settled flat under the cursor */
+  .map-live .state-shape{ pointer-events:auto; }
+  .state--live .state-shape{
+    fill:var(--tile-live);
+    stroke:var(--tile-live-edge);
+  }
+
+  /* pending states are shown, focusable, but lead nowhere yet */
+  .state--pending .state-shape{ cursor:default; }
+
+  /* <button> would shrink-to-fit its content, so the pending states need an
+     explicit box to match the <a> of the live ones. */
+  .state-hit{
+    display:block;
+    width:100%; height:100%;
+    padding:0; border:0; background:none;
+    -webkit-appearance:none; appearance:none;
+    color:inherit; font:inherit; text-align:inherit;
+    outline:none;
+  }
+
+  .state:hover, .state:focus-within{ z-index:5; }
+  .state--live:hover .state-shape,
+  .state--live:focus-within .state-shape{ fill:var(--tile-active); stroke:var(--tile-active-edge); }
+  .state--pending:hover .state-shape,
+  .state--pending:focus-within .state-shape{ fill:#D8DCCE; stroke:var(--ink-soft); }
+
+  /* focus ring lives on the shape — the anchor box spans the whole map */
+  .state-hit:focus-visible .state-shape{ stroke:var(--ink); stroke-width:5; }
+
+  .state-label{
+    font-family:var(--font-mono);
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    fill:var(--ink-soft);
+    text-anchor:middle;
+    dominant-baseline:middle;
+    pointer-events:none;
+    paint-order:stroke;
+    stroke:var(--paper-alt);
+    stroke-width:3.5;
+    stroke-linejoin:round;
+  }
+  .state--live .state-label{ fill:#08210F; }
+  .state--live:hover .state-label,
+  .state--live:focus-within .state-label{ stroke:var(--green); }
+  .state-leader{ stroke:var(--ink-faint); stroke-width:1.2; fill:none; pointer-events:none; }
+
+  /* Osttirol is a district of Tirol, not a Bundesland: it is deliberately set
+     smaller and lighter than a state name so it reads as a place inside Tirol
+     rather than a tenth thing you can pick. Clicking it opens Tirol. */
+  .state-sublabel{
+    font-family:var(--font-mono);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    fill:var(--ink-faint);
+    text-anchor:middle;
+    dominant-baseline:middle;
+    pointer-events:none;
+    paint-order:stroke;
+    stroke:var(--paper-alt);
+    stroke-width:2.5;
+    stroke-linejoin:round;
+  }
+
+  /* labels are unreadable while the map is steeply tilted */
+  .map-labels-hidden .state-label,
+  .map-labels-hidden .state-sublabel,
+  .map-labels-hidden .state-leader{ opacity:0; }
+  .state-label, .state-sublabel, .state-leader{ transition:opacity .4s ease; }
+
+  /* ============ Stage readout ============ */
+  .stage-readout{
+    display:flex; align-items:center; gap:12px;
+    min-height:44px;
+    padding:10px 18px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    font-size:14px;
+    color:var(--ink-soft);
+    text-align:center;
+    box-shadow:0 6px 20px rgba(19,32,24,.05);
+    /* Only appears for a Bundesland whose map isn't ready yet. The live ones say
+       it themselves by being green and clickable. */
+    opacity:0;
+    transform:translateY(4px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .stage-readout[data-status="pending"]{ opacity:1; transform:translateY(0); }
+  .stage-readout .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--line-strong);
+    flex:none;
+    transition:background .25s ease;
+  }
+  .stage-readout[data-status="pending"] .dot{ background:var(--blue); }
+  .stage-readout strong{ color:var(--ink); font-weight:600; }
+
+  /* ============ Scroll cue ============ */
+  .scroll-cue{
+    display:flex; align-items:center; gap:9px;
+    font-family:var(--font-mono);
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-faint);
+    transition:opacity .4s ease;
+  }
+  .scroll-cue svg{ width:14px; height:14px; animation:cueBob 1.8s ease-in-out infinite; }
+  @keyframes cueBob{ 0%,100%{ transform:translateY(-2px); } 50%{ transform:translateY(2px); } }
+
+  /* ============ Touch fallback: the map is decorative below this width ============ */
+  .state-picker{ display:none; }
+  .state-picker-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .state-picker-head h2{
+    font-family:var(--font-display); font-weight:500; font-size:22px;
+  }
+  .state-picker-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;
+  }
+  .state-pick{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    min-height:52px;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    font-size:14.5px; font-weight:500;
+    color:var(--ink);
+    text-align:left;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .state-pick svg{ width:15px; height:15px; flex:none; color:var(--ink-faint); }
+  .state-pick--live{ border-color:var(--green-deep); }
+  .state-pick--live svg{ color:var(--green-deep); }
+  .state-pick--live:active{ background:var(--tile-live); }
+  .state-pick--pending{ color:var(--ink-faint); background:var(--paper-alt); }
+  .state-pick-note{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--ink-faint);
+  }
+
+  /* ============ Referenzen ============ */
+  .refs{
+    padding:clamp(64px,9vw,112px) 0 clamp(72px,10vw,120px);
+    background:var(--paper);
+  }
+  .refs-head{ margin-bottom:clamp(28px,4vw,40px); }
+  .refs-head .eyebrow{ margin-bottom:16px; }
+  .refs-head h2{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(36px,5.4vw,64px);
+    line-height:1.02;
+    letter-spacing:-.015em;
+    margin-bottom:14px;
+  }
+  .refs-head p{
+    color:var(--ink-soft); font-size:16px; line-height:1.6; max-width:56ch;
+  }
+
+  /* the disclosure button */
+  .refs-toggle{
+    width:100%;
+    display:flex; align-items:center; gap:clamp(14px,2vw,22px);
+    padding:clamp(20px,2.6vw,26px) clamp(18px,2.4vw,28px);
+    background:var(--surface);
+    border:1px solid var(--line-strong);
+    border-radius:14px;
+    text-align:left;
+    color:var(--ink);
+    transition:border-color .3s ease, box-shadow .3s ease, transform .25s var(--ease), border-radius .3s ease;
+  }
+  .refs-toggle:hover{
+    border-color:var(--ink);
+    box-shadow:0 12px 34px rgba(19,32,24,.09);
+    transform:translateY(-2px);
+  }
+  .refs-toggle[aria-expanded="true"]{
+    border-radius:14px 14px 0 0;
+    border-bottom-color:var(--line);
+    transform:none;
+    box-shadow:none;
+  }
+
+  .refs-toggle-pin{
+    width:46px; height:46px; flex:none;
+    border-radius:50%;
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    transition:background .3s ease, border-color .3s ease;
+  }
+  .refs-toggle-pin svg{ width:20px; height:20px; color:var(--green-deep); }
+  .refs-toggle:hover .refs-toggle-pin{ background:var(--tile-live); border-color:var(--green-deep); }
+
+  .refs-toggle-main{ flex:1; min-width:0; }
+  .refs-toggle-title{
+    display:block;
+    font-family:var(--font-display);
+    font-size:clamp(21px,2.4vw,28px);
+    font-weight:500;
+  }
+  .refs-toggle-sub{
+    display:block;
+    color:var(--ink-soft); font-size:14px; line-height:1.5; margin-top:4px;
+  }
+
+  .refs-toggle-count{
+    flex:none;
+    font-family:var(--font-mono);
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft);
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:7px 12px;
+    white-space:nowrap;
+  }
+  .refs-toggle-chevron{
+    flex:none;
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .4s var(--ease), background .3s ease, border-color .3s ease, color .3s ease;
+  }
+  .refs-toggle-chevron svg{ width:15px; height:15px; }
+  .refs-toggle:hover .refs-toggle-chevron{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .refs-toggle[aria-expanded="true"] .refs-toggle-chevron{ transform:rotate(180deg); }
+
+  /* the panel */
+  .refs-panel{
+    border:1px solid var(--line-strong);
+    border-top:none;
+    border-radius:0 0 14px 14px;
+    /* Glass needs something behind it to refract — on a flat fill it just looks
+       like a pale card. These two washes give the buttons colour to pick up. */
+    background:
+      radial-gradient(62% 90% at 10% 0%, rgba(0,200,5,0.13), transparent 62%),
+      radial-gradient(55% 85% at 92% 100%, rgba(49,145,214,0.13), transparent 62%),
+      var(--paper-alt);
+    padding:clamp(20px,2.6vw,28px);
+  }
+  .refs-panel[hidden]{ display:none; }
+
+  .refs-panel-hint{
+    font-family:var(--font-mono);
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:14px;
+  }
+
+  .refs-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+    gap:10px;
+  }
+
+  /* Liquid glass, light version: a frosted pane over the panel's colour wash */
+  .ref-state{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    display:flex; align-items:center; gap:11px;
+    min-height:56px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.75);
+    background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.52) 100%);
+    box-shadow:
+      0 4px 18px rgba(19,32,24,0.07),
+      inset 0 1px 0 rgba(255,255,255,0.95);
+    text-align:left;
+    color:var(--ink);
+    transition:border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .ref-state{
+      -webkit-backdrop-filter:blur(14px) saturate(170%);
+              backdrop-filter:blur(14px) saturate(170%);
+      background:linear-gradient(135deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.30) 100%);
+    }
+  }
+  .ref-state::before{
+    content:'';
+    position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
+    transform:translateX(-100%);
+    transition:transform .7s var(--ease);
+  }
+  .ref-state:hover::before{ transform:translateX(100%); }
+  .ref-state:hover{
+    transform:translateY(-1px);
+    border-color:#fff;
+    box-shadow:0 8px 24px rgba(19,32,24,0.10), inset 0 1px 0 rgba(255,255,255,1);
+  }
+  /* the selected one drops the glass: a pick has to be unmistakable */
+  .ref-state[aria-expanded="true"]{
+    border-color:var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    box-shadow:0 6px 20px rgba(19,32,24,0.18);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+  }
+
+  .ref-state-dot{
+    width:8px; height:8px; border-radius:50%; flex:none;
+    background:var(--green);
+  }
+  .ref-state--empty .ref-state-dot{ background:var(--line-strong); }
+  .ref-state[aria-expanded="true"] .ref-state-dot{ background:var(--green); }
+
+  .ref-state-name{ flex:1; font-size:14.5px; font-weight:500; }
+  .ref-state-count{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.06em;
+    color:var(--ink-faint); flex:none;
+  }
+  .ref-state[aria-expanded="true"] .ref-state-count{ color:rgba(250,250,247,.7); }
+  /* Bundesländer without references: same pane, thinner and dimmer, and it
+     doesn't lift on hover — there is nothing behind it yet. */
+  .ref-state--empty{
+    color:var(--ink-faint);
+    border-color:rgba(255,255,255,0.5);
+    background:linear-gradient(135deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.16) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .ref-state--empty:hover{
+    transform:none;
+    border-color:rgba(255,255,255,0.7);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .ref-state--empty::before{ display:none; }
+
+  /* gemeinde list */
+  .ref-list{
+    margin-top:14px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:clamp(16px,2vw,22px);
+  }
+  .ref-list[hidden]{ display:none; }
+  .ref-list-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+    padding-bottom:14px; margin-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .ref-list-title{ font-family:var(--font-display); font-size:20px; font-weight:500; }
+  .ref-list-meta{ font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+
+  .ref-list-items{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:2px;
+    list-style:none;
+  }
+  .ref-list-items a{
+    display:flex; align-items:center; gap:9px;
+    min-height:44px;
+    padding:9px 10px;
+    border-radius:7px;
+    font-size:14.5px;
+    color:var(--ink);
+    transition:background .18s ease, color .18s ease;
+  }
+  .ref-list-items a::before{
+    content:'';
+    width:5px; height:5px; border-radius:50%;
+    background:var(--line-strong);
+    flex:none;
+    transition:background .18s ease;
+  }
+  .ref-list-items a:hover{ background:var(--paper-alt); }
+  .ref-list-items a:hover::before{ background:var(--green); }
+  .ref-list-items a svg{
+    width:13px; height:13px; margin-left:auto; flex:none;
+    color:var(--ink-faint);
+    opacity:0; transition:opacity .18s ease;
+  }
+  .ref-list-items a:hover svg{ opacity:1; }
+
+  .ref-empty{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:4px 2px;
+  }
+  .ref-empty svg{ width:18px; height:18px; color:var(--ink-faint); flex:none; margin-top:2px; }
+  .ref-empty-text{ font-size:14.5px; color:var(--ink-soft); line-height:1.55; }
+  .ref-empty-text strong{ color:var(--ink); font-weight:600; }
+
+  /* ============ Modal (identical to index.html) ============ */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(10,28,21,0.5);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .modal-card{
+    background:var(--surface);
+    border-radius:16px;
+    width:100%; max-width:560px;
+    max-height:88vh;
+    overflow-y:auto;
+    padding:clamp(28px,4vw,44px);
+    position:relative;
+    box-shadow:0 30px 80px rgba(10,28,21,0.28);
+    transform:translateY(14px) scale(.98);
+    transition:transform .35s var(--ease);
+  }
+  .modal-overlay.open .modal-card{ transform:translateY(0) scale(1); }
+
+  .modal-close{
+    position:absolute; top:20px; right:20px;
+    width:40px; height:40px; border-radius:50%;
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink);
+    transition:background .2s ease;
+  }
+  .modal-close:hover{ background:var(--line); }
+  .modal-close svg{ width:16px; height:16px; }
+
+  .modal-eyebrow{ margin-bottom:14px; }
+  #modalTitle{
+    font-family:var(--font-display);
+    font-size:clamp(26px,3vw,32px);
+    font-weight:500;
+    margin-bottom:10px;
+  }
+  .modal-sub{ color:var(--ink-soft); font-size:15px; line-height:1.55; margin-bottom:28px; max-width:46ch; }
+
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .field{ margin-bottom:18px; }
+  .field label{
+    display:block; font-size:12.5px; font-weight:600; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:7px;
+  }
+  .field input, .field textarea{
+    width:100%;
+    font-family:inherit; font-size:15.5px; color:var(--ink);
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    min-height:46px;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .field textarea{ min-height:auto; resize:vertical; }
+  .field input:focus, .field textarea:focus{
+    background:var(--surface);
+    border-color:var(--ink);
+    outline:none;
+  }
+
+  fieldset{ border:none; margin:0 0 18px; padding:0; }
+  legend{ font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:9px; padding:0; }
+
+  .segmented{ display:flex; gap:8px; }
+  .segmented--single{ max-width:220px; }
+  .segment{
+    flex:1; text-align:center;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 14px;
+    font-size:14px; font-weight:500;
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease, color .2s ease;
+    position:relative;
+  }
+  .segment input{ position:absolute; opacity:0; inset:0; cursor:pointer; margin:0; }
+  .segment:has(input:checked){ border-color:var(--ink); background:var(--ink); color:var(--paper); }
+  .segment:has(input:focus-visible){ outline:2px solid var(--ink); outline-offset:2px; }
+
+  .interest-group{ margin-bottom:18px; }
+  .group-label{ display:block; font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:10px; }
+  .check-row{
+    display:flex; align-items:center; gap:10px;
+    font-size:14.5px; padding:12px 0;
+    min-height:44px;
+    cursor:pointer;
+  }
+  .check-row input{ width:18px; height:18px; accent-color:var(--ink); flex:none; }
+
+  .modal-submit{ width:100%; justify-content:center; margin-top:6px; }
+  .modal-note{ font-size:12.5px; color:var(--ink-faint); margin-top:12px; line-height:1.5; }
+
+  .modal-success{ display:none; text-align:center; padding:20px 0; }
+  .modal-success.show{ display:block; }
+  .modal-success svg{ width:52px; height:52px; color:var(--green-deep); margin:0 auto 20px; }
+  .modal-success h3{ font-family:var(--font-display); font-size:24px; font-weight:500; margin-bottom:10px; }
+  .modal-success p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:38ch; margin:0 auto; }
+
+  /* ============ Footer (identical to index.html) ============ */
+  .site-footer{
+    padding:40px clamp(20px,4vw,56px) 48px;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:16px;
+    border-top:1px solid var(--line);
+  }
+  .footer-legal{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .footer-legal a{ font-size:13px; color:var(--ink-soft); transition:color .2s ease; }
+  .footer-legal a:hover{ color:var(--ink); }
+  .footer-dot{ color:var(--line-strong); }
+  .footer-bottom{ font-size:13px; color:var(--ink-faint); }
+
+  /* ============ Responsive ============ */
+  /* 1080px, not 900: five nav items plus the CTA stop fitting before then. */
+  @media (max-width:1080px){
+    .nav-group{ display:none; }
+    .header-actions .header-cta{ display:none; }
+    .menu-toggle{ display:flex; }
+  }
+
+  /* Below 760px (or on any coarse pointer) the states are too small to tap
+     reliably, so the map becomes presentational and the list takes over. */
+  @media (max-width:760px), (pointer:coarse){
+    .map-live .state-shape{ pointer-events:none; cursor:default; }
+    /* no pinning, no shrinking — the intro is just a heading here */
+    .intro{ position:static; pointer-events:auto; background:var(--paper); }
+    .state-picker{ display:block; width:100%; max-width:520px; }
+    .stage{ height:auto; }
+    .stage-sticky{
+      position:static;
+      height:auto;
+      padding:clamp(28px,7vw,48px) clamp(16px,4vw,56px) clamp(40px,8vw,64px);
+      gap:24px;
+    }
+    /* static map sits in normal flow — the viewport-height cap no longer applies */
+    .scene{ perspective:none; max-width:1120px; }
+    .map{ transform:none !important; }
+    .state{ transform:none !important; filter:drop-shadow(0 1px 1px rgba(19,32,24,.16)) !important; }
+    .stage-grid{ opacity:.5 !important; }
+    .scroll-cue{ display:none; }
+    /* A label big enough to read here would be wider than its own Bundesland
+       (\"Niederösterreich\" needs ~375 of the 342 units NÖ spans), so the map
+       carries shape and colour only — the picker below carries the names. */
+    .state-label, .state-sublabel, .state-leader{ display:none; }
+    /* nothing hovers here, so the readout would never have anything to say */
+    .stage-readout{ display:none; }
+  }
+
+  @media (max-width:640px){
+    .field-row{ grid-template-columns:1fr; }
+  }
+
+  @media (max-width:520px){
+    .state-picker-grid{ grid-template-columns:1fr; }
+    .refs-toggle{ flex-wrap:wrap; }
+    .refs-toggle-count{ order:3; }
+    .refs-toggle-chevron{ order:4; margin-left:auto; }
+  }
+
+  /* Reduced motion: no scroll choreography at all — the map starts flat and usable. */
+  @media (prefers-reduced-motion: reduce){
+    .stage{ height:auto; }
+    .intro{ position:static; pointer-events:auto; background:var(--paper); }
+    .stage-sticky{
+      position:static; height:auto;
+      padding:clamp(28px,7vw,48px) clamp(16px,4vw,56px) clamp(40px,8vw,64px);
+    }
+    .scene{ perspective:none; max-width:1120px; }
+    .map{ transform:none !important; }
+    .state{ transform:none !important; }
+    .stage-grid{ opacity:.5 !important; }
+    .scroll-cue{ display:none; }
+    .map-labels-hidden .state-label,
+    .map-labels-hidden .state-leader{ opacity:1; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header" id="siteHeader">
+  <a class="brand" href="index.html" aria-label="GeoBonus Startseite">
+    <img src="assets/geobonus-logo.png" alt="GeoBonus">
+  </a>
+
+  <nav class="nav-group" aria-label="Hauptnavigation">
+    <a class="nav-link" href="index.html#produkte">Produkte</a>
+    <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+    <a class="nav-link" href="#referenzen" aria-current="page">Digitale Gemeinde</a>
+    <a class="nav-link" href="ueber-uns.html">Über uns</a>
+    <a class="nav-link" href="kontakt.html">Kontakt</a>
+  </nav>
+
+  <div class="header-actions">
+    <a class="header-cta" href="#" data-action="projekt">Projekt anfragen</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobilePanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <a class="nav-link" href="index.html#produkte">Produkte</a>
+  <a class="nav-link" href="mein-standort.html">Mein Standort</a>
+  <a class="nav-link" href="#referenzen">Digitale Gemeinde</a>
+  <a class="nav-link" href="ueber-uns.html">Über uns</a>
+  <a class="nav-link" href="kontakt.html">Kontakt</a>
+  <a class="btn btn-primary" href="#" data-action="projekt">Projekt anfragen</a>
+</div>
+
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Formular schließen" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div id="modalFormWrap">
+      <span class="eyebrow modal-eyebrow"><span class="dot"></span>GeoBonus · Kontakt</span>
+      <h2 id="modalTitle">Projekt anfragen</h2>
+      <p class="modal-sub">Erzählen Sie uns von Ihrem Vorhaben – wir melden uns zeitnah.</p>
+
+      <form id="projectForm" novalidate>
+        <div class="field">
+          <label for="pf-name">Ansprechpartner</label>
+          <input type="text" id="pf-name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="pf-email">E-Mail</label>
+            <input type="email" id="pf-email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="pf-phone">Telefon</label>
+            <input type="tel" id="pf-phone" name="telefon" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-org" id="pf-org-label">Gemeinde</label>
+          <input type="text" id="pf-org" name="organisation" autocomplete="organization">
+        </div>
+
+        <fieldset>
+          <legend>Ich interessiere mich als</legend>
+          <div class="segmented">
+            <label class="segment">
+              <input type="radio" name="type" value="gemeinde" checked>
+              <span>Gemeinde</span>
+            </label>
+            <label class="segment">
+              <input type="radio" name="type" value="betrieb">
+              <span>Betrieb</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="interest-group" id="interestGemeinde">
+          <span class="group-label">Interessensbereich (Mehrfachauswahl möglich)</span>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Digitale Gemeindekarte"> Digitale Gemeindekarte</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Gemeindekarte/Ortskarte/Regionskarte Print"> Gemeindekarte/Ortskarte/Regionskarte (Print)</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="Schautafel"> Schautafel</label>
+          <label class="check-row"><input type="checkbox" name="interesse" value="3D Panorama"> 3D Panorama</label>
+        </div>
+
+        <div class="interest-group" id="interestBetrieb" hidden>
+          <span class="group-label">Interessensbereich</span>
+          <div class="segmented segmented--single">
+            <label class="segment">
+              <input type="radio" name="betrieb_interesse" value="Mein Standort" checked>
+              <span>Mein Standort</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pf-message">Nachricht (optional)</label>
+          <textarea id="pf-message" name="nachricht" rows="3" placeholder="Teilen Sie uns mehr Details mit"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary modal-submit">
+          Anfrage senden
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="modal-note">Beim Absenden öffnet sich Ihr E-Mail-Programm mit einem vorausgefüllten Entwurf an unser Team.</p>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+      <h3>Fast geschafft</h3>
+      <p>Ihr E-Mail-Programm hat sich mit einem vorausgefüllten Entwurf geöffnet. Senden Sie die Nachricht ab, und wir melden uns bei Ihnen.</p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <div class="stage-wrap">
+
+  <section class="intro">
+    <div class="wrap" data-reveal>
+      <div class="intro-supp" id="introTop">
+        <span class="eyebrow eyebrow--fade"><span class="dot"></span>GeoBonus · Österreich</span>
+      </div>
+      <h1><span class="intro-title" id="introTitle">Österreich <em class="fade-text">entdecken</em></span></h1>
+      <div class="intro-supp" id="introBottom">
+        <div class="intro-rule" aria-hidden="true"></div>
+        <p class="intro-claim fade-text">Digitale Karten, die verbinden</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="stage" aria-label="Interaktive Karte von Österreich">
+    <div class="stage-sticky">
+      <div class="stage-grid" id="stageGrid" aria-hidden="true"></div>
+
+      <div class="scene">
+        <div class="map map-labels-hidden" id="map">
+          <div class="state state--pending" data-name="Niederösterreich" data-slug="niederoesterreich" data-lift="0.42"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M881.1 306.2L877.1 310.3L870.4 311.2L866.8 308.2L865.2 305.3L866.0 303.6L863.9 301.6L862.5 291.8L860.7 291.4L859.3 294.7L856.4 295.7L856.4 298.8L854.0 297.8L851.3 293.6L844.8 292.2L842.4 292.6L836.6 290.2L835.3 287.8L835.5 284.4L833.2 282.2L831.4 281.8L830.1 283.3L827.8 282.9L827.5 279.3L829.6 273.4L827.0 273.1L824.5 269.2L822.6 269.8L819.2 268.4L815.1 270.3L814.1 268.4L811.9 267.6L812.3 264.1L810.4 257.5L811.1 255.2L808.1 254.6L805.8 257.3L804.7 255.2L802.2 253.7L800.2 254.1L797.0 247.2L784.2 248.1L784.5 244.9L783.2 243.9L777.2 243.6L775.8 242.8L773.6 239.3L770.8 240.7L769.7 237.6L769.8 235.6L766.6 233.1L762.2 232.7L756.1 233.6L754.7 239.4L750.1 239.1L747.5 237.9L745.3 238.4L744.1 240.0L744.4 244.9L743.0 246.7L734.5 245.9L734.1 247.8L728.5 249.1L724.1 249.2L721.4 246.9L715.0 249.3L713.3 248.7L707.4 255.1L700.7 254.0L700.6 252.0L698.2 249.3L695.8 250.5L693.0 248.5L686.3 252.0L682.5 247.7L679.1 239.6L681.6 237.8L679.2 235.1L678.8 233.1L680.5 231.4L680.3 229.1L678.8 227.8L682.1 225.3L684.4 224.8L686.6 222.2L685.3 218.1L683.2 214.8L681.5 213.7L681.2 211.4L678.7 212.0L678.0 213.2L670.8 210.0L665.4 208.6L662.6 205.3L655.5 200.7L650.4 199.1L650.3 196.6L645.5 190.3L645.8 181.5L650.4 177.3L648.1 175.2L648.2 171.2L647.1 170.0L649.0 165.3L648.8 159.4L649.9 155.5L654.1 152.5L659.3 153.7L663.3 156.2L665.9 160.6L670.1 164.6L676.0 168.1L678.2 167.1L679.5 163.9L682.7 165.2L694.4 161.9L695.9 161.0L698.0 157.6L698.6 154.5L701.8 153.4L703.3 154.3L705.7 153.4L709.5 154.5L711.9 159.3L713.4 160.0L712.1 156.9L710.6 156.1L712.9 150.9L715.8 148.9L715.0 136.5L711.6 135.3L709.4 135.7L712.2 125.0L711.1 122.5L708.0 122.0L709.9 118.7L708.8 116.3L707.4 116.2L705.3 114.1L703.5 111.0L700.5 109.9L699.6 105.6L702.4 104.0L702.7 101.6L706.1 101.5L706.5 100.2L703.4 96.9L697.0 94.3L692.1 90.9L688.4 89.6L687.3 90.5L685.7 88.9L684.0 89.1L682.3 91.1L679.1 86.0L676.3 84.9L677.5 85.2L680.3 81.4L679.3 78.5L680.4 74.4L679.1 72.1L681.2 64.7L682.8 62.2L687.0 60.2L689.9 56.6L691.7 55.8L690.7 53.2L692.1 50.4L691.7 47.3L696.2 46.1L697.3 47.4L701.3 46.8L704.5 49.4L705.9 48.9L711.0 51.1L714.3 47.7L713.5 46.3L711.1 45.3L711.2 40.7L712.9 38.3L713.3 28.4L714.7 28.4L715.2 24.4L715.5 20.4L714.1 18.0L715.1 16.5L713.7 9.6L714.8 6.6L716.5 5.6L717.5 1.5L719.7 0.0L722.2 1.7L724.5 1.0L725.3 4.0L735.5 4.6L737.6 6.0L739.1 11.2L737.2 14.5L737.8 15.3L740.0 14.2L741.6 15.1L743.0 13.3L746.2 11.7L751.1 13.0L755.0 7.0L759.0 8.6L760.4 6.9L764.9 7.5L767.8 9.3L768.4 10.8L773.1 13.5L778.2 13.4L782.6 16.5L784.1 20.7L793.8 24.2L798.0 24.3L799.4 26.4L802.4 26.8L807.6 32.1L810.3 31.6L815.6 32.8L819.0 28.4L825.3 29.1L826.5 28.0L830.2 32.7L835.7 36.0L837.4 35.4L837.9 38.2L839.4 39.2L841.1 38.6L841.3 41.9L847.1 47.0L861.4 53.6L867.5 54.0L868.2 53.0L882.4 55.2L883.7 54.4L887.9 54.9L888.6 55.8L892.0 56.1L892.5 54.0L894.7 55.0L895.0 56.9L898.2 56.4L901.6 54.0L902.0 52.4L904.9 49.6L906.7 43.1L908.8 41.0L910.6 42.5L915.5 42.4L918.8 40.2L921.9 44.1L924.1 44.5L925.6 46.3L930.5 46.7L933.3 45.8L936.3 48.5L937.1 52.8L936.2 54.1L937.3 57.0L939.8 55.3L943.4 55.3L945.8 56.2L947.6 59.1L949.6 60.1L961.8 60.0L963.9 59.2L966.6 59.7L968.2 63.5L967.2 66.6L968.9 68.5L968.4 71.8L969.6 74.3L968.7 77.7L971.0 78.4L970.4 81.4L970.9 88.6L971.4 91.1L972.9 92.9L971.2 97.3L967.6 99.4L967.7 102.5L965.5 101.9L964.2 106.1L963.3 105.7L959.3 111.2L960.9 117.4L959.3 119.1L960.1 121.7L958.1 126.4L958.3 128.6L959.2 130.9L962.2 130.8L962.3 133.1L966.8 135.1L965.1 138.2L969.1 145.9L971.6 146.0L972.7 148.5L972.0 153.1L975.8 161.5L975.8 165.2L982.4 171.2L986.4 170.7L987.7 175.6L987.3 177.3L984.4 178.9L983.7 182.3L979.9 180.9L978.7 177.5L977.2 177.0L975.2 179.1L981.1 184.4L977.2 193.1L974.9 193.6L974.9 190.7L968.4 188.8L968.0 185.5L964.5 184.2L962.4 184.6L958.8 187.9L956.4 193.0L953.1 193.1L944.3 196.8L939.9 196.5L939.5 205.3L931.7 209.3L930.7 211.7L923.1 220.9L922.9 219.5L920.8 217.8L915.9 209.7L913.9 210.5L911.7 209.9L905.2 212.8L902.8 215.7L903.3 217.8L900.3 222.9L898.9 221.8L894.4 224.8L893.5 224.4L898.7 229.4L897.3 232.4L894.4 233.6L893.6 236.5L891.3 237.6L889.2 240.7L888.2 239.5L888.4 236.2L885.4 235.4L884.1 236.0L883.1 239.4L884.0 239.0L887.7 240.7L886.4 243.9L887.1 245.2L886.0 251.6L886.6 254.2L888.4 259.6L891.6 261.3L894.6 261.1L894.0 262.6L896.7 268.3L896.2 272.5L894.3 272.7L893.0 276.1L891.0 277.0L891.2 280.0L888.9 283.4L889.0 287.8L892.4 292.9L887.6 302.5L884.7 304.8L883.3 304.6L881.1 306.2ZM875.2 147.3L872.2 155.3L873.6 155.2L875.1 159.3L874.1 162.5L871.7 165.4L873.3 166.3L873.8 168.6L877.1 168.9L875.4 170.0L877.1 172.3L876.5 173.8L877.4 174.3L882.9 172.7L886.9 173.5L888.8 175.4L890.4 171.9L902.0 175.7L903.3 174.8L905.2 175.4L905.1 171.9L907.3 171.7L910.6 168.2L915.2 167.8L919.1 170.8L923.4 172.4L922.3 166.9L920.4 167.2L918.2 164.2L918.9 161.4L918.2 159.7L920.3 152.2L918.6 151.4L919.6 147.5L916.1 147.2L914.3 145.4L915.4 143.1L913.7 142.2L911.0 141.6L911.2 144.2L910.1 145.1L905.6 141.9L905.3 137.0L904.0 136.3L899.7 135.9L897.9 137.0L898.2 138.9L895.5 143.7L893.0 143.2L889.1 145.4L885.8 146.0L885.3 148.4L883.6 148.8L881.5 152.0L879.5 152.3L878.5 150.0L875.2 147.3Z"/><text class="state-label" x="806" y="122">Niederösterreich</text></svg><span class="sr-only">Niederösterreich – Karte in Vorbereitung</span></button></div>
+          <div class="state state--pending" data-name="Oberösterreich" data-slug="oberoesterreich" data-lift="0.55"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M545.7 280.7L548.2 281.4L551.1 281.1L553.8 285.8L552.5 287.8L553.3 291.0L554.4 292.1L552.9 295.8L550.2 298.0L548.7 301.2L549.4 303.5L542.2 303.4L536.8 302.4L534.5 300.9L531.5 301.0L524.7 297.1L522.3 296.8L520.5 293.8L518.9 293.5L517.2 290.2L518.2 285.8L517.4 282.8L520.9 280.1L521.1 276.5L523.3 273.0L521.7 270.4L518.9 270.7L518.1 268.5L520.3 265.1L520.2 263.2L524.6 260.2L526.9 254.4L517.2 252.4L511.9 249.6L513.2 243.1L515.7 240.4L522.2 243.1L524.9 242.3L524.1 238.3L521.7 238.3L521.3 239.4L518.4 239.5L518.0 237.7L513.7 236.9L506.2 238.7L499.9 235.2L495.6 235.2L495.1 233.4L492.7 232.9L493.1 225.3L490.1 219.9L491.5 217.3L491.2 214.1L492.1 212.8L491.4 207.5L495.0 205.7L495.7 206.9L498.9 207.6L499.2 209.6L501.7 210.5L503.4 204.2L497.2 200.2L494.2 199.6L494.5 197.2L491.8 197.4L491.7 198.9L488.4 200.4L486.5 200.3L480.7 203.8L473.7 203.7L471.2 200.9L471.0 199.5L465.2 198.1L464.3 195.6L462.3 196.1L460.9 191.4L458.5 192.4L456.3 191.6L450.9 194.1L449.6 192.3L446.8 191.6L444.5 194.0L443.2 194.3L440.5 200.5L436.4 199.4L434.8 195.3L424.6 185.9L422.3 181.8L422.0 176.9L423.9 173.6L426.2 174.8L428.5 170.1L432.1 168.9L433.1 166.8L434.8 166.0L437.0 160.2L438.1 159.3L448.8 158.0L454.5 152.5L457.1 148.8L466.7 144.5L470.3 144.7L478.2 141.3L487.9 141.6L495.9 137.1L503.7 129.3L508.1 126.2L511.8 115.8L510.6 110.1L514.7 99.4L513.0 95.9L513.8 94.5L512.2 91.9L512.2 89.9L513.7 88.9L515.4 90.8L517.0 90.5L520.8 87.2L520.4 85.6L521.7 83.6L523.7 84.2L529.0 89.3L531.2 89.5L532.2 87.8L534.1 88.3L536.7 90.8L540.6 92.1L541.8 94.7L550.0 98.8L550.8 96.4L552.9 95.0L552.2 92.7L553.7 88.7L555.7 90.9L558.3 87.3L559.7 87.0L560.5 85.0L559.8 82.2L562.9 78.3L561.7 63.4L563.9 64.0L564.4 62.4L561.4 62.2L559.7 59.2L561.9 56.4L562.3 51.8L564.3 50.2L564.7 48.5L569.6 49.6L580.0 59.6L586.2 60.7L590.3 66.8L593.6 67.6L593.3 70.6L589.0 71.6L587.1 74.2L591.7 77.2L591.3 79.4L592.9 81.1L597.1 81.9L598.3 83.4L601.0 84.0L603.2 82.4L606.0 82.7L607.2 84.0L609.6 83.1L615.7 84.8L617.4 86.2L621.2 85.6L622.3 86.9L628.0 89.1L629.4 91.3L632.0 87.9L636.6 87.4L637.4 86.3L636.3 83.5L640.2 83.3L642.2 84.1L643.9 81.1L645.2 75.8L643.9 73.4L648.0 73.3L650.3 75.4L651.8 78.5L657.5 79.2L658.5 80.8L663.1 78.4L665.2 76.3L666.7 77.6L667.9 81.0L670.5 80.0L672.7 85.4L676.3 84.9L679.1 86.0L682.3 91.1L684.0 89.1L685.7 88.9L687.3 90.5L688.4 89.6L703.4 96.9L706.5 100.2L706.1 101.5L702.7 101.6L702.4 104.0L699.6 105.6L700.5 109.9L703.5 111.0L705.3 114.1L707.4 116.2L708.8 116.3L709.9 118.7L708.0 122.0L711.1 122.5L712.2 125.0L709.4 135.7L711.6 135.3L715.0 136.5L715.8 148.9L712.9 150.9L710.6 156.1L712.1 156.9L713.4 160.0L711.9 159.3L709.5 154.5L705.7 153.4L703.3 154.3L701.8 153.4L698.6 154.5L698.0 157.6L695.9 161.0L694.4 161.9L682.7 165.2L679.5 163.9L678.2 167.1L676.0 168.1L670.1 164.6L665.9 160.6L663.3 156.2L659.3 153.7L654.1 152.5L649.9 155.5L648.8 159.4L649.0 165.3L647.1 170.0L648.2 171.2L648.1 175.2L650.4 177.3L645.8 181.5L645.5 190.3L650.3 196.6L650.4 199.1L655.5 200.7L662.6 205.3L665.4 208.6L668.3 209.9L670.8 210.0L678.0 213.2L678.7 212.0L681.2 211.4L681.5 213.7L683.2 214.8L685.3 218.1L686.6 222.2L685.7 223.6L678.8 227.8L680.3 229.1L680.5 231.4L678.8 233.1L679.2 235.1L681.6 237.8L679.1 239.6L682.5 247.7L677.1 244.3L673.6 249.2L671.2 249.7L670.5 252.2L666.2 251.2L662.6 253.6L657.9 253.4L655.4 254.5L654.1 256.5L654.9 258.1L653.5 260.7L651.7 261.4L649.8 260.6L644.6 264.2L644.0 265.8L637.8 266.4L637.1 269.6L630.0 272.9L628.5 275.1L624.6 275.1L622.7 273.8L620.4 274.6L616.5 271.2L615.0 268.4L616.2 266.8L612.7 266.4L609.0 269.2L604.8 269.4L598.0 272.8L592.4 273.3L593.0 263.4L587.1 257.0L586.0 256.6L583.6 257.7L579.4 255.3L575.3 256.2L569.8 252.2L567.4 251.8L566.2 254.3L564.8 253.5L558.6 254.7L556.6 253.6L553.9 257.0L552.9 259.6L550.9 260.3L551.3 262.2L548.6 263.1L547.5 265.6L545.7 272.1L545.7 280.7Z"/><text class="state-label" x="581" y="172">Oberösterreich</text></svg><span class="sr-only">Oberösterreich – Karte in Vorbereitung</span></button></div>
+          <div class="state state--pending" data-name="Burgenland" data-slug="burgenland" data-lift="0.38"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M856.5 422.7L855.5 424.9L851.5 424.4L848.9 426.4L847.4 425.5L849.0 421.1L849.1 417.4L852.5 414.3L852.8 412.0L855.0 410.9L857.5 406.0L860.3 406.2L860.4 402.4L863.8 395.3L865.6 394.5L868.1 395.3L865.0 391.1L863.4 384.3L859.4 379.3L860.3 371.6L861.2 371.6L863.0 367.5L862.7 362.3L858.8 350.1L858.6 342.5L855.7 332.2L852.8 326.7L851.8 319.6L855.8 318.6L857.3 314.8L858.9 313.8L860.1 317.5L861.5 316.5L861.1 312.7L877.1 310.3L881.1 306.2L883.3 304.6L884.7 304.8L887.6 302.5L892.4 292.9L889.0 287.8L888.9 283.4L891.2 280.0L891.0 277.0L893.0 276.1L894.3 272.7L896.2 272.5L896.7 268.3L894.0 262.6L894.6 261.1L891.6 261.3L888.4 259.6L886.0 251.6L887.1 245.2L886.4 243.9L887.7 240.7L884.0 239.0L883.1 239.4L884.1 236.0L885.4 235.4L888.4 236.2L888.2 239.5L889.2 240.7L891.3 237.6L893.6 236.5L894.4 233.6L897.3 232.4L898.7 229.4L893.5 224.4L894.4 224.8L898.9 221.8L900.3 222.9L903.3 217.8L902.8 215.7L907.2 211.5L911.7 209.9L913.9 210.5L915.9 209.7L920.8 217.8L922.9 219.5L923.1 220.9L923.9 220.4L930.7 211.7L931.7 209.3L939.5 205.3L939.9 196.5L944.3 196.8L953.1 193.1L956.4 193.0L958.8 187.9L962.4 184.6L964.5 184.2L968.0 185.5L968.4 188.8L974.9 190.7L974.9 193.6L977.2 193.1L981.1 184.4L975.2 179.1L977.2 177.0L978.7 177.5L979.9 180.9L983.7 182.3L984.4 178.9L987.3 177.3L987.7 175.6L989.1 178.1L991.1 179.3L989.0 181.9L988.1 187.6L990.5 189.8L988.9 193.4L990.7 194.9L993.4 192.6L995.6 194.6L997.8 194.8L1000.0 197.5L991.4 204.4L994.3 206.3L990.9 211.5L993.7 212.9L992.4 216.1L992.6 218.3L990.1 223.2L989.1 222.6L984.2 224.7L981.3 224.4L980.4 226.5L985.7 230.3L985.1 232.2L988.4 236.1L985.6 238.8L987.3 242.0L988.2 251.7L991.1 255.5L967.5 259.5L962.1 259.1L961.5 252.9L957.9 256.3L956.4 260.5L946.1 260.8L942.4 252.7L942.4 250.3L934.0 249.1L931.7 247.7L931.0 245.6L927.7 245.4L919.7 247.1L918.2 250.0L920.3 252.8L918.7 254.8L916.1 254.8L913.1 256.5L910.4 258.9L910.1 260.8L908.2 260.2L906.5 257.9L905.9 262.3L903.2 264.0L910.7 266.9L913.1 269.0L915.6 267.8L922.9 272.8L925.2 273.2L931.1 271.2L933.5 272.3L936.4 280.1L934.8 282.7L935.8 284.4L937.5 284.2L939.4 287.2L940.4 291.6L938.3 294.1L933.4 296.0L935.8 301.1L934.6 304.7L924.9 311.1L923.3 314.3L919.5 314.5L918.7 313.6L915.6 313.5L914.7 316.2L913.0 317.5L912.0 314.3L908.0 313.0L906.3 314.3L907.8 318.5L907.8 321.9L904.7 324.7L906.6 327.3L908.6 328.1L912.0 338.9L910.5 339.9L910.6 342.3L904.3 344.7L905.8 345.0L905.1 352.6L902.5 353.5L904.0 357.4L907.3 356.8L908.5 360.2L907.3 362.8L907.4 365.8L915.6 364.4L917.2 366.7L917.3 368.7L913.4 369.4L913.5 372.0L908.8 374.2L911.7 380.1L913.4 379.9L916.1 381.5L914.3 383.8L907.0 385.7L905.4 387.7L906.6 389.0L908.6 387.2L914.6 392.8L911.3 394.6L907.0 392.7L906.3 394.8L903.9 394.8L902.0 392.5L896.7 393.8L895.7 392.0L893.7 391.4L892.8 393.6L890.1 393.0L887.5 393.8L885.8 390.8L884.2 395.8L884.1 400.7L881.3 400.4L880.2 403.3L877.3 405.1L873.8 405.2L871.4 411.6L866.1 415.8L865.3 417.7L859.9 419.8L858.2 422.2L856.5 422.7Z"/><path class="state-leader" d="M927 300L912 292"/><text class="state-label" x="948" y="300">Burgenland</text></svg><span class="sr-only">Burgenland – Karte in Vorbereitung</span></button></div>
+          <div class="state state--live" data-name="Steiermark" data-slug="steiermark" data-lift="0.9" data-map-name="Steiermarkkarte"><a class="state-hit" href="https://www.geobonus.at/de/steiermark"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M725.4 461.2L723.3 458.3L720.0 457.8L722.4 447.8L721.0 443.0L720.9 438.5L713.7 435.4L716.2 427.1L718.4 426.1L719.4 423.8L718.1 421.8L717.9 416.9L718.8 416.6L720.4 411.0L719.1 408.5L715.9 405.5L712.5 397.0L710.2 394.8L704.2 393.4L700.2 389.1L696.8 387.0L696.4 384.1L694.6 383.8L689.8 386.4L687.2 385.8L681.7 388.3L681.0 389.3L677.3 390.3L672.9 389.9L668.0 390.8L666.4 393.9L663.4 393.1L662.5 391.2L654.8 391.7L650.3 388.6L648.4 389.7L647.6 392.0L646.0 391.2L645.6 394.3L642.1 393.4L636.3 397.4L635.2 395.0L635.9 391.0L633.4 388.5L630.4 388.8L629.0 387.8L620.0 388.2L618.6 386.7L616.6 388.4L615.2 386.6L614.1 381.5L612.3 378.7L606.9 383.3L603.1 381.3L601.9 382.6L601.3 385.7L599.1 386.0L595.2 391.0L592.2 392.7L589.2 392.2L587.6 393.1L587.9 395.6L586.6 399.2L581.6 400.7L579.8 402.0L578.8 405.0L577.2 404.1L574.1 406.5L572.7 406.4L570.3 409.5L568.3 409.0L565.9 411.1L561.6 409.3L557.5 404.4L561.2 402.8L563.7 400.2L565.4 395.6L568.0 394.2L567.9 389.6L573.5 379.8L569.8 373.9L571.7 371.2L578.4 366.9L579.7 369.1L584.2 368.7L584.8 365.8L581.4 363.9L579.5 361.5L575.2 360.0L573.1 355.5L566.1 348.7L568.5 346.3L568.0 344.4L562.6 341.5L562.9 336.4L560.1 336.5L557.4 339.9L554.4 341.6L553.2 339.7L549.0 339.8L548.0 342.9L545.9 342.8L545.9 341.8L540.4 339.6L537.5 340.1L536.2 338.3L534.4 338.3L533.0 336.3L533.3 327.1L528.6 312.0L532.4 303.7L531.5 301.0L534.5 300.9L536.8 302.4L542.2 303.4L549.4 303.5L548.7 301.2L550.2 298.0L552.9 295.8L554.4 292.1L553.3 291.0L552.5 287.8L553.8 285.8L551.1 281.1L548.2 281.4L545.7 280.7L545.7 272.1L548.6 263.1L551.3 262.2L550.9 260.3L552.9 259.6L553.9 257.0L556.6 253.6L558.6 254.7L564.8 253.5L566.2 254.3L567.4 251.8L569.8 252.2L575.3 256.2L579.4 255.3L583.6 257.7L586.0 256.6L587.1 257.0L593.0 263.4L592.4 273.3L598.0 272.8L604.8 269.4L609.0 269.2L612.7 266.4L616.2 266.8L615.0 268.4L616.5 271.2L620.4 274.6L622.7 273.8L624.6 275.1L628.5 275.1L630.0 272.9L637.1 269.6L637.8 266.4L644.0 265.8L644.6 264.2L649.8 260.6L651.7 261.4L653.5 260.7L654.9 258.1L654.1 256.5L655.4 254.5L657.9 253.4L662.6 253.6L666.2 251.2L670.5 252.2L671.2 249.7L673.6 249.2L677.1 244.3L682.5 247.7L686.3 252.0L693.0 248.5L695.8 250.5L698.2 249.3L700.6 252.0L700.7 254.0L707.4 255.1L713.3 248.7L715.0 249.3L721.4 246.9L724.1 249.2L728.5 249.1L734.1 247.8L734.5 245.9L743.0 246.7L744.4 244.9L744.1 240.0L745.3 238.4L747.5 237.9L750.1 239.1L754.7 239.4L756.1 233.6L762.2 232.7L766.6 233.1L769.8 235.6L769.7 237.6L770.8 240.7L773.6 239.3L775.8 242.8L777.2 243.6L783.2 243.9L784.5 244.9L784.2 248.1L797.0 247.2L800.2 254.1L802.2 253.7L804.7 255.2L805.8 257.3L808.1 254.6L811.1 255.2L810.4 257.5L812.3 264.1L811.9 267.6L814.1 268.4L815.1 270.3L819.2 268.4L822.6 269.8L824.5 269.2L827.0 273.1L829.6 273.4L827.5 279.3L827.8 282.9L830.1 283.3L831.4 281.8L833.2 282.2L835.5 284.4L835.3 287.8L836.6 290.2L842.4 292.6L844.8 292.2L851.3 293.6L854.0 297.8L856.4 298.8L856.4 295.7L859.3 294.7L860.7 291.4L862.5 291.8L863.9 301.6L866.0 303.6L865.2 305.3L866.8 308.2L870.4 311.2L861.1 312.7L861.5 316.5L860.1 317.5L858.9 313.8L857.3 314.8L855.8 318.6L851.8 319.6L851.8 321.1L852.8 326.7L855.7 332.2L858.6 342.5L858.8 350.1L862.7 362.3L863.0 367.5L861.2 371.6L860.3 371.6L859.4 379.3L863.4 384.3L865.0 391.1L868.1 395.3L865.6 394.5L863.8 395.3L860.4 402.4L860.3 406.2L857.5 406.0L855.0 410.9L852.8 412.0L852.5 414.3L849.1 417.4L849.0 421.1L846.1 427.1L847.6 430.2L845.9 441.7L847.1 445.9L851.5 450.9L853.4 454.7L852.9 460.4L849.0 458.4L848.1 456.1L840.9 454.0L837.4 450.7L831.8 448.1L825.7 447.7L822.2 448.8L817.6 452.1L811.7 452.7L807.8 452.0L805.1 450.5L802.0 450.8L802.5 453.3L800.3 453.8L799.8 455.5L797.4 455.4L794.8 453.8L791.5 455.6L791.2 456.7L788.4 457.7L789.3 461.0L788.1 465.1L786.5 465.4L783.9 468.1L780.8 467.3L778.8 469.0L775.8 463.1L774.4 463.6L771.1 460.5L758.8 462.0L755.3 461.2L753.1 462.9L747.7 463.7L742.7 462.5L740.8 460.4L738.7 460.8L735.9 459.7L734.0 461.5L731.3 459.7L727.6 462.6L725.4 461.2Z"/><text class="state-label" x="718" y="341">Steiermark</text></svg><span class="sr-only">Steiermark – Steiermarkkarte öffnen</span></a></div>
+          <div class="state state--pending" data-name="Tirol" data-slug="tirol" data-lift="0.7"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M416.9 444.9L416.8 450.9L414.4 451.6L414.1 460.3L409.9 460.2L407.7 461.2L406.3 459.4L399.2 460.4L398.2 461.4L391.3 456.1L386.5 456.3L386.0 454.7L381.7 454.1L373.1 447.5L370.5 437.3L364.1 435.3L361.0 435.8L360.4 434.4L361.9 431.8L360.7 429.5L363.7 425.9L361.6 421.4L361.9 419.7L359.7 418.0L359.5 416.0L354.6 415.1L352.2 418.0L348.6 411.7L344.6 411.2L343.6 409.6L345.7 405.5L344.3 403.0L341.7 401.9L341.2 396.8L339.5 392.3L342.9 388.6L345.2 389.8L350.5 388.2L352.0 384.7L352.0 382.0L357.9 379.3L360.8 375.4L364.1 375.3L364.7 373.4L368.9 372.2L370.6 370.7L371.2 365.9L376.0 363.7L377.7 365.5L380.6 364.2L382.7 365.5L384.6 365.3L387.0 362.7L392.0 364.1L392.8 366.7L396.1 368.6L397.9 367.0L400.6 367.7L401.2 369.1L404.4 369.8L415.5 379.7L416.8 384.0L419.9 385.3L424.0 384.8L418.8 394.9L420.1 396.8L421.2 401.1L423.2 401.9L424.5 404.2L426.7 405.2L427.6 407.8L433.3 410.5L432.7 413.0L433.7 414.3L433.9 420.5L439.8 424.1L441.0 427.4L449.9 432.7L450.2 434.8L445.7 439.4L441.5 436.9L438.6 439.7L435.9 440.2L433.9 442.3L427.9 441.1L421.7 442.6L420.4 443.9L418.6 443.4L416.9 444.9ZM143.3 419.9L134.3 424.7L133.9 422.7L129.8 423.6L123.1 421.7L123.3 418.2L122.4 416.0L125.2 409.9L125.6 405.6L121.4 402.9L117.8 402.0L117.5 398.3L112.5 393.4L110.3 395.2L107.2 395.3L104.5 402.4L102.0 403.2L101.8 405.5L103.0 407.9L100.4 409.0L93.2 406.8L93.1 409.5L91.1 413.6L92.3 415.9L91.9 419.4L86.9 419.5L83.6 422.5L80.5 422.5L80.0 417.8L76.9 415.8L75.8 413.9L75.8 411.3L74.4 407.6L77.3 405.6L79.2 402.2L80.5 396.7L82.4 396.6L81.7 392.4L78.7 390.9L79.1 387.7L82.1 383.9L81.3 381.4L79.1 381.0L79.0 378.3L80.5 374.6L85.9 368.3L88.6 368.0L88.2 365.7L90.6 364.4L87.3 355.6L89.4 353.7L89.4 349.8L87.4 347.4L90.6 344.1L86.7 342.6L84.9 340.9L87.9 339.5L90.7 339.7L92.0 340.8L96.4 337.4L98.4 337.4L102.8 333.8L104.8 334.1L107.2 331.6L108.3 327.8L112.2 324.0L112.5 321.5L113.6 320.1L116.5 318.6L118.7 319.4L117.8 317.3L119.0 312.9L121.2 311.6L121.7 310.1L123.8 309.4L122.3 299.5L119.2 298.7L118.0 295.4L119.2 293.4L119.0 291.5L121.1 285.2L125.6 288.2L136.6 289.5L139.9 282.5L144.7 284.6L150.2 284.6L152.0 285.3L152.5 287.4L160.9 289.4L161.6 292.3L163.4 293.4L168.1 290.9L171.4 291.1L173.3 289.6L178.2 288.8L180.2 292.7L175.5 296.5L175.7 299.7L177.7 300.0L181.1 299.0L184.5 300.0L183.7 302.3L190.4 309.7L188.9 312.1L188.7 315.5L191.4 316.3L205.8 316.7L208.8 315.6L209.3 313.2L218.6 310.1L219.5 309.0L225.3 309.3L221.7 316.1L228.3 316.0L230.6 314.2L230.7 310.3L234.2 309.3L236.6 306.1L247.8 306.8L246.2 302.6L243.7 302.5L243.9 299.5L246.0 297.9L247.2 295.6L250.5 292.6L251.5 294.7L259.7 294.9L267.6 293.3L269.6 291.1L269.5 285.4L272.0 280.2L274.2 279.7L276.6 277.9L278.8 279.7L294.1 278.5L303.6 280.1L304.6 276.2L312.3 273.9L314.9 274.1L325.3 272.1L326.2 274.3L332.0 273.0L334.4 274.7L338.7 274.4L340.5 275.5L347.1 273.8L347.0 276.4L350.2 275.4L350.9 273.9L349.6 268.4L345.6 260.6L344.9 256.9L347.7 257.0L353.3 253.6L356.4 249.1L358.4 250.8L356.0 255.0L355.5 258.8L357.3 261.2L360.0 259.5L366.5 258.0L370.4 259.0L371.3 260.3L381.3 258.1L381.4 262.2L384.6 266.9L388.0 269.4L389.1 271.7L393.9 269.5L399.0 270.3L398.3 273.4L398.9 275.6L407.6 277.9L411.0 280.8L409.1 282.5L407.7 285.5L406.0 286.4L409.4 288.9L410.8 294.9L415.3 300.4L410.8 302.9L408.1 302.3L406.5 302.9L407.2 308.4L405.5 311.2L402.7 312.8L399.5 317.0L397.5 315.7L392.1 317.4L390.0 316.7L388.6 319.4L386.9 319.9L386.4 321.8L388.9 325.9L388.5 327.8L386.3 329.9L385.2 330.4L381.5 329.5L378.5 330.8L377.4 332.4L372.7 332.8L367.6 329.5L362.5 329.6L358.2 334.6L357.0 333.5L354.7 334.8L353.8 332.7L352.3 332.9L350.9 334.6L345.2 334.7L342.5 337.4L338.6 333.8L333.9 339.9L333.6 341.0L336.8 343.2L338.1 346.6L337.1 347.4L334.5 355.3L335.9 365.0L338.3 366.5L338.5 369.2L340.4 372.1L340.0 375.4L341.5 377.8L339.2 379.2L336.7 378.2L334.5 379.9L333.6 382.0L328.9 381.7L326.2 384.3L320.9 383.7L319.5 385.6L318.0 385.0L316.6 386.9L314.8 386.1L307.1 391.5L303.3 393.1L302.3 394.7L299.5 395.4L295.0 394.9L292.7 398.8L290.5 399.5L287.9 398.8L285.8 394.8L282.8 394.3L279.6 395.0L275.8 392.8L274.8 390.9L269.9 392.4L268.8 394.0L263.1 396.6L259.8 392.6L255.3 391.3L254.1 394.4L252.1 394.8L250.6 397.9L247.3 400.0L245.2 400.3L242.7 399.2L239.6 395.4L236.7 396.4L234.6 394.9L232.1 396.8L231.2 396.2L224.2 399.4L217.1 399.4L215.4 400.7L214.1 400.1L212.9 406.3L210.8 407.6L207.7 406.8L206.8 409.8L205.0 411.4L205.9 414.9L202.0 421.5L203.5 428.0L199.2 430.7L195.4 439.0L194.4 437.8L192.1 438.8L186.1 437.3L181.8 437.3L177.2 439.6L175.3 439.1L171.7 436.0L169.7 437.6L168.2 437.3L165.8 434.1L160.4 435.3L157.2 434.7L156.8 432.8L159.3 431.5L161.6 428.0L160.4 426.0L156.2 425.0L155.4 423.3L152.5 422.3L152.0 419.2L149.0 417.7L147.2 419.4L143.3 419.9ZM121.1 285.2L119.9 283.0L118.3 282.6L118.5 279.8L121.2 280.0L123.1 279.1L123.5 282.2L121.1 285.2Z"/><text class="state-label" x="233" y="345">Tirol</text><text class="state-sublabel" x="392" y="415">Osttirol</text></svg><span class="sr-only">Tirol – Karte in Vorbereitung</span></button></div>
+          <div class="state state--live" data-name="Kärnten" data-slug="kaernten" data-lift="1" data-map-name="Kärntenkarte"><a class="state-hit" href="https://www.geobonus.at/de/kaernten"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M642.7 501.9L639.4 501.4L626.1 504.3L625.3 502.9L622.9 501.8L616.8 504.0L614.0 501.9L613.0 502.6L610.8 501.8L608.9 503.7L606.0 503.4L603.4 500.3L601.7 495.4L592.4 492.2L590.3 492.6L588.3 494.5L586.6 494.5L582.6 491.2L581.8 491.5L578.3 488.6L574.2 486.7L570.3 486.4L567.1 488.1L563.3 487.5L561.0 489.7L559.4 489.6L553.5 487.3L551.3 487.5L549.8 486.3L545.3 486.7L536.2 482.6L531.6 482.1L529.5 483.3L528.6 480.9L526.4 480.4L522.2 481.3L520.8 477.9L516.9 479.7L510.2 479.4L508.1 478.9L508.3 476.9L503.5 475.4L502.3 477.2L499.8 477.3L496.9 480.5L493.7 479.1L487.8 479.1L486.1 480.7L483.2 477.1L478.2 475.7L476.8 473.5L468.6 472.5L466.2 471.1L459.0 472.1L457.5 470.9L453.0 471.5L449.0 470.1L448.2 470.8L446.0 469.5L437.0 469.5L435.4 470.4L432.9 469.4L433.4 466.0L431.0 465.9L425.3 462.3L422.8 462.2L419.5 464.7L417.6 461.9L414.1 460.3L414.4 451.6L416.8 450.9L416.9 444.9L418.6 443.4L420.4 443.9L421.7 442.6L427.9 441.1L433.9 442.3L435.9 440.2L438.6 439.7L441.5 436.9L445.7 439.4L450.2 434.8L449.9 432.7L441.0 427.4L439.8 424.1L433.9 420.5L433.7 414.3L432.7 413.0L433.3 410.5L427.6 407.8L426.7 405.2L424.5 404.2L423.2 401.9L421.2 401.1L420.1 396.8L418.8 394.9L424.0 384.8L419.9 385.3L416.8 384.0L415.5 379.7L409.7 374.1L411.5 372.7L410.9 369.5L416.0 369.7L419.4 368.0L420.5 373.9L422.7 374.4L424.9 373.8L426.1 375.4L431.1 374.4L433.3 377.3L436.3 377.7L437.8 376.7L440.6 377.6L444.1 377.6L446.5 378.7L447.2 381.9L450.1 385.9L452.8 386.5L455.1 384.9L457.5 385.8L457.3 387.6L464.3 390.8L465.2 388.2L471.3 388.2L472.1 386.7L487.2 383.6L487.4 376.4L491.0 374.9L494.0 376.4L501.2 374.6L504.5 375.5L504.8 377.8L508.0 380.0L510.7 377.6L512.2 378.3L514.7 377.8L530.8 383.3L535.4 381.9L538.3 382.7L539.3 385.6L544.7 385.7L545.6 392.3L547.6 394.3L550.9 395.6L552.3 394.7L555.8 397.9L556.2 402.7L561.6 409.3L565.9 411.1L568.3 409.0L570.3 409.5L572.7 406.4L574.1 406.5L577.2 404.1L578.8 405.0L579.8 402.0L581.6 400.7L586.6 399.2L587.9 395.6L587.6 393.1L589.2 392.2L592.2 392.7L595.2 391.0L599.1 386.0L601.3 385.7L601.9 382.6L603.1 381.3L606.9 383.3L612.3 378.7L614.1 381.5L615.2 386.6L616.6 388.4L618.6 386.7L620.0 388.2L629.0 387.8L630.4 388.8L633.4 388.5L635.9 391.0L635.2 395.0L636.3 397.4L642.1 393.4L645.6 394.3L646.0 391.2L647.6 392.0L648.4 389.7L650.3 388.6L654.8 391.7L662.5 391.2L663.4 393.1L666.4 393.9L668.0 390.8L672.9 389.9L677.3 390.3L681.0 389.3L681.7 388.3L687.2 385.8L689.8 386.4L694.6 383.8L696.4 384.1L696.8 387.0L700.2 389.1L704.2 393.4L710.2 394.8L712.5 397.0L715.9 405.5L719.1 408.5L720.4 411.0L718.8 416.6L717.9 416.9L718.1 421.8L719.4 423.8L718.4 426.1L716.2 427.1L713.7 435.4L720.9 438.5L721.0 443.0L722.4 447.8L720.0 457.8L723.3 458.3L725.4 461.2L722.6 461.2L718.9 463.4L714.1 471.1L713.1 466.9L711.0 465.0L708.9 467.5L706.4 468.2L706.7 470.7L702.4 468.9L699.8 469.9L693.6 482.4L693.0 489.0L688.6 490.9L687.6 489.9L685.2 490.0L683.8 491.3L682.9 489.8L681.4 492.5L679.4 490.8L678.7 494.6L677.2 495.8L677.4 497.9L674.7 498.1L674.2 500.4L672.2 501.6L665.6 502.6L662.6 504.5L662.8 511.0L661.5 514.8L659.9 515.2L656.5 508.0L654.2 505.7L652.8 505.2L650.3 507.8L646.7 506.0L644.3 506.1L642.3 503.6L642.7 501.9Z"/><text class="state-label" x="575" y="437">Kärnten</text></svg><span class="sr-only">Kärnten – Kärntenkarte öffnen</span></a></div>
+          <div class="state state--pending" data-name="Salzburg" data-slug="salzburg" data-lift="0.62"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M559.7 403.0L557.5 404.4L556.2 402.7L555.8 397.9L552.3 394.7L550.9 395.6L547.6 394.3L545.6 392.3L544.7 385.7L539.3 385.6L538.3 382.7L535.4 381.9L530.8 383.3L514.7 377.8L512.2 378.3L510.7 377.6L508.0 380.0L504.8 377.8L504.5 375.5L501.2 374.6L494.0 376.4L491.0 374.9L487.4 376.4L487.2 383.6L472.1 386.7L471.3 388.2L465.2 388.2L464.3 390.8L457.3 387.6L457.5 385.8L455.1 384.9L452.8 386.5L450.1 385.9L447.2 381.9L446.5 378.7L444.1 377.6L440.6 377.6L437.8 376.7L436.3 377.7L433.3 377.3L431.1 374.4L426.1 375.4L424.9 373.8L422.7 374.4L420.5 373.9L419.4 368.0L416.0 369.7L410.9 369.5L411.5 372.7L409.7 374.1L407.4 373.0L404.4 369.8L401.2 369.1L400.6 367.7L397.9 367.0L396.1 368.6L392.8 366.7L392.0 364.1L387.0 362.7L384.6 365.3L382.7 365.5L380.6 364.2L377.7 365.5L376.0 363.7L371.2 365.9L370.6 370.7L368.9 372.2L364.7 373.4L364.1 375.3L360.8 375.4L357.9 379.3L355.2 380.0L353.4 377.5L348.0 375.5L343.5 378.0L341.5 377.8L340.0 375.4L340.4 372.1L338.5 369.2L338.3 366.5L335.9 365.0L334.5 355.3L337.1 347.4L338.1 346.6L336.8 343.2L333.6 341.0L338.6 333.8L342.5 337.4L345.2 334.7L350.9 334.6L352.3 332.9L353.8 332.7L354.7 334.8L357.0 333.5L358.2 334.6L362.5 329.6L367.6 329.5L372.7 332.8L377.4 332.4L378.5 330.8L381.5 329.5L385.2 330.4L388.5 327.8L388.9 325.9L386.4 321.8L386.9 319.9L388.6 319.4L390.0 316.7L392.1 317.4L397.5 315.7L399.5 317.0L402.7 312.8L405.5 311.2L407.2 308.4L406.5 302.9L408.1 302.3L410.8 302.9L415.3 300.4L410.8 294.9L409.4 288.9L406.0 286.4L407.7 285.5L409.1 282.5L411.0 280.8L407.6 277.9L398.9 275.6L398.3 273.4L399.0 270.3L402.7 262.6L406.2 261.8L408.6 262.9L410.9 260.8L416.0 260.8L417.4 261.8L419.5 261.1L421.2 261.9L422.9 264.3L423.0 266.3L426.0 270.3L427.1 270.1L431.7 274.3L429.4 274.6L427.3 276.9L425.8 280.7L427.8 285.0L430.8 287.3L434.7 287.1L435.3 290.1L438.9 291.8L439.6 293.6L442.7 296.7L450.9 301.1L452.8 299.7L454.8 303.1L458.2 298.7L460.9 297.6L460.7 292.1L458.7 289.8L462.0 284.9L460.1 281.2L460.5 280.0L464.1 278.6L463.1 277.3L464.2 274.4L467.5 270.1L464.8 262.8L465.0 259.5L462.7 257.7L460.7 254.7L456.1 252.7L453.0 255.7L445.9 255.3L443.3 253.8L442.2 251.8L444.4 248.5L445.6 248.4L447.3 244.9L446.8 241.9L455.0 229.6L454.9 227.1L446.7 211.1L444.9 210.6L443.1 207.1L439.0 206.4L437.8 205.3L436.4 199.4L440.5 200.5L443.2 194.3L444.5 194.0L446.6 191.7L449.6 192.3L450.9 194.1L456.3 191.6L458.5 192.4L460.9 191.4L462.3 196.1L464.3 195.6L465.2 198.1L471.0 199.5L471.2 200.9L473.7 203.7L480.7 203.8L486.5 200.3L488.4 200.4L491.7 198.9L491.8 197.4L494.5 197.2L494.2 199.6L497.2 200.2L503.4 204.2L501.7 210.5L499.2 209.6L498.9 207.6L495.7 206.9L495.0 205.7L491.4 207.5L492.1 212.8L491.2 214.1L491.5 217.3L490.1 219.9L493.1 225.3L492.7 232.9L495.1 233.4L495.6 235.2L499.9 235.2L506.2 238.7L513.7 236.9L518.0 237.7L518.4 239.5L521.3 239.4L521.7 238.3L524.1 238.3L524.9 242.3L522.2 243.1L515.7 240.4L513.2 243.1L511.9 249.6L517.2 252.4L526.9 254.4L524.6 260.2L520.2 263.2L520.3 265.1L518.1 268.5L518.9 270.7L521.7 270.4L523.3 273.0L521.1 276.5L520.9 280.1L517.4 282.8L518.2 285.8L517.2 290.2L518.9 293.5L520.5 293.8L522.3 296.8L524.7 297.1L531.5 301.0L532.4 303.7L528.6 312.0L533.3 327.1L533.0 336.3L534.4 338.3L536.2 338.3L537.5 340.1L540.4 339.6L545.9 341.8L545.9 342.8L548.0 342.9L549.0 339.8L553.2 339.7L554.4 341.6L557.4 339.9L560.1 336.5L562.9 336.4L562.6 341.5L568.0 344.4L568.5 346.3L566.1 348.7L573.1 355.5L575.2 360.0L579.5 361.5L581.4 363.9L584.8 365.8L584.2 368.7L579.7 369.1L578.4 366.9L577.3 367.2L571.7 371.2L569.8 373.9L573.5 379.8L567.9 389.6L568.0 394.2L565.4 395.6L563.7 400.2L561.2 402.8L559.7 403.0Z"/><text class="state-label" x="466" y="318">Salzburg</text></svg><span class="sr-only">Salzburg – Karte in Vorbereitung</span></button></div>
+          <div class="state state--pending" data-name="Vorarlberg" data-slug="vorarlberg" data-lift="0.5"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M79.1 387.7L78.7 390.9L81.7 392.4L82.4 396.6L80.5 396.7L79.2 402.2L77.3 405.6L74.4 407.6L75.8 411.3L75.8 413.9L76.9 415.8L80.0 417.8L80.5 422.5L77.6 423.0L75.3 424.4L73.0 420.5L69.3 420.6L68.4 417.6L63.8 412.6L62.3 413.2L59.2 411.7L58.6 409.8L54.4 410.5L45.3 406.1L45.1 398.9L47.3 395.6L46.9 393.3L44.9 392.2L45.3 389.3L43.1 388.9L42.2 390.3L39.3 390.7L33.2 386.0L28.4 386.2L28.1 385.5L23.3 384.2L23.3 383.2L21.9 383.3L19.2 381.5L15.0 381.8L13.9 383.4L11.3 383.0L10.0 381.6L12.2 377.4L13.4 377.3L13.6 373.8L12.0 372.3L11.8 363.9L9.4 363.9L9.2 362.6L5.6 359.2L5.5 356.3L7.1 353.6L3.1 349.3L4.8 346.5L0.0 340.8L2.0 338.9L3.7 335.0L7.5 331.6L9.8 324.9L11.7 322.9L17.3 321.2L18.7 319.2L18.7 317.3L16.8 315.8L15.9 313.9L15.1 307.9L16.9 305.6L12.0 304.4L10.0 301.9L8.1 302.7L6.9 299.8L4.1 296.7L4.1 295.2L26.4 289.5L29.6 280.5L32.1 277.9L35.6 277.4L38.0 279.0L38.7 284.1L37.4 286.8L42.3 288.3L45.1 290.5L45.8 286.8L48.7 287.5L51.4 290.3L53.8 288.6L56.9 289.9L56.9 291.6L59.0 294.0L61.4 299.4L62.8 299.6L66.4 298.2L70.8 304.7L73.2 303.8L75.1 309.6L73.8 312.3L71.2 312.8L70.8 314.1L72.4 316.8L74.6 324.4L77.1 320.3L79.6 321.8L83.7 321.2L83.7 318.3L87.1 317.6L89.3 319.3L91.2 317.7L92.6 320.7L87.7 329.9L89.8 332.9L87.9 335.2L85.3 335.8L84.1 339.1L86.7 342.6L90.6 344.1L87.4 347.4L89.4 349.8L89.4 353.7L87.3 355.6L90.6 364.4L88.2 365.7L88.6 368.0L85.9 368.3L80.5 374.6L79.0 378.3L79.1 381.0L81.3 381.4L82.1 383.9L79.1 387.7Z"/><text class="state-label" x="48" y="347">Vorarlberg</text></svg><span class="sr-only">Vorarlberg – Karte in Vorbereitung</span></button></div>
+          <div class="state state--pending" data-name="Wien" data-slug="wien" data-lift="0.46"><button class="state-hit" type="button"><svg viewBox="0 0 1000 515" aria-hidden="true" focusable="false"><path class="state-shape" d="M895.8 173.7L890.4 171.9L888.8 175.4L886.9 173.5L882.9 172.7L877.4 174.3L876.5 173.8L877.1 172.3L875.4 170.0L877.1 168.9L873.8 168.6L873.3 166.3L871.7 165.4L874.1 162.5L875.1 159.3L873.6 155.2L872.2 155.3L875.2 147.3L878.5 150.0L879.5 152.3L881.5 152.0L883.6 148.8L885.3 148.4L885.8 146.0L889.1 145.4L893.0 143.2L895.5 143.7L898.2 138.9L897.9 137.0L899.7 135.9L904.0 136.3L905.3 137.0L905.6 141.9L910.1 145.1L911.2 144.2L911.0 141.6L913.7 142.2L915.4 143.1L914.3 145.4L916.1 147.2L919.6 147.5L918.6 151.4L920.3 152.2L918.2 159.7L918.9 161.4L918.2 164.2L920.4 167.2L922.3 166.9L923.4 172.4L919.1 170.8L915.2 167.8L910.6 168.2L907.3 171.7L905.1 171.9L905.2 175.4L903.3 174.8L902.0 175.7L895.8 173.7Z"/><path class="state-leader" d="M944 118L903 152"/><text class="state-label" x="952" y="108">Wien</text></svg><span class="sr-only">Wien – Karte in Vorbereitung</span></button></div>
+        </div>
+      </div>
+
+      <!-- Visual echo of hover/focus, empty until something is hovered. Not a
+           live region: each state carries its own label, so announcing this too
+           would say everything twice on keyboard focus. -->
+      <p class="stage-readout" id="stageReadout" data-status="idle" aria-hidden="true">
+        <span class="dot"></span>
+        <span id="stageReadoutText"></span>
+      </p>
+
+      <p class="scroll-cue" id="scrollCue" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        Scrollen zum Heranzoomen
+      </p>
+
+      <div class="state-picker">
+        <div class="state-picker-head">
+          <h2>Bundesland wählen</h2>
+          <span class="state-pick-note">Gesamtkarte</span>
+        </div>
+        <div class="state-picker-grid">
+          <span class="state-pick state-pick--pending">Burgenland<span class="state-pick-note">bald</span></span>
+          <a class="state-pick state-pick--live" href="https://www.geobonus.at/de/kaernten">Kärnten<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+          <span class="state-pick state-pick--pending">Niederösterreich<span class="state-pick-note">bald</span></span>
+          <span class="state-pick state-pick--pending">Oberösterreich<span class="state-pick-note">bald</span></span>
+          <span class="state-pick state-pick--pending">Salzburg<span class="state-pick-note">bald</span></span>
+          <a class="state-pick state-pick--live" href="https://www.geobonus.at/de/steiermark">Steiermark<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+          <span class="state-pick state-pick--pending">Tirol<span class="state-pick-note">bald</span></span>
+          <span class="state-pick state-pick--pending">Vorarlberg<span class="state-pick-note">bald</span></span>
+          <span class="state-pick state-pick--pending">Wien<span class="state-pick-note">bald</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /.stage-wrap -->
+
+  <section class="refs" id="referenzen" aria-label="Referenzen">
+    <div class="wrap">
+      <div class="refs-head" data-reveal-stagger>
+        <span class="eyebrow eyebrow--fade"><span class="dot"></span>Ihre Gemeinde. Digital. Präzise</span>
+        <h2>Referenzen</h2>
+        <p>Hier geht es zu den einzelnen Gemeindekarten</p>
+      </div>
+
+      <button class="refs-toggle" id="refsToggle" type="button" aria-expanded="false" aria-controls="refsPanel">
+        <span class="refs-toggle-pin" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </span>
+        <span class="refs-toggle-main">
+          <span class="refs-toggle-title">Gemeinden ansehen</span>
+          <span class="refs-toggle-sub">Bundesland öffnen und Gemeinde auswählen</span>
+        </span>
+        <span class="refs-toggle-count">58 Gemeinden</span>
+        <span class="refs-toggle-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </button>
+
+      <div class="refs-panel" id="refsPanel" hidden>
+        <p class="refs-panel-hint">Bundesland wählen</p>
+        <div class="refs-grid">
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="burgenland" data-name="Burgenland"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Burgenland</span><span class="ref-state-count">–</span></button>
+          <button class="ref-state" type="button" aria-expanded="false" aria-controls="refList" data-slug="kaernten" data-name="Kärnten"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Kärnten</span><span class="ref-state-count">49</span></button>
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="niederoesterreich" data-name="Niederösterreich"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Niederösterreich</span><span class="ref-state-count">–</span></button>
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="oberoesterreich" data-name="Oberösterreich"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Oberösterreich</span><span class="ref-state-count">–</span></button>
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="salzburg" data-name="Salzburg"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Salzburg</span><span class="ref-state-count">–</span></button>
+          <button class="ref-state" type="button" aria-expanded="false" aria-controls="refList" data-slug="steiermark" data-name="Steiermark"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Steiermark</span><span class="ref-state-count">9</span></button>
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="tirol" data-name="Tirol"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Tirol</span><span class="ref-state-count">–</span></button>
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="vorarlberg" data-name="Vorarlberg"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Vorarlberg</span><span class="ref-state-count">–</span></button>
+          <button class="ref-state ref-state--empty" type="button" aria-expanded="false" aria-controls="refList" data-slug="wien" data-name="Wien"><span class="ref-state-dot" aria-hidden="true"></span><span class="ref-state-name">Wien</span><span class="ref-state-count">–</span></button>
+        </div>
+        <div class="ref-list" id="refList" hidden></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <nav class="footer-legal" aria-label="Rechtliches">
+    <a href="agb.html">AGB</a>
+    <span class="footer-dot">·</span>
+    <a href="impressum.html">Impressum</a>
+    <span class="footer-dot">·</span>
+    <a href="https://www.geobonus.at/datenschutz-einstellungen/">Datenschutz Einstellungen</a>
+  </nav>
+  <div class="footer-bottom">
+    <span>© <span id="copyYear">2026</span> GeoBonus by MapExplorer Information Systems GmbH</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var GEMEINDEN = {"kaernten":[["Althofen","/oesterreich/kaernten/althofen/"],["Arnoldstein","/oesterreich/kaernten/arnoldstein/"],["Bad Eisenkappel","/oesterreich/kaernten/bad_eisenkappel/"],["Bad St. Leonhard","/oesterreich/kaernten/bad_st_leonhard/"],["Berg im Drautal","/oesterreich/kaernten/berg_im_drautal/"],["Dellach im Drautal","/oesterreich/kaernten/dellach_im_drautal/"],["Diex","/oesterreich/kaernten/diex/"],["Eberndorf","/oesterreich/kaernten/eberndorf/"],["Feistritz ob Bleiburg","/oesterreich/kaernten/feistritz-ob-bleiburg/"],["Feldkirchen","/oesterreich/kaernten/feldkirchen/"],["Ferlach","/oesterreich/kaernten/ferlach/"],["Ferndorf","/oesterreich/kaernten/ferndorf/"],["Finkenstein am Faaker See","/oesterreich/kaernten/finkenstein_am_faakersee/"],["Flattach","/oesterreich/kaernten/flattach/"],["Frauenstein","/oesterreich/kaernten/frauenstein/"],["Fresach","/oesterreich/kaernten/fresach/"],["Gnesau","/oesterreich/kaernten/gnesau/"],["Grafenstein","/oesterreich/kaernten/grafenstein/"],["Greifenburg","/oesterreich/kaernten/greifenburg/"],["Grosskirchheim","/oesterreich/kaernten/grosskirchheim/"],["Heiligenblut","/oesterreich/kaernten/heiligenblut/"],["Himmelberg","/oesterreich/kaernten/himmelberg/"],["Irschen","/oesterreich/kaernten/irschen/"],["Keutschach","/oesterreich/kaernten/keutschach/"],["Klagenfurt am Wörthersee","/oesterreich/kaernten/klagenfurt_am_woerthersee/"],["Kleblach-Lind","/oesterreich/kaernten/kleblach-lind/"],["Köttmannsdorf","/oesterreich/kaernten/koettmannsdorf/"],["Lendorf","/oesterreich/kaernten/lendorf/"],["Ludmannsdorf","/oesterreich/kaernten/ludmannsdorf/"],["Lurnfeld","/oesterreich/kaernten/lurnfeld/"],["Mallnitz","/oesterreich/kaernten/mallnitz/"],["Malta","/oesterreich/kaernten/malta/"],["Millstatt am See","/oesterreich/kaernten/millstatt_am_see/"],["Mörtschach","/oesterreich/kaernten/moertschach/"],["Mühldorf","/oesterreich/kaernten/muehldorf/"],["Oberdrauburg","/oesterreich/kaernten/oberdrauburg/"],["Preitenegg","/oesterreich/kaernten/preitenegg/"],["Rangersdorf","/oesterreich/kaernten/rangersdorf/"],["Reisseck","/oesterreich/kaernten/reisseck/"],["Rosegg","/oesterreich/kaernten/rosegg/"],["Stall","/oesterreich/kaernten/stall/"],["Steindorf am Ossiachersee","/oesterreich/kaernten/steindorf_am_ossiachersee/"],["Steinfeld","/oesterreich/kaernten/steinfeld/"],["St. Georgen im Lavanttal","/oesterreich/kaernten/st_georgen_im_lavanttal/"],["St. Paul im Lavanttal","/oesterreich/kaernten/st_paul_im_lavanttal/"],["Techelsberg am Wörther See","/oesterreich/kaernten/techelsberg_am_woerthersee/"],["Winklern","/oesterreich/kaernten/winklern/"],["Wolfsberg","/oesterreich/kaernten/wolfsberg/"],["Zell/Sele","/oesterreich/kaernten/zell_sele/"]],"steiermark":[["Bad Mitterndorf","/oesterreich/steiermark/bad_mitterndorf/"],["Gratwein-Strassengel","/oesterreich/steiermark/gratwein_strassengel/"],["Gröbming","/oesterreich/steiermark/groebming/"],["Premstätten","/oesterreich/steiermark/premstaetten/"],["Semriach","/oesterreich/steiermark/semriach/"],["Stallhofen","/oesterreich/steiermark/stallhofen/"],["Stiwoll","/oesterreich/steiermark/stiwoll/"],["Unterlamm","/oesterreich/steiermark/unterlamm/"],["Wörschach","/oesterreich/steiermark/woerschach/"]],"burgenland":[],"niederoesterreich":[],"oberoesterreich":[],"salzburg":[],"tirol":[],"vorarlberg":[],"wien":[]};
+  var BASE = 'https://www.geobonus.at';
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // unlocks the reveal styles — without this the text stays plainly visible
+  document.documentElement.classList.add('js');
+
+  /* ---- Reveal: a small lift + fade as things scroll into view ---- */
+  (function(){
+    var els = document.querySelectorAll('[data-reveal], [data-reveal-stagger]');
+    if (reduceMotion || !('IntersectionObserver' in window)){
+      els.forEach(function(el){ el.classList.add('in-view'); });
+      return;
+    }
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function(el){ obs.observe(el); });
+  })();
+
+  /* ---- Mobile nav ---- */
+  var toggle = document.getElementById('menuToggle');
+  var panel = document.getElementById('mobilePanel');
+  toggle.addEventListener('click', function(){
+    var open = panel.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  panel.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      panel.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  /* ---- Copyright year ---- */
+  var copyYearEl = document.getElementById('copyYear');
+  if (copyYearEl) copyYearEl.textContent = new Date().getFullYear();
+
+  /* ---- Project inquiry modal (same form as index.html, so "Projekt anfragen"
+          opens here instead of bouncing through the start page) ---- */
+  var overlay = document.getElementById('projectModalOverlay');
+  var modalClose = document.getElementById('modalClose');
+  var formWrap = document.getElementById('modalFormWrap');
+  var successView = document.getElementById('modalSuccess');
+  var form = document.getElementById('projectForm');
+  var lastFocused = null;
+
+  function openModal(){
+    lastFocused = document.activeElement;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    var firstInput = document.getElementById('pf-name');
+    if (firstInput) setTimeout(function(){ firstInput.focus(); }, 250);
+  }
+  function closeModal(){
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lastFocused) lastFocused.focus();
+  }
+
+  document.querySelectorAll('[data-action="projekt"]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      panel.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      openModal();
+    });
+  });
+  modalClose.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  var interestGemeinde = document.getElementById('interestGemeinde');
+  var interestBetrieb = document.getElementById('interestBetrieb');
+  var orgLabel = document.getElementById('pf-org-label');
+  function syncType(){
+    var val = document.querySelector('input[name="type"]:checked').value;
+    interestGemeinde.hidden = val !== 'gemeinde';
+    interestBetrieb.hidden = val !== 'betrieb';
+    orgLabel.textContent = val === 'gemeinde' ? 'Gemeinde' : 'Firmenname';
+  }
+  document.querySelectorAll('input[name="type"]').forEach(function(r){ r.addEventListener('change', syncType); });
+  syncType();
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var data = new FormData(form);
+    var type = data.get('type');
+    var lines = [];
+    lines.push('Name: ' + (data.get('name') || ''));
+    lines.push('E-Mail: ' + (data.get('email') || ''));
+    lines.push('Telefon: ' + (data.get('telefon') || '–'));
+    if (data.get('organisation')) lines.push((type === 'gemeinde' ? 'Gemeinde' : 'Firmenname') + ': ' + data.get('organisation'));
+    lines.push('Interessiert als: ' + (type === 'gemeinde' ? 'Gemeinde' : 'Betrieb'));
+    if (type === 'gemeinde') {
+      var interessen = data.getAll('interesse');
+      lines.push('Interessensbereiche: ' + (interessen.length ? interessen.join(', ') : '–'));
+    } else {
+      lines.push('Interessensbereich: ' + (data.get('betrieb_interesse') || '–'));
+    }
+    var nachricht = data.get('nachricht');
+    if (nachricht) { lines.push(''); lines.push('Nachricht:'); lines.push(nachricht); }
+
+    var subject = 'Projektanfrage – ' + (type === 'gemeinde' ? 'Gemeinde' : 'Betrieb');
+    var mailto = 'mailto:info@geobonus.at?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+
+    formWrap.style.display = 'none';
+    successView.classList.add('show');
+    window.location.href = mailto;
+  });
+
+  /* ============================================================
+     Scroll-driven 3D map
+
+     The stage is 340vh tall and its inner panel sticks for the full
+     scroll. Progress p (0→1) drives one transform on .map plus a
+     translateZ per state, so Austria starts as a distant, steeply
+     tilted relief and settles flat and clickable.
+     ============================================================ */
+  var stage = document.getElementById('stage');
+  var map = document.getElementById('map');
+  var stageGrid = document.getElementById('stageGrid');
+  var scrollCue = document.getElementById('scrollCue');
+  var states = Array.prototype.slice.call(document.querySelectorAll('.state'));
+  var introTitle = document.getElementById('introTitle');
+  var introTop = document.getElementById('introTop');
+  var introBottom = document.getElementById('introBottom');
+  var intro = document.querySelector('.intro');
+  var stageSticky = document.querySelector('.stage-sticky');
+
+  var TILT_START = 62;   // degrees
+  var SCALE_START = 0.58;
+  var SCALE_END = 1;
+  var LIFT = 96;         // px of translateZ at the peak of the rise
+  var SETTLE = 0.85;     // fraction of the stage the choreography uses
+
+  // Title: shrinks as the map grows — the inverse of the map's own scale — but
+  // only down to TITLE_MIN, which is still readable (78px × 0.3 ≈ 23px).
+  var TITLE_MIN = 0.3;
+
+  // The title has to be gone before the growing map reaches it, and when that
+  // happens depends entirely on viewport height — measured, the map touches the
+  // title at 12% of the stage on a 700px-tall window, 37% at 800px, 55% at
+  // 900px, and never at 1000px. So the fade is driven by the real distance
+  // between them, not by a scroll percentage that would be wrong on most screens.
+  var TITLE_CLEAR = 56;      // px of approach the fade is spread over
+  var titleGapSpan = TITLE_CLEAR;
+  // Backstop for tall viewports where the map never gets near: the title still
+  // has to leave before the map becomes clickable.
+  var TITLE_FADE_FROM = 0.62;
+  var TITLE_FADE_TO = 0.80;
+
+  function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+  // smoothstep, not ease-out: an ease-out would spend half the choreography in
+  // the first quarter of the scroll and leave the rest of the stage inert.
+  function ease(t){ return t * t * (3 - 2 * t); }
+
+  // Geometry only — split out so the gap between map and title can be measured
+  // against a real frame without also firing the opacity/class side effects.
+  function frameTransforms(p){
+    // The choreography finishes at 85% of the stage, leaving a settled plateau
+    // where the map is flat, labelled and clickable while still pinned.
+    var q = clamp(p / SETTLE, 0, 1);
+    var e = ease(q);
+    var tilt = TILT_START * (1 - e);
+    var scale = SCALE_START + (SCALE_END - SCALE_START) * e;
+    // states rise while the map tilts, then settle — at q=1 every z is 0, so the
+    // flat map is geometrically exact and no lifted tile covers its neighbour.
+    var rise = Math.sin(q * Math.PI);
+
+    map.style.transform = 'scale(' + scale.toFixed(4) + ') rotateX(' + tilt.toFixed(2) + 'deg)';
+
+    for (var i = 0; i < states.length; i++){
+      var el = states[i];
+      var z = rise * LIFT * parseFloat(el.dataset.lift || 0.5);
+      el.style.transform = 'translateZ(' + z.toFixed(2) + 'px)';
+      var sh = 1 + rise * 14 * parseFloat(el.dataset.lift || 0.5);
+      el.style.filter = 'drop-shadow(0 ' + sh.toFixed(1) + 'px ' + (sh * 1.1).toFixed(1) + 'px rgba(19,32,24,' + (0.16 + rise * 0.12).toFixed(3) + '))';
+    }
+
+    // Title shrinks against the map's growth.
+    introTitle.style.transform = 'scale(' + (1 - (1 - TITLE_MIN) * e).toFixed(4) + ')';
+    return { q: q, e: e };
+  }
+
+  // How much room there is between title and map at the very start of the
+  // animation. Measured once per layout: on a short window they are nearly
+  // touching from the outset, and the fade has to fit inside whatever gap exists
+  // or the title would already be see-through before the user scrolls at all.
+  function measureTitleGap(){
+    // the gap only exists once the stage is pinned, so force that layout briefly
+    var i0 = intro.style.position, i1 = intro.style.top, i2 = intro.style.left, i3 = intro.style.right;
+    var s0 = stageSticky.style.position, s1 = stageSticky.style.top, s2 = stageSticky.style.left, s3 = stageSticky.style.right;
+    intro.style.position = 'fixed'; intro.style.top = '0'; intro.style.left = '0'; intro.style.right = '0';
+    stageSticky.style.position = 'fixed'; stageSticky.style.top = '0'; stageSticky.style.left = '0'; stageSticky.style.right = '0';
+    frameTransforms(0);
+    var g = map.getBoundingClientRect().top - introTitle.getBoundingClientRect().bottom;
+    intro.style.position = i0; intro.style.top = i1; intro.style.left = i2; intro.style.right = i3;
+    stageSticky.style.position = s0; stageSticky.style.top = s1; stageSticky.style.left = s2; stageSticky.style.right = s3;
+    titleGapSpan = Math.max(8, Math.min(TITLE_CLEAR, g));
+  }
+
+  function render(p){
+    var f = frameTransforms(p);
+    var q = f.q;
+
+    // Title leaves before the map can touch it — by measured distance, plus a
+    // scroll-based backstop for viewports the map never grows far enough on.
+    var gap = map.getBoundingClientRect().top - introTitle.getBoundingClientRect().bottom;
+    var clearFade = clamp(gap / titleGapSpan, 0, 1);
+    var endFade = 1 - clamp((p - TITLE_FADE_FROM) / (TITLE_FADE_TO - TITLE_FADE_FROM), 0, 1);
+    introTitle.parentNode.style.opacity = Math.min(clearFade, endFade).toFixed(3);
+    // eyebrow and claim clear out early — only the title stays up there
+    var suppFade = (1 - clamp(p / 0.18, 0, 1)).toFixed(3);
+    introTop.style.opacity = suppFade;
+    introBottom.style.opacity = suppFade;
+
+    stageGrid.style.opacity = (ease(clamp(q * 1.6, 0, 1)) * 0.9).toFixed(3);
+    if (scrollCue) scrollCue.style.opacity = (1 - clamp(q * 2.2, 0, 1)).toFixed(3);
+
+    // Labels only once the relief has settled: while tiles are lifted they sit at
+    // different depths and a raised neighbour paints over its neighbour's label.
+    map.classList.toggle('map-labels-hidden', q < 0.97);
+    // don't let clicks land while the map is still moving under the cursor
+    map.classList.toggle('map-live', q >= 0.97);
+  }
+
+  function progress(){
+    var travel = stage.offsetHeight - window.innerHeight;
+    if (travel <= 0) return 1;
+    return clamp(-stage.getBoundingClientRect().top / travel, 0, 1);
+  }
+  function renderNow(){ render(progress()); }
+
+  var ticking = false;
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){
+      ticking = false;
+      renderNow();
+    });
+  }
+  // the room between title and map changes with the viewport, so re-measure it
+  function onResize(){ measureTitleGap(); onScroll(); }
+
+  /* Mirrors the CSS media query below exactly: narrow screens, touch pointers and
+     reduced-motion all get the flat, static map. Re-evaluated on change, because
+     `pointer` can resolve late and viewports get resized. */
+  var staticMap = window.matchMedia('(max-width: 760px), (pointer: coarse), (prefers-reduced-motion: reduce)');
+
+  function applyMode(){
+    if (staticMap.matches){
+      document.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      map.style.transform = '';
+      states.forEach(function(el){ el.style.transform = ''; el.style.filter = ''; });
+      stageGrid.style.opacity = '';
+      if (scrollCue) scrollCue.style.opacity = '';
+      // the title never shrinks here — hand the intro back to plain layout
+      introTitle.style.transform = '';
+      introTitle.parentNode.style.opacity = '';
+      introTop.style.opacity = '';
+      introBottom.style.opacity = '';
+      map.classList.remove('map-labels-hidden');
+      map.classList.add('map-live');
+    } else {
+      document.addEventListener('scroll', onScroll, { passive:true });
+      window.addEventListener('resize', onResize, { passive:true });
+      measureTitleGap();
+      // synchronous, so the first paint is already the tilted start frame
+      // rather than a flat map that snaps once the first rAF lands
+      renderNow();
+    }
+  }
+  applyMode();
+  staticMap.addEventListener('change', applyMode);
+
+  /* Where the states are too small to tap, the picker list below is the real
+     control and the map is a picture — so keep it out of the tab order and off
+     the screen-reader tree instead of leaving nine dead stops behind.
+     Mirrors the pointer-events rule in CSS. */
+  var decorativeMap = window.matchMedia('(max-width: 760px), (pointer: coarse)');
+  function applyMapRole(){
+    var off = decorativeMap.matches;
+    map.setAttribute('aria-hidden', off ? 'true' : 'false');
+    states.forEach(function(el){
+      var hit = el.querySelector('.state-hit');
+      if (!hit) return;
+      if (off) hit.setAttribute('tabindex', '-1');
+      else hit.removeAttribute('tabindex');
+    });
+  }
+  applyMapRole();
+  decorativeMap.addEventListener('change', applyMapRole);
+
+  /* ---- Stage readout: says where the pointer/focus is and what will happen ---- */
+  var readout = document.getElementById('stageReadout');
+  var readoutText = document.getElementById('stageReadoutText');
+  var idleTimer = null;
+
+  // Only the ones that lead nowhere need explaining. A green Bundesland that
+  // says "open the map" is telling people what they already worked out.
+  function setReadout(el){
+    if (idleTimer){ clearTimeout(idleTimer); idleTimer = null; }
+    readout.dataset.status = 'pending';
+    readoutText.innerHTML = '<strong>' + el.dataset.name + '</strong> · Karte in Vorbereitung';
+  }
+  function resetReadout(){
+    // fades out; the text stays until it is invisible so it doesn't blink empty
+    idleTimer = setTimeout(function(){ readout.dataset.status = 'idle'; }, 120);
+  }
+
+  states.forEach(function(el){
+    if (el.classList.contains('state--live')) return;   // green speaks for itself
+    var hit = el.querySelector('.state-hit');
+    ['mouseenter','focusin'].forEach(function(ev){
+      el.addEventListener(ev, function(){ setReadout(el); });
+    });
+    ['mouseleave','focusout'].forEach(function(ev){
+      el.addEventListener(ev, resetReadout);
+    });
+    if (hit){
+      hit.addEventListener('click', function(e){
+        e.preventDefault();
+        setReadout(el);
+        resetReadout();
+      });
+    }
+  });
+
+  /* ---- Referenzen: disclosure ---- */
+  var refsToggle = document.getElementById('refsToggle');
+  var refsPanel = document.getElementById('refsPanel');
+
+  function setRefs(open){
+    refsToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    refsPanel.hidden = !open;
+  }
+  refsToggle.addEventListener('click', function(){
+    setRefs(refsToggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  // "Digitale Gemeinde" anywhere on the site links here — land with it open,
+  // otherwise the jump ends on a closed button and looks like nothing happened
+  function openFromHash(){
+    if (location.hash === '#referenzen') setRefs(true);
+  }
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+
+  /* ---- Referenzen: Bundesland → Gemeinden ---- */
+  var refList = document.getElementById('refList');
+  var refStates = Array.prototype.slice.call(document.querySelectorAll('.ref-state'));
+  var openSlug = null;
+
+  var arrowSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>';
+
+  function renderList(slug, name){
+    var items = GEMEINDEN[slug] || [];
+    if (!items.length){
+      refList.innerHTML =
+        '<div class="ref-empty">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>' +
+          '<p class="ref-empty-text">In <strong>' + name + '</strong> ist noch keine digitale Gemeinde online. ' +
+          'Wenn Sie hier die erste sein möchten, <a href="index.html" style="text-decoration:underline">fragen Sie Ihr Projekt an</a>.</p>' +
+        '</div>';
+      refList.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="ref-list-head">' +
+        '<span class="ref-list-title">' + name + '</span>' +
+        '<span class="ref-list-meta">' + items.length + ' Gemeinden</span>' +
+      '</div><ul class="ref-list-items">';
+    for (var i = 0; i < items.length; i++){
+      html += '<li><a href="' + BASE + items[i][1] + '">' + items[i][0] + arrowSvg + '</a></li>';
+    }
+    refList.innerHTML = html + '</ul>';
+    refList.hidden = false;
+  }
+
+  refStates.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var slug = btn.dataset.slug;
+      if (openSlug === slug){
+        btn.setAttribute('aria-expanded', 'false');
+        refList.hidden = true;
+        openSlug = null;
+        return;
+      }
+      refStates.forEach(function(b){ b.setAttribute('aria-expanded', 'false'); });
+      btn.setAttribute('aria-expanded', 'true');
+      openSlug = slug;
+      renderList(slug, btn.dataset.name);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
